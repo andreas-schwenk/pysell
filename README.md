@@ -28,11 +28,11 @@ Mark the correct answers
 
 
 QUESTION Addition
-@python
+"""
 import random
 x = random.randint(10, 20)
 y = random.randint(10, 20)
 z = x + y
-@text
+"""
 Calculate $x + y =$ #z
 ```

@@ -1,9 +1,8 @@
-LANG en
-TITLE Cryptography Quizzes
-AUTHOR TH Köln, Schwenk/Knospe
+LANG     en
+TITLE    Cryptography Quizzes
+AUTHOR   TH Köln, Schwenk/Knospe
 
 QUESTION CPA-Security
-@text
 What is true about *CPA-secure* encryption schemes?
 [x] Two encrypted plaintexts cannot be distinguished.
 [x] CPA-secure schemes are probabilistic. 
@@ -23,7 +22,7 @@ an itemization:
 - blub
 
 QUESTION Vigenère Cipher: Encryption
-@python
+"""
 import random
 m1 = random.randint(0, 25)
 m2 = random.randint(0, 25)
@@ -37,7 +36,6 @@ c2 = (m2+k2) % 26
 c3 = (m3+k1) % 26
 c4 = (m4+k2) % 26
 c5 = (m5+k1) % 26
-@text
+"""
 Encrypt $m=(m1,m2,m3,m4,m5)$ using the key $k=(k1,k2)$.
 - $c=($ #c1, #c2, #c3, #c4, #c5 $)$
-

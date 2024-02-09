@@ -94,7 +94,7 @@ class TextNode:
 
     def parse_paragraph(self, lex: Lexer):
         # grammar: paragraph = "*" paragraph "*" | "$" paragraph "$" | {*};
-        TODO: grammar is not ok!
+        # TODO: grammar is not ok!
         node = TextNode("")
         if lex.token == "*":
             lex.next()
@@ -195,7 +195,7 @@ def compile(src: str) -> str:
     questions = []
 
     question = None
-    question_state = "text"
+    parsing_python = False
     for line in lines:
         line = line.strip()
         if line.startswith("LANG"):
@@ -210,15 +210,13 @@ def compile(src: str) -> str:
             question = Question()
             questions.append(question)
             question.title = line[8:].strip()
-            question_state = "text"
+            parsing_python = False
         elif question != None:
-            if line.startswith("@text"):
-                question_state = "text"
-            elif line.startswith("@python"):
-                question_state = "python"
+            if line.startswith('"""'):
+                parsing_python = not parsing_python
             else:
-                if question_state == "text":
-                    question.text_src += line + "\n"
+                if parsing_python:
+                    question.python_src += line + "\n"
                 else:
                     question.text_src += line + "\n"
     for question in questions:
@@ -236,6 +234,9 @@ def compile(src: str) -> str:
 
 
 if __name__ == "__main__":
+
+    # TODO: get path from args
+
     # read input
     f = open("examples/ex1.txt")
     src = f.read()
