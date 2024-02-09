@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>QUIZ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+      integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+      integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8"
+      crossorigin="anonymous"
+    ></script>
+
+    <style>
+      html {
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      body {
+        max-width: 1024px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+      h1 {
+        font-size: 28pt;
+      }
+      .courseInfo {
+        font-size: 14pt;
+        font-style: italic;
+        margin-bottom: 24px;
+      }
+      .question {
+        border-style: solid;
+        border-radius: 5px;
+        border-width: 2px;
+        border-color: black;
+        padding: 14px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        -webkit-box-shadow: 4px 6px 8px -1px rgba(0, 0, 0, 0.93);
+        box-shadow: 4px 6px 8px -1px rgba(0, 0, 0, 0.1);
+      }
+      .questionTitle {
+        font-size: 18pt;
+        font-weight: bold;
+      }
+      ul {
+        margin-top: 0;
+        margin-left: 0px;
+        padding-left: 20px;
+      }
+      li {
+      }
+      .inputField {
+        height: 24px;
+        font-size: 14pt;
+        border-style: solid;
+        border-color: black;
+        border-radius: 5px;
+        border-width: 0.2;
+        padding-left: 5px;
+        padding-right: 5px;
+        outline-color: black;
+      }
+      .inputField:focus {
+        outline-color: green;
+      }
+      .button {
+        padding-left: 8px;
+        padding-right: 8px;
+        padding-top: 3px;
+        padding-bottom: 3px;
+        font-size: 12pt;
+        /*background-color: rgba(62, 146, 3, 0.767);*/
+        background-color: green;
+        color: white;
+        border-style: none;
+        border-radius: 5px;
+        height: 32px;
+        cursor: pointer;
+      }
+      .buttonRow {
+        display: flex;
+        align-items: baseline;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>ITS: Quizaufgaben</h1>
+    <p class="courseInfo">
+      This page runs in your browser and does not store any data on servers. You
+      can refresh this page in order to get new randomized tasks.
+    </p>
+    <div class="question">
+      <div class="questionTitle">AND, OR, XOR</div>
+      <p>
+        Berechne <span id="equation"></span> binär und gebe das Ergebnis als
+        Dezimalzahl an
+      </p>
+      <ul>
+        <li>
+          <p>
+            8 XOR 3 = <input type="text" class="inputField" />
+            <span id="inputFeedback1"></span>
+          </p>
+        </li>
+        <li>
+          <p>
+            0 OR 2 = <input type="text" class="inputField" />
+            <span id="inputFeedback2"></span>
+          </p>
+        </li>
+      </ul>
+      <div class="buttonRow">
+        <button type="button" class="button">check</button>
+        &nbsp;&nbsp;&nbsp;
+        <span>message</span>
+      </div>
+    </div>
+    <div class="question">xx</div>
+    <script>
+      const iconOK =
+        '<svg xmlns="http://www.w3.org/2000/svg" height="28" viewBox="0 0 512 512" fill="green"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z" /></svg>';
+      const iconError = `
+        <svg xmlns="http://www.w3.org/2000/svg" height="28" viewBox="0 0 512 512" fill="#cc0000"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/></svg>
+        `;
+      let element = document.getElementById("equation");
+      katex.render("c = \\pm\\sqrt{a^2 + b^2}", element, {
+        throwOnError: false,
+      });
+      document.getElementById("inputFeedback1").innerHTML = iconOK;
+      document.getElementById("inputFeedback2").innerHTML = iconError;
+    </script>
+  </body>
+</html>

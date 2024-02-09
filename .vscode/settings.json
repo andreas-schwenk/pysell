@@ -1,0 +1,9 @@
+{
+  "cSpell.words": ["Andreas", "katex", "randint", "Schwenk"],
+  "editor.insertSpaces": true,
+  "editor.rulers": [80],
+  "editor.formatOnSave": true,
+  "editor.tabSize": 4,
+  "python.defaultInterpreterPath": "/opt/homebrew/bin/python3",
+  "liveServer.settings.port": 5501
+}

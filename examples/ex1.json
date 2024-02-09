@@ -1,0 +1,322 @@
+{
+  "lang": "en",
+  "title": "Cryptography Quizzes",
+  "author": "TH K\u00f6ln, Schwenk/Knospe",
+  "info": "",
+  "questions": [
+    {
+      "title": "CPA-Security",
+      "text": {
+        "type": "root",
+        "data": "",
+        "children": [
+          {
+            "type": "paragraph",
+            "data": "",
+            "children": []
+          },
+          {
+            "type": "multi-choice",
+            "data": "",
+            "children": [
+              {
+                "type": "answer",
+                "data": "",
+                "children": [
+                  {
+                    "type": "bool",
+                    "data": "true",
+                    "children": []
+                  },
+                  {
+                    "type": "paragraph",
+                    "data": "",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "answer",
+                "data": "",
+                "children": [
+                  {
+                    "type": "bool",
+                    "data": "true",
+                    "children": []
+                  },
+                  {
+                    "type": "paragraph",
+                    "data": "",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "answer",
+                "data": "",
+                "children": [
+                  {
+                    "type": "bool",
+                    "data": "false",
+                    "children": []
+                  },
+                  {
+                    "type": "paragraph",
+                    "data": "",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "answer",
+                "data": "",
+                "children": [
+                  {
+                    "type": "bool",
+                    "data": "true",
+                    "children": []
+                  },
+                  {
+                    "type": "paragraph",
+                    "data": "",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "answer",
+                "data": "",
+                "children": [
+                  {
+                    "type": "bool",
+                    "data": "false",
+                    "children": []
+                  },
+                  {
+                    "type": "paragraph",
+                    "data": "",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "answer",
+                "data": "",
+                "children": [
+                  {
+                    "type": "bool",
+                    "data": "false",
+                    "children": []
+                  },
+                  {
+                    "type": "paragraph",
+                    "data": "",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "answer",
+                "data": "",
+                "children": [
+                  {
+                    "type": "bool",
+                    "data": "false",
+                    "children": []
+                  },
+                  {
+                    "type": "paragraph",
+                    "data": "",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "answer",
+                "data": "",
+                "children": [
+                  {
+                    "type": "bool",
+                    "data": "true",
+                    "children": []
+                  },
+                  {
+                    "type": "paragraph",
+                    "data": "",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "answer",
+                "data": "",
+                "children": [
+                  {
+                    "type": "bool",
+                    "data": "false",
+                    "children": []
+                  },
+                  {
+                    "type": "paragraph",
+                    "data": "",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "data": "",
+            "children": []
+          },
+          {
+            "type": "multi-choice",
+            "data": "",
+            "children": [
+              {
+                "type": "answer",
+                "data": "",
+                "children": [
+                  {
+                    "type": "bool",
+                    "data": "false",
+                    "children": []
+                  },
+                  {
+                    "type": "paragraph",
+                    "data": "",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "answer",
+                "data": "",
+                "children": [
+                  {
+                    "type": "bool",
+                    "data": "true",
+                    "children": []
+                  },
+                  {
+                    "type": "paragraph",
+                    "data": "",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "answer",
+                "data": "",
+                "children": [
+                  {
+                    "type": "bool",
+                    "data": "true",
+                    "children": []
+                  },
+                  {
+                    "type": "paragraph",
+                    "data": "",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "data": "",
+            "children": []
+          },
+          {
+            "type": "itemize",
+            "data": "",
+            "children": [
+              {
+                "type": "paragraph",
+                "data": "",
+                "children": []
+              },
+              {
+                "type": "paragraph",
+                "data": "",
+                "children": []
+              },
+              {
+                "type": "paragraph",
+                "data": "",
+                "children": []
+              },
+              {
+                "type": "paragraph",
+                "data": "",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "title": "Vigen\u00e8re Cipher: Encryption",
+      "text": {
+        "type": "root",
+        "data": "",
+        "children": [
+          {
+            "type": "paragraph",
+            "data": "",
+            "children": []
+          },
+          {
+            "type": "itemize",
+            "data": "",
+            "children": [
+              {
+                "type": "paragraph",
+                "data": "",
+                "children": []
+              },
+              {
+                "type": "paragraph",
+                "data": "",
+                "children": []
+              },
+              {
+                "type": "paragraph",
+                "data": "",
+                "children": []
+              },
+              {
+                "type": "paragraph",
+                "data": "",
+                "children": []
+              },
+              {
+                "type": "paragraph",
+                "data": "",
+                "children": []
+              },
+              {
+                "type": "paragraph",
+                "data": "",
+                "children": []
+              },
+              {
+                "type": "paragraph",
+                "data": "",
+                "children": []
+              },
+              {
+                "type": "paragraph",
+                "data": "",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
