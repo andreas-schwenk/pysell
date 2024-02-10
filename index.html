@@ -199,109 +199,127 @@
         ],
       };
 
-      function generateMathString(node) {
-        let s = "";
-        switch (node.type) {
-          case "math": {
-            for (let c of node.children) s += generateMathString(c);
-            break;
+      class Question {
+        constructor(src) {
+          this.src = src;
+          this.instanceIdx = 0; // TODO
+        }
+
+        populateDom(parent) {
+          // generate question div
+          let qDiv = document.createElement("div");
+          parent.appendChild(qDiv);
+          qDiv.classList.add("question");
+          // generate question title
+          let titleDiv = document.createElement("div");
+          qDiv.appendChild(titleDiv);
+          titleDiv.classList.add("questionTitle");
+          titleDiv.innerHTML = this.src["title"];
+          // generate question text
+          for (let c of this.src.text.children)
+            qDiv.appendChild(this.generateText(c));
+          // generate button row
+          let buttonDiv = document.createElement("div");
+          qDiv.appendChild(buttonDiv);
+          buttonDiv.classList.add("buttonRow");
+          // (a) check button
+          let checkBtn = document.createElement("button");
+          buttonDiv.appendChild(checkBtn);
+          checkBtn.type = "button";
+          checkBtn.classList.add("button");
+          checkBtn.innerHTML = "check";
+          // (b) spacing
+          let space = document.createElement("span");
+          space.innerHTML = "&nbsp;&nbsp;&nbsp;";
+          buttonDiv.appendChild(space);
+          // (c) feedback text
+          let feedbackSpan = document.createElement("span");
+          buttonDiv.appendChild(feedbackSpan);
+          feedbackSpan.innerHTML = "message";
+        }
+
+        generateMathString(node) {
+          let s = "";
+          switch (node.type) {
+            case "math": {
+              for (let c of node.children) s += this.generateMathString(c);
+              break;
+            }
+            case "text": {
+              return node.data;
+            }
+            case "var": {
+              let instance = this.src.instances[this.instanceIdx];
+              return instance[node.data].value;
+            }
           }
-          case "text": {
-            return node.data;
-          }
-          case "var": {
-            return "VAR";
+          return s;
+        }
+
+        generateText(node) {
+          switch (node.type) {
+            case "paragraph":
+            case "span": {
+              let e = document.createElement(
+                node.type == "span" ? "span" : "p"
+              );
+              for (let c of node.children) e.appendChild(this.generateText(c));
+              return e;
+            }
+            case "text": {
+              let span = document.createElement("span");
+              span.innerHTML = node.data;
+              return span;
+            }
+            case "bold": {
+              let span = document.createElement("span");
+              span.style.fontWeight = "bold";
+              for (let c of node.children)
+                span.appendChild(this.generateText(c));
+              return span;
+            }
+            case "math": {
+              let span = document.createElement("span");
+              let str = this.generateMathString(node);
+              katex.render(str, span, {
+                throwOnError: false,
+              });
+              return span;
+            }
+            case "input": {
+              let span = document.createElement("span");
+
+              let input = document.createElement("input");
+              input.type = "text";
+              input.classList.add("inputField");
+              span.appendChild(input);
+
+              let space = document.createElement("span");
+              space.innerHTML = "&nbsp;";
+              span.appendChild(space);
+
+              let feedback = document.createElement("span");
+              feedback.innerHTML = "FEEDBACK";
+              span.appendChild(feedback);
+
+              return span;
+            }
+            default: {
+              let span = document.createElement("span");
+              span.style.color = "red";
+              span.innerHTML = "UNIMPLEMENTED(" + node.type + ")";
+              return span;
+            }
           }
         }
-        return s;
       }
 
-      function generateText(node) {
-        switch (node.type) {
-          case "paragraph":
-          case "span": {
-            let e = document.createElement(node.type == "span" ? "span" : "p");
-            for (let c of node.children) e.appendChild(generateText(c));
-            return e;
-          }
-          case "text": {
-            let span = document.createElement("span");
-            span.innerHTML = node.data;
-            return span;
-          }
-          case "bold": {
-            let span = document.createElement("span");
-            span.style.fontWeight = "bold";
-            for (let c of node.children) span.appendChild(generateText(c));
-            return span;
-          }
-          case "math": {
-            let span = document.createElement("span");
-            let str = generateMathString(node);
-            katex.render(str, span, {
-              throwOnError: false,
-            });
-            return span;
-          }
-          case "input": {
-            let span = document.createElement("span");
-
-            let input = document.createElement("input");
-            input.type = "text";
-            input.classList.add("inputField");
-            span.appendChild(input);
-
-            let space = document.createElement("span");
-            space.innerHTML = "&nbsp;";
-            span.appendChild(space);
-
-            let feedback = document.createElement("span");
-            feedback.innerHTML = "FEEDBACK";
-            span.appendChild(feedback);
-
-            return span;
-          }
-          default: {
-            let span = document.createElement("span");
-            span.style.color = "red";
-            span.innerHTML = "UNIMPLEMENTED(" + node.type + ")";
-            return span;
-          }
-        }
-      }
-
+      let questions = [];
       let questionsDiv = document.getElementById("questions");
       for (let questionSrc of quizSrc.questions) {
-        // generate question div
-        let qDiv = document.createElement("div");
-        questionsDiv.appendChild(qDiv);
-        qDiv.classList.add("question");
-        // generate question title
-        let titleDiv = document.createElement("div");
-        qDiv.appendChild(titleDiv);
-        titleDiv.classList.add("questionTitle");
-        titleDiv.innerHTML = questionSrc["title"];
-        // generate question text
-        for (let c of questionSrc.text.children)
-          qDiv.appendChild(generateText(c));
-        // generate button row
-        let buttonDiv = document.createElement("div");
-        qDiv.appendChild(buttonDiv);
-        buttonDiv.classList.add("buttonRow");
-        // (a) check button
-        let checkBtn = document.createElement("button");
-        buttonDiv.appendChild(checkBtn);
-        checkBtn.type = "button";
-        checkBtn.classList.add("button");
-        checkBtn.innerHTML = "check";
-        // (b) spacing
-        let space = document.createElement("span");
-        space.innerHTML = "&nbsp;&nbsp;&nbsp;";
-        buttonDiv.appendChild(space);
-        // (c) feedback text
-        let feedbackSpan = document.createElement("span");
-        buttonDiv.appendChild(feedbackSpan);
-        feedbackSpan.innerHTML = "message";
+        let question = new Question(questionSrc);
+        questions.push(question);
+        question.populateDom(questionsDiv);
       }
 
       const iconOK =
