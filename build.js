@@ -24,7 +24,7 @@ for (let line of lines) {
   else if (skip == false) html += line + "\n";
 }
 //   remove white spaces
-html = html.replaceAll("  ", "").replaceAll("\n", "");
+html = html.replaceAll("  ", "").replaceAll("\n", " ");
 //   insert javascript code
 html = html.replace(
   "</body>",
@@ -44,4 +44,4 @@ for (let line of lines) {
   } else if (skip == false) py += line + "\n";
 }
 //   write new version of sell.py
-fs.writeFileSync("sell.py", py);
+fs.writeFileSync("sell.py", py.trim() + "\n");
