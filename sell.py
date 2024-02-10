@@ -10,6 +10,7 @@ import json, sys, numpy, types, sys, os
 # TODO: test python code with indentation (e.g. a while loop)
 # TODO: debug output (show variables + solution)
 # TODO: matrix input
+# TODO: single choice
 
 
 class Lexer:

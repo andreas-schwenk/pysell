@@ -1,0 +1,53 @@
+LANG     en
+TITLE    Cryptography Quizzes
+AUTHOR   TH Köln, Schwenk/Knospe
+
+
+QUESTION Addition
+"""
+import random
+x = random.randint(10, 20)
+y = random.randint(10, 20)
+z = x + y
+"""
+Calculate $x + y =$ #z
+
+
+QUESTION CPA-Security
+What is true about *CPA-secure* encryption schemes?
+[x] Two encrypted plaintexts cannot be distinguished.
+[x] CPA-secure schemes are probabilistic. 
+[ ] CPA-secure schemes are determinstic. 
+[x] The One-Time-Pad is CPA-secure. 
+[ ] Successful Attacks against CPA-secure schemes run in polynomial time.
+[ ] An attacker may win the CPA experiment in $60\%$ of the cases.
+[ ] CPA-secure schemes are perfectly secure.
+[x] CPA-secure schemes are EAV-secure.
+[ ] CPA-secure schemes are secure against chosen ciphertext attacks.
+TODO another MC
+[ ] false
+[x] true
+[x] true
+an itemization:
+- bla
+- blub
+
+
+QUESTION Vigenère Cipher: Encryption
+"""
+import random
+m1 = random.randint(0, 25)
+m2 = random.randint(0, 25)
+m3 = random.randint(0, 25)
+m4 = random.randint(0, 25)
+m5 = random.randint(0, 25)
+k1 = random.randint(1, 3)
+k2 = random.randint(4, 5)
+c1 = (m1+k1) % 26
+c2 = (m2+k2) % 26
+c3 = (m3+k1) % 26
+c4 = (m4+k2) % 26
+c5 = (m5+k1) % 26
+"""
+Encrypt $m=(m1,m2,m3,m4,m5)$ using the key $k=(k1,k2)$.
+- $c=($ #c1, #c2, #c3, #c4, #c5 $)$
