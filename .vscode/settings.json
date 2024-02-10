@@ -1,5 +1,12 @@
 {
-  "cSpell.words": ["Andreas", "katex", "outfile", "randint", "Schwenk"],
+  "cSpell.words": [
+    "Andreas",
+    "katex",
+    "numpy",
+    "outfile",
+    "randint",
+    "Schwenk"
+  ],
   "editor.insertSpaces": true,
   "editor.rulers": [80],
   "editor.formatOnSave": true,
