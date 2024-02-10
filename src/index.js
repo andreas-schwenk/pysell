@@ -48,6 +48,14 @@ class Question {
     this.qDiv.appendChild(titleDiv);
     titleDiv.classList.add("questionTitle");
     titleDiv.innerHTML = this.src["title"];
+    // error?
+    if (this.src["error"].length > 0) {
+      let errorSpan = document.createElement("span");
+      this.qDiv.appendChild(errorSpan);
+      errorSpan.style.color = "red";
+      errorSpan.innerHTML = this.src["error"];
+      return;
+    }
     // generate question text
     for (let c of this.src.text.children)
       this.qDiv.appendChild(this.generateText(c));
