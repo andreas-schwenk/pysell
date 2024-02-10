@@ -9,8 +9,8 @@ import json, sys, numpy, types, sys, os
 
 # TODO: publish
 # TODO: debug output (show variables + solution)
-# TODO: matrix input
-# TODO: single choice
+# TODO: matrix input, set input, complex numbers, ...
+# TODO: support for single choice questions
 
 
 class Lexer:
