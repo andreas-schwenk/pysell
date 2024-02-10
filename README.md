@@ -64,12 +64,14 @@ Calculate $x + y =$ #z
 
 ### Global
 
-- `LANG` defines the language (currently, only `en` is supported)
-- `TITLE` defines the title
-- `AUTHOR` defines the author/institution of the quizzes
-- `QUESTION` marks the beginning of a new question. The title of the question is written into the same line
+- `LANG` defines the language (currently, only `en` is supported).
+- `TITLE` defines the pages title.
+- `AUTHOR` defines the author/institution of the quizzes.
+- `QUESTION` marks the beginning of a new question. The title of the question is written into the same line.
 
 ### Question
+
+A question consists of a textual part, and optionally of Python code, to generate random variables and to calculate the sample solution.
 
 **Question text**
 
@@ -86,7 +88,7 @@ To generate randomized variables, arbitrary Python-Code can be evaluated (this i
 
 For each question, 5 instances are drawn. In case that you won't use random numbers, all instances are equal.
 
-- Python code is embedded into a pair of `"""`. The triple-quotations must written in distinct lines, without any other characters.
+- Python code is embedded into a pair of `"""`. The triple-quotations must written in distinct lines, without any other characters. Python code be provided before its variables are accessed in the textual part.
 
 - Variables denoted in math mode in text are replaced by its actual values (the execution environment randomly chooses one of the 5 instances).
 
