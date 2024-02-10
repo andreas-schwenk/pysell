@@ -98,8 +98,10 @@
       This page runs in your browser and does not store any data on servers. You
       can refresh this page in order to get new randomized tasks.
     </p>
+    <div id="questions"></div>
+
     <div class="question">
-      <div class="questionTitle">AND, OR, XOR</div>
+      <div class="questionTitle">XXXXXTEXTXXXXX AND, OR, XOR</div>
       <p>
         Berechne <span id="equation"></span> binär und gebe das Ergebnis als
         Dezimalzahl an
@@ -126,6 +128,182 @@
     </div>
     <div class="question">xx</div>
     <script>
+      const quizSrc = {
+        lang: "en",
+        title: "Cryptography Quizzes",
+        author: "TH K\u00f6ln, Schwenk/Knospe",
+        info: "",
+        questions: [
+          {
+            title: "Addition",
+            variables: ["x", "z", "y"],
+            instances: [
+              {
+                x: { type: "int", value: "14" },
+                y: { type: "int", value: "20" },
+                z: { type: "int", value: "34" },
+              },
+              {
+                x: { type: "int", value: "15" },
+                y: { type: "int", value: "19" },
+                z: { type: "int", value: "34" },
+              },
+              {
+                x: { type: "int", value: "16" },
+                y: { type: "int", value: "18" },
+                z: { type: "int", value: "34" },
+              },
+              {
+                x: { type: "int", value: "10" },
+                y: { type: "int", value: "15" },
+                z: { type: "int", value: "25" },
+              },
+              {
+                x: { type: "int", value: "11" },
+                y: { type: "int", value: "13" },
+                z: { type: "int", value: "24" },
+              },
+            ],
+            text: {
+              type: "root",
+              data: "",
+              children: [
+                {
+                  type: "paragraph",
+                  data: "",
+                  children: [
+                    {
+                      type: "span",
+                      data: "",
+                      children: [
+                        { type: "text", data: "Calculate ", children: [] },
+                        {
+                          type: "math",
+                          data: "",
+                          children: [
+                            { type: "var", data: "x", children: [] },
+                            { type: "text", data: " + ", children: [] },
+                            { type: "var", data: "y", children: [] },
+                            { type: "text", data: " =", children: [] },
+                          ],
+                        },
+                        { type: "text", data: " ", children: [] },
+                        { type: "input", data: "z", children: [] },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        ],
+      };
+
+      function generateMathString(node) {
+        let s = "";
+        switch (node.type) {
+          case "math": {
+            for (let c of node.children) s += generateMathString(c);
+            break;
+          }
+          case "text": {
+            return node.data;
+          }
+          case "var": {
+            return "VAR";
+          }
+        }
+        return s;
+      }
+
+      function generateText(node) {
+        switch (node.type) {
+          case "paragraph":
+          case "span": {
+            let e = document.createElement(node.type == "span" ? "span" : "p");
+            for (let c of node.children) e.appendChild(generateText(c));
+            return e;
+          }
+          case "text": {
+            let span = document.createElement("span");
+            span.innerHTML = node.data;
+            return span;
+          }
+          case "bold": {
+            let span = document.createElement("span");
+            span.style.fontWeight = "bold";
+            for (let c of node.children) span.appendChild(generateText(c));
+            return span;
+          }
+          case "math": {
+            let span = document.createElement("span");
+            let str = generateMathString(node);
+            katex.render(str, span, {
+              throwOnError: false,
+            });
+            return span;
+          }
+          case "input": {
+            let span = document.createElement("span");
+
+            let input = document.createElement("input");
+            input.type = "text";
+            input.classList.add("inputField");
+            span.appendChild(input);
+
+            let space = document.createElement("span");
+            space.innerHTML = "&nbsp;";
+            span.appendChild(space);
+
+            let feedback = document.createElement("span");
+            feedback.innerHTML = "FEEDBACK";
+            span.appendChild(feedback);
+
+            return span;
+          }
+          default: {
+            let span = document.createElement("span");
+            span.style.color = "red";
+            span.innerHTML = "UNIMPLEMENTED(" + node.type + ")";
+            return span;
+          }
+        }
+      }
+
+      let questionsDiv = document.getElementById("questions");
+      for (let questionSrc of quizSrc.questions) {
+        // generate question div
+        let qDiv = document.createElement("div");
+        questionsDiv.appendChild(qDiv);
+        qDiv.classList.add("question");
+        // generate question title
+        let titleDiv = document.createElement("div");
+        qDiv.appendChild(titleDiv);
+        titleDiv.classList.add("questionTitle");
+        titleDiv.innerHTML = questionSrc["title"];
+        // generate question text
+        for (let c of questionSrc.text.children)
+          qDiv.appendChild(generateText(c));
+        // generate button row
+        let buttonDiv = document.createElement("div");
+        qDiv.appendChild(buttonDiv);
+        buttonDiv.classList.add("buttonRow");
+        // (a) check button
+        let checkBtn = document.createElement("button");
+        buttonDiv.appendChild(checkBtn);
+        checkBtn.type = "button";
+        checkBtn.classList.add("button");
+        checkBtn.innerHTML = "check";
+        // (b) spacing
+        let space = document.createElement("span");
+        space.innerHTML = "&nbsp;&nbsp;&nbsp;";
+        buttonDiv.appendChild(space);
+        // (c) feedback text
+        let feedbackSpan = document.createElement("span");
+        buttonDiv.appendChild(feedbackSpan);
+        feedbackSpan.innerHTML = "message";
+      }
+
       const iconOK =
         '<svg xmlns="http://www.w3.org/2000/svg" height="28" viewBox="0 0 512 512" fill="green"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z" /></svg>';
       const iconError = `

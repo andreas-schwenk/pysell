@@ -5,7 +5,36 @@
   "info": "",
   "questions": [
     {
-      "title": "CPA-Security",
+      "title": "Addition",
+      "error": "",
+      "variables": ["z", "x", "y"],
+      "instances": [
+        {
+          "x": { "type": "int", "value": "18" },
+          "y": { "type": "int", "value": "15" },
+          "z": { "type": "int", "value": "33" }
+        },
+        {
+          "x": { "type": "int", "value": "10" },
+          "y": { "type": "int", "value": "17" },
+          "z": { "type": "int", "value": "27" }
+        },
+        {
+          "x": { "type": "int", "value": "16" },
+          "y": { "type": "int", "value": "17" },
+          "z": { "type": "int", "value": "33" }
+        },
+        {
+          "x": { "type": "int", "value": "13" },
+          "y": { "type": "int", "value": "20" },
+          "z": { "type": "int", "value": "33" }
+        },
+        {
+          "x": { "type": "int", "value": "16" },
+          "y": { "type": "int", "value": "14" },
+          "z": { "type": "int", "value": "30" }
+        }
+      ],
       "text": {
         "type": "root",
         "data": "",
@@ -13,7 +42,68 @@
           {
             "type": "paragraph",
             "data": "",
-            "children": []
+            "children": [
+              {
+                "type": "span",
+                "data": "",
+                "children": [
+                  { "type": "text", "data": "Calculate ", "children": [] },
+                  {
+                    "type": "math",
+                    "data": "",
+                    "children": [
+                      { "type": "var", "data": "x", "children": [] },
+                      { "type": "text", "data": " + ", "children": [] },
+                      { "type": "var", "data": "y", "children": [] },
+                      { "type": "text", "data": " =", "children": [] }
+                    ]
+                  },
+                  { "type": "text", "data": " ", "children": [] },
+                  { "type": "input", "data": "z", "children": [] }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "title": "CPA-Security",
+      "error": "",
+      "variables": [],
+      "instances": [],
+      "text": {
+        "type": "root",
+        "data": "",
+        "children": [
+          {
+            "type": "paragraph",
+            "data": "",
+            "children": [
+              {
+                "type": "span",
+                "data": "",
+                "children": [
+                  {
+                    "type": "text",
+                    "data": "What is true about ",
+                    "children": []
+                  },
+                  {
+                    "type": "bold",
+                    "data": "",
+                    "children": [
+                      { "type": "text", "data": "CPA-secure", "children": [] }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "data": " encryption schemes?",
+                    "children": []
+                  }
+                ]
+              }
+            ]
           },
           {
             "type": "multi-choice",
@@ -23,15 +113,23 @@
                 "type": "answer",
                 "data": "",
                 "children": [
-                  {
-                    "type": "bool",
-                    "data": "true",
-                    "children": []
-                  },
+                  { "type": "bool", "data": "true", "children": [] },
                   {
                     "type": "paragraph",
                     "data": "",
-                    "children": []
+                    "children": [
+                      {
+                        "type": "span",
+                        "data": "",
+                        "children": [
+                          {
+                            "type": "text",
+                            "data": "Two encrypted plaintexts cannot be distinguished.",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               },
@@ -39,15 +137,23 @@
                 "type": "answer",
                 "data": "",
                 "children": [
-                  {
-                    "type": "bool",
-                    "data": "true",
-                    "children": []
-                  },
+                  { "type": "bool", "data": "true", "children": [] },
                   {
                     "type": "paragraph",
                     "data": "",
-                    "children": []
+                    "children": [
+                      {
+                        "type": "span",
+                        "data": "",
+                        "children": [
+                          {
+                            "type": "text",
+                            "data": "CPA-secure schemes are probabilistic.",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               },
@@ -55,15 +161,23 @@
                 "type": "answer",
                 "data": "",
                 "children": [
-                  {
-                    "type": "bool",
-                    "data": "false",
-                    "children": []
-                  },
+                  { "type": "bool", "data": "false", "children": [] },
                   {
                     "type": "paragraph",
                     "data": "",
-                    "children": []
+                    "children": [
+                      {
+                        "type": "span",
+                        "data": "",
+                        "children": [
+                          {
+                            "type": "text",
+                            "data": "CPA-secure schemes are determinstic.",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               },
@@ -71,15 +185,23 @@
                 "type": "answer",
                 "data": "",
                 "children": [
-                  {
-                    "type": "bool",
-                    "data": "true",
-                    "children": []
-                  },
+                  { "type": "bool", "data": "true", "children": [] },
                   {
                     "type": "paragraph",
                     "data": "",
-                    "children": []
+                    "children": [
+                      {
+                        "type": "span",
+                        "data": "",
+                        "children": [
+                          {
+                            "type": "text",
+                            "data": "The One-Time-Pad is CPA-secure.",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               },
@@ -87,15 +209,23 @@
                 "type": "answer",
                 "data": "",
                 "children": [
-                  {
-                    "type": "bool",
-                    "data": "false",
-                    "children": []
-                  },
+                  { "type": "bool", "data": "false", "children": [] },
                   {
                     "type": "paragraph",
                     "data": "",
-                    "children": []
+                    "children": [
+                      {
+                        "type": "span",
+                        "data": "",
+                        "children": [
+                          {
+                            "type": "text",
+                            "data": "Successful Attacks against CPA-secure schemes run in polynomial time.",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               },
@@ -103,15 +233,39 @@
                 "type": "answer",
                 "data": "",
                 "children": [
-                  {
-                    "type": "bool",
-                    "data": "false",
-                    "children": []
-                  },
+                  { "type": "bool", "data": "false", "children": [] },
                   {
                     "type": "paragraph",
                     "data": "",
-                    "children": []
+                    "children": [
+                      {
+                        "type": "span",
+                        "data": "",
+                        "children": [
+                          {
+                            "type": "text",
+                            "data": "An attacker may win the CPA experiment in ",
+                            "children": []
+                          },
+                          {
+                            "type": "math",
+                            "data": "",
+                            "children": [
+                              {
+                                "type": "text",
+                                "data": "60\\%",
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "type": "text",
+                            "data": " of the cases.",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               },
@@ -119,15 +273,23 @@
                 "type": "answer",
                 "data": "",
                 "children": [
-                  {
-                    "type": "bool",
-                    "data": "false",
-                    "children": []
-                  },
+                  { "type": "bool", "data": "false", "children": [] },
                   {
                     "type": "paragraph",
                     "data": "",
-                    "children": []
+                    "children": [
+                      {
+                        "type": "span",
+                        "data": "",
+                        "children": [
+                          {
+                            "type": "text",
+                            "data": "CPA-secure schemes are perfectly secure.",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               },
@@ -135,15 +297,23 @@
                 "type": "answer",
                 "data": "",
                 "children": [
-                  {
-                    "type": "bool",
-                    "data": "true",
-                    "children": []
-                  },
+                  { "type": "bool", "data": "true", "children": [] },
                   {
                     "type": "paragraph",
                     "data": "",
-                    "children": []
+                    "children": [
+                      {
+                        "type": "span",
+                        "data": "",
+                        "children": [
+                          {
+                            "type": "text",
+                            "data": "CPA-secure schemes are EAV-secure.",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               },
@@ -151,15 +321,23 @@
                 "type": "answer",
                 "data": "",
                 "children": [
-                  {
-                    "type": "bool",
-                    "data": "false",
-                    "children": []
-                  },
+                  { "type": "bool", "data": "false", "children": [] },
                   {
                     "type": "paragraph",
                     "data": "",
-                    "children": []
+                    "children": [
+                      {
+                        "type": "span",
+                        "data": "",
+                        "children": [
+                          {
+                            "type": "text",
+                            "data": "CPA-secure schemes are secure against chosen ciphertext attacks.",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               }
@@ -168,7 +346,15 @@
           {
             "type": "paragraph",
             "data": "",
-            "children": []
+            "children": [
+              {
+                "type": "span",
+                "data": "",
+                "children": [
+                  { "type": "text", "data": "TODO another MC", "children": [] }
+                ]
+              }
+            ]
           },
           {
             "type": "multi-choice",
@@ -178,15 +364,19 @@
                 "type": "answer",
                 "data": "",
                 "children": [
-                  {
-                    "type": "bool",
-                    "data": "false",
-                    "children": []
-                  },
+                  { "type": "bool", "data": "false", "children": [] },
                   {
                     "type": "paragraph",
                     "data": "",
-                    "children": []
+                    "children": [
+                      {
+                        "type": "span",
+                        "data": "",
+                        "children": [
+                          { "type": "text", "data": "false", "children": [] }
+                        ]
+                      }
+                    ]
                   }
                 ]
               },
@@ -194,15 +384,19 @@
                 "type": "answer",
                 "data": "",
                 "children": [
-                  {
-                    "type": "bool",
-                    "data": "true",
-                    "children": []
-                  },
+                  { "type": "bool", "data": "true", "children": [] },
                   {
                     "type": "paragraph",
                     "data": "",
-                    "children": []
+                    "children": [
+                      {
+                        "type": "span",
+                        "data": "",
+                        "children": [
+                          { "type": "text", "data": "true", "children": [] }
+                        ]
+                      }
+                    ]
                   }
                 ]
               },
@@ -210,15 +404,19 @@
                 "type": "answer",
                 "data": "",
                 "children": [
-                  {
-                    "type": "bool",
-                    "data": "true",
-                    "children": []
-                  },
+                  { "type": "bool", "data": "true", "children": [] },
                   {
                     "type": "paragraph",
                     "data": "",
-                    "children": []
+                    "children": [
+                      {
+                        "type": "span",
+                        "data": "",
+                        "children": [
+                          { "type": "text", "data": "true", "children": [] }
+                        ]
+                      }
+                    ]
                   }
                 ]
               }
@@ -227,7 +425,15 @@
           {
             "type": "paragraph",
             "data": "",
-            "children": []
+            "children": [
+              {
+                "type": "span",
+                "data": "",
+                "children": [
+                  { "type": "text", "data": "an itemization:", "children": [] }
+                ]
+              }
+            ]
           },
           {
             "type": "itemize",
@@ -236,22 +442,28 @@
               {
                 "type": "paragraph",
                 "data": "",
-                "children": []
+                "children": [
+                  {
+                    "type": "span",
+                    "data": "",
+                    "children": [
+                      { "type": "text", "data": "bla", "children": [] }
+                    ]
+                  }
+                ]
               },
               {
                 "type": "paragraph",
                 "data": "",
-                "children": []
-              },
-              {
-                "type": "paragraph",
-                "data": "",
-                "children": []
-              },
-              {
-                "type": "paragraph",
-                "data": "",
-                "children": []
+                "children": [
+                  {
+                    "type": "span",
+                    "data": "",
+                    "children": [
+                      { "type": "text", "data": "blub", "children": [] }
+                    ]
+                  }
+                ]
               }
             ]
           }
@@ -260,6 +472,93 @@
     },
     {
       "title": "Vigen\u00e8re Cipher: Encryption",
+      "error": "Unknown input variable 'c1,'. Unknown input variable 'c2,'. Unknown input variable 'c3,'. Unknown input variable 'c4,'. ",
+      "variables": [
+        "k1",
+        "m2",
+        "m5",
+        "m3",
+        "c3",
+        "c4",
+        "c5",
+        "m4",
+        "m1",
+        "c2",
+        "k2",
+        "c1"
+      ],
+      "instances": [
+        {
+          "m1": { "type": "int", "value": "11" },
+          "m2": { "type": "int", "value": "12" },
+          "m3": { "type": "int", "value": "25" },
+          "m4": { "type": "int", "value": "21" },
+          "m5": { "type": "int", "value": "19" },
+          "k1": { "type": "int", "value": "2" },
+          "k2": { "type": "int", "value": "5" },
+          "c1": { "type": "int", "value": "13" },
+          "c2": { "type": "int", "value": "17" },
+          "c3": { "type": "int", "value": "1" },
+          "c4": { "type": "int", "value": "0" },
+          "c5": { "type": "int", "value": "21" }
+        },
+        {
+          "m1": { "type": "int", "value": "9" },
+          "m2": { "type": "int", "value": "12" },
+          "m3": { "type": "int", "value": "5" },
+          "m4": { "type": "int", "value": "0" },
+          "m5": { "type": "int", "value": "16" },
+          "k1": { "type": "int", "value": "1" },
+          "k2": { "type": "int", "value": "5" },
+          "c1": { "type": "int", "value": "10" },
+          "c2": { "type": "int", "value": "17" },
+          "c3": { "type": "int", "value": "6" },
+          "c4": { "type": "int", "value": "5" },
+          "c5": { "type": "int", "value": "17" }
+        },
+        {
+          "m1": { "type": "int", "value": "12" },
+          "m2": { "type": "int", "value": "1" },
+          "m3": { "type": "int", "value": "0" },
+          "m4": { "type": "int", "value": "12" },
+          "m5": { "type": "int", "value": "4" },
+          "k1": { "type": "int", "value": "1" },
+          "k2": { "type": "int", "value": "5" },
+          "c1": { "type": "int", "value": "13" },
+          "c2": { "type": "int", "value": "6" },
+          "c3": { "type": "int", "value": "1" },
+          "c4": { "type": "int", "value": "17" },
+          "c5": { "type": "int", "value": "5" }
+        },
+        {
+          "m1": { "type": "int", "value": "23" },
+          "m2": { "type": "int", "value": "24" },
+          "m3": { "type": "int", "value": "13" },
+          "m4": { "type": "int", "value": "21" },
+          "m5": { "type": "int", "value": "20" },
+          "k1": { "type": "int", "value": "3" },
+          "k2": { "type": "int", "value": "4" },
+          "c1": { "type": "int", "value": "0" },
+          "c2": { "type": "int", "value": "2" },
+          "c3": { "type": "int", "value": "16" },
+          "c4": { "type": "int", "value": "25" },
+          "c5": { "type": "int", "value": "23" }
+        },
+        {
+          "m1": { "type": "int", "value": "5" },
+          "m2": { "type": "int", "value": "4" },
+          "m3": { "type": "int", "value": "25" },
+          "m4": { "type": "int", "value": "17" },
+          "m5": { "type": "int", "value": "16" },
+          "k1": { "type": "int", "value": "3" },
+          "k2": { "type": "int", "value": "4" },
+          "c1": { "type": "int", "value": "8" },
+          "c2": { "type": "int", "value": "8" },
+          "c3": { "type": "int", "value": "2" },
+          "c4": { "type": "int", "value": "21" },
+          "c5": { "type": "int", "value": "19" }
+        }
+      ],
       "text": {
         "type": "root",
         "data": "",
@@ -267,7 +566,35 @@
           {
             "type": "paragraph",
             "data": "",
-            "children": []
+            "children": [
+              {
+                "type": "span",
+                "data": "",
+                "children": [
+                  { "type": "text", "data": "Encrypt ", "children": [] },
+                  {
+                    "type": "math",
+                    "data": "",
+                    "children": [
+                      {
+                        "type": "text",
+                        "data": "m=(m1,m2,m3,m4,m5)",
+                        "children": []
+                      }
+                    ]
+                  },
+                  { "type": "text", "data": " using the key ", "children": [] },
+                  {
+                    "type": "math",
+                    "data": "",
+                    "children": [
+                      { "type": "text", "data": "k=(k1,k2)", "children": [] }
+                    ]
+                  },
+                  { "type": "text", "data": ".", "children": [] }
+                ]
+              }
+            ]
           },
           {
             "type": "itemize",
@@ -276,42 +603,39 @@
               {
                 "type": "paragraph",
                 "data": "",
-                "children": []
-              },
-              {
-                "type": "paragraph",
-                "data": "",
-                "children": []
-              },
-              {
-                "type": "paragraph",
-                "data": "",
-                "children": []
-              },
-              {
-                "type": "paragraph",
-                "data": "",
-                "children": []
-              },
-              {
-                "type": "paragraph",
-                "data": "",
-                "children": []
-              },
-              {
-                "type": "paragraph",
-                "data": "",
-                "children": []
-              },
-              {
-                "type": "paragraph",
-                "data": "",
-                "children": []
-              },
-              {
-                "type": "paragraph",
-                "data": "",
-                "children": []
+                "children": [
+                  {
+                    "type": "span",
+                    "data": "",
+                    "children": [
+                      {
+                        "type": "math",
+                        "data": "",
+                        "children": [
+                          { "type": "text", "data": "c=(", "children": [] }
+                        ]
+                      },
+                      { "type": "text", "data": " ", "children": [] },
+                      { "type": "input", "data": "c1,", "children": [] },
+                      { "type": "text", "data": " ", "children": [] },
+                      { "type": "input", "data": "c2,", "children": [] },
+                      { "type": "text", "data": " ", "children": [] },
+                      { "type": "input", "data": "c3,", "children": [] },
+                      { "type": "text", "data": " ", "children": [] },
+                      { "type": "input", "data": "c4,", "children": [] },
+                      { "type": "text", "data": " ", "children": [] },
+                      { "type": "input", "data": "c5", "children": [] },
+                      { "type": "text", "data": " ", "children": [] },
+                      {
+                        "type": "math",
+                        "data": "",
+                        "children": [
+                          { "type": "text", "data": ")", "children": [] }
+                        ]
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           }

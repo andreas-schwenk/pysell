@@ -7,7 +7,7 @@ LICENSE: GPLv3
 
 # TODO: test python program with indents
 
-import json, sys, numpy
+import json, sys, numpy, types
 
 
 class Lexer:
@@ -79,40 +79,85 @@ class TextNode:
                 node.children.append(TextNode("paragraph", option[3:].strip()))
                 node.children[1].parse()
         elif self.type == "itemize":
-            items = self.data.strip().split()
+            items = self.data.strip().split("\n")
             self.data = ""
             for child in items:
-                node = TextNode("paragraph", child)
+                node = TextNode("paragraph", child[1:].strip())
                 self.children.append(node)
                 node.parse()
         elif self.type == "paragraph":
             lex = Lexer(self.data.strip())
             self.data = ""
-            self.parse_paragraph(lex)
+            self.children.append(self.parse_span(lex))
         else:
             raise Exception("unimplemented")
 
-    def parse_paragraph(self, lex: Lexer):
-        # grammar: paragraph = "*" paragraph "*" | "$" paragraph "$" | {*};
-        # TODO: grammar is not ok!
-        node = TextNode("")
+    def parse_span(self, lex: Lexer):
+        # grammar: span = { item };
+        #          item = bold | math | text | input;
+        #          bold = "*" { item } "*";
+        #          math = "$" { item } "$";
+        #          input = "#" var;
+        #          text = otherwise;
+        span = TextNode("span")
+        while lex.token != "":
+            span.children.append(self.parse_item(lex))
+        return span
+
+    def parse_item(self, lex: Lexer):
+        if lex.token == "*":
+            return self.parse_bold(lex)
+        elif lex.token == "$":
+            return self.parse_math(lex)
+        elif lex.token == "#":
+            return self.parse_input(lex)
+        else:
+            n = TextNode("text", lex.token)
+            lex.next()
+            return n
+
+    def parse_bold(self, lex: Lexer):
+        bold = TextNode("bold")
         if lex.token == "*":
             lex.next()
-            node.type = "bold"
-            node.children.append(self.parse_paragraph(lex))
-            if lex.token == "*":
-                lex.next()
-        elif lex.token == "$":
+        while lex.token != "" and lex.token != "*":
+            bold.children.append(self.parse_item(lex))
+        if lex.token == "*":
             lex.next()
-            node.type = "tex"
-            node.children.append(self.parse_paragraph(lex))
-            if lex.token == "$":
-                lex.next()
-        else:
-            node.type = "text"
-            while len(lex.token) > 0 and lex.token not in "*$":
-                node.data += lex.token
-        return node
+        return bold
+
+    def parse_math(self, lex: Lexer):
+        math = TextNode("math")
+        if lex.token == "$":
+            lex.next()
+        while lex.token != "" and lex.token != "$":
+            math.children.append(self.parse_item(lex))
+        if lex.token == "$":
+            lex.next()
+        return math
+
+    def parse_input(self, lex: Lexer):
+        input = TextNode("input")
+        if lex.token == "#":
+            lex.next()
+        input.data = lex.token.strip()
+        lex.next()
+        return input
+
+    def optimize(self):
+        children_opt = []
+        for c in self.children:
+            opt = c.optimize()
+            if (
+                opt.type == "text"
+                and len(children_opt) > 0
+                and children_opt[-1].type == "text"
+            ):
+                children_opt[-1].data += opt.data
+            else:
+                children_opt.append(opt)
+        self.children = children_opt
+        return self
 
     def to_dict(self) -> dict:
         return {
@@ -128,6 +173,7 @@ class Question:
     def __init__(self):
         self.title = ""
         self.python_src = ""
+        self.variables = set()
         self.instances = []
         self.text_src = ""
         self.text = None
@@ -141,6 +187,20 @@ class Question:
                 self.instances.append(res)
         self.text = TextNode("root", self.text_src)
         self.text.parse()
+        self.post_process_text(self.text)
+        self.text.optimize()
+
+    def post_process_text(self, node, math=False):
+        for c in node.children:
+            self.post_process_text(c, math or node.type == "math")
+        if node.type == "input":
+            var_id = node.data
+            if var_id not in self.variables:
+                self.error += "Unknown input variable '" + var_id + "'. "
+        elif math and node.type == "text":
+            var_id = node.data
+            if var_id in self.variables:
+                node.type = "var"
 
     def run_python_code(self) -> dict:
         locals = {}
@@ -149,12 +209,13 @@ class Question:
             exec(self.python_src, globals(), locals)
         except Exception as e:
             # print(e)
-            self.error += e
+            self.error += e + ". "
             return res
         for id in locals:
-            # print(id)
             value = locals[id]
-            # print(value)
+            if isinstance(value, types.ModuleType):
+                continue
+            self.variables.add(id)
             if isinstance(value, numpy.matrix):
                 rows, cols = value.shape
                 v = numpy.array2string(value, separator=",").replace("\\n", "")
@@ -177,8 +238,9 @@ class Question:
     def to_dict(self) -> dict:
         return {
             "title": self.title,
-            # "python_src": self.python_src,
-            # "text_src": self.text_src,
+            "error": self.error,
+            "variables": list(self.variables),
+            "instances": self.instances,
             "text": self.text.to_dict(),
         }
 
@@ -228,8 +290,7 @@ def compile(src: str) -> str:
         "info": info,
         "questions": list(map(lambda o: o.to_dict(), questions)),
     }
-    output_json = json.dumps(output, indent=2)
-    # print(output_json)
+    output_json = json.dumps(output)
     return output_json
 
 
