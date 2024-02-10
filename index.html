@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>QUIZ</title>
+    <title>SELL Quiz</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link
@@ -25,23 +25,29 @@
         max-width: 1024px;
         margin-left: auto;
         margin-right: auto;
-        padding-left: 10px;
-        padding-right: 10px;
+        padding-left: 5px;
+        padding-right: 5px;
       }
       h1 {
+        text-align: center;
         font-size: 28pt;
+      }
+      .author {
+        text-align: center;
+        font-size: 18pt;
       }
       .courseInfo {
         font-size: 14pt;
         font-style: italic;
-        margin-bottom: 24px;
+        /*margin-bottom: 24px;*/
+        text-align: center;
       }
       .question {
         border-style: solid;
         border-radius: 5px;
         border-width: 2px;
         border-color: black;
-        padding: 14px;
+        padding: 8px;
         margin-top: 20px;
         margin-bottom: 20px;
         -webkit-box-shadow: 4px 6px 8px -1px rgba(0, 0, 0, 0.93);
@@ -56,9 +62,8 @@
         margin-left: 0px;
         padding-left: 20px;
       }
-      li {
-      }
       .inputField {
+        width: 64px;
         height: 24px;
         font-size: 14pt;
         border-style: solid;
@@ -68,9 +73,10 @@
         padding-left: 5px;
         padding-right: 5px;
         outline-color: black;
+        background-color: transparent;
       }
       .inputField:focus {
-        outline-color: green;
+        outline-color: gray;
       }
       .button {
         padding-left: 8px;
@@ -82,7 +88,7 @@
         background-color: green;
         color: white;
         border-style: none;
-        border-radius: 5px;
+        border-radius: 2px;
         height: 32px;
         cursor: pointer;
       }
@@ -93,246 +99,30 @@
     </style>
   </head>
   <body>
-    <h1>ITS: Quizaufgaben</h1>
+    <h1 id="title"></h1>
+    <div class="author" id="author"></div>
     <p class="courseInfo">
-      This page runs in your browser and does not store any data on servers. You
-      can refresh this page in order to get new randomized tasks.
+      This page runs in your browser and does not store any data on servers.
+    </p>
+    <p class="courseInfo">
+      You can
+      <span
+        onclick="location.reload()"
+        style="text-decoration: underline; font-weight: bold; cursor: pointer"
+        >reload</span
+      >
+      this page in order to get new randomized tasks.
     </p>
     <div id="questions"></div>
-
-    <div class="question">
-      <div class="questionTitle">XXXXXTEXTXXXXX AND, OR, XOR</div>
-      <p>
-        Berechne <span id="equation"></span> binär und gebe das Ergebnis als
-        Dezimalzahl an
-      </p>
-      <ul>
-        <li>
-          <p>
-            8 XOR 3 = <input type="text" class="inputField" />
-            <span id="inputFeedback1"></span>
-          </p>
-        </li>
-        <li>
-          <p>
-            0 OR 2 = <input type="text" class="inputField" />
-            <span id="inputFeedback2"></span>
-          </p>
-        </li>
-      </ul>
-      <div class="buttonRow">
-        <button type="button" class="button">check</button>
-        &nbsp;&nbsp;&nbsp;
-        <span>message</span>
-      </div>
-    </div>
-    <div class="question">xx</div>
-    <script>
-      const quizSrc = {
-        lang: "en",
-        title: "Cryptography Quizzes",
-        author: "TH K\u00f6ln, Schwenk/Knospe",
-        info: "",
-        questions: [
-          {
-            title: "Addition",
-            variables: ["x", "z", "y"],
-            instances: [
-              {
-                x: { type: "int", value: "14" },
-                y: { type: "int", value: "20" },
-                z: { type: "int", value: "34" },
-              },
-              {
-                x: { type: "int", value: "15" },
-                y: { type: "int", value: "19" },
-                z: { type: "int", value: "34" },
-              },
-              {
-                x: { type: "int", value: "16" },
-                y: { type: "int", value: "18" },
-                z: { type: "int", value: "34" },
-              },
-              {
-                x: { type: "int", value: "10" },
-                y: { type: "int", value: "15" },
-                z: { type: "int", value: "25" },
-              },
-              {
-                x: { type: "int", value: "11" },
-                y: { type: "int", value: "13" },
-                z: { type: "int", value: "24" },
-              },
-            ],
-            text: {
-              type: "root",
-              data: "",
-              children: [
-                {
-                  type: "paragraph",
-                  data: "",
-                  children: [
-                    {
-                      type: "span",
-                      data: "",
-                      children: [
-                        { type: "text", data: "Calculate ", children: [] },
-                        {
-                          type: "math",
-                          data: "",
-                          children: [
-                            { type: "var", data: "x", children: [] },
-                            { type: "text", data: " + ", children: [] },
-                            { type: "var", data: "y", children: [] },
-                            { type: "text", data: " =", children: [] },
-                          ],
-                        },
-                        { type: "text", data: " ", children: [] },
-                        { type: "input", data: "z", children: [] },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          },
-        ],
-      };
-
-      class Question {
-        constructor(src) {
-          this.src = src;
-          this.instanceIdx = 0; // TODO
-        }
-
-        populateDom(parent) {
-          // generate question div
-          let qDiv = document.createElement("div");
-          parent.appendChild(qDiv);
-          qDiv.classList.add("question");
-          // generate question title
-          let titleDiv = document.createElement("div");
-          qDiv.appendChild(titleDiv);
-          titleDiv.classList.add("questionTitle");
-          titleDiv.innerHTML = this.src["title"];
-          // generate question text
-          for (let c of this.src.text.children)
-            qDiv.appendChild(this.generateText(c));
-          // generate button row
-          let buttonDiv = document.createElement("div");
-          qDiv.appendChild(buttonDiv);
-          buttonDiv.classList.add("buttonRow");
-          // (a) check button
-          let checkBtn = document.createElement("button");
-          buttonDiv.appendChild(checkBtn);
-          checkBtn.type = "button";
-          checkBtn.classList.add("button");
-          checkBtn.innerHTML = "check";
-          // (b) spacing
-          let space = document.createElement("span");
-          space.innerHTML = "&nbsp;&nbsp;&nbsp;";
-          buttonDiv.appendChild(space);
-          // (c) feedback text
-          let feedbackSpan = document.createElement("span");
-          buttonDiv.appendChild(feedbackSpan);
-          feedbackSpan.innerHTML = "message";
-        }
-
-        generateMathString(node) {
-          let s = "";
-          switch (node.type) {
-            case "math": {
-              for (let c of node.children) s += this.generateMathString(c);
-              break;
-            }
-            case "text": {
-              return node.data;
-            }
-            case "var": {
-              let instance = this.src.instances[this.instanceIdx];
-              return instance[node.data].value;
-            }
-          }
-          return s;
-        }
-
-        generateText(node) {
-          switch (node.type) {
-            case "paragraph":
-            case "span": {
-              let e = document.createElement(
-                node.type == "span" ? "span" : "p"
-              );
-              for (let c of node.children) e.appendChild(this.generateText(c));
-              return e;
-            }
-            case "text": {
-              let span = document.createElement("span");
-              span.innerHTML = node.data;
-              return span;
-            }
-            case "bold": {
-              let span = document.createElement("span");
-              span.style.fontWeight = "bold";
-              for (let c of node.children)
-                span.appendChild(this.generateText(c));
-              return span;
-            }
-            case "math": {
-              let span = document.createElement("span");
-              let str = this.generateMathString(node);
-              katex.render(str, span, {
-                throwOnError: false,
-              });
-              return span;
-            }
-            case "input": {
-              let span = document.createElement("span");
-
-              let input = document.createElement("input");
-              input.type = "text";
-              input.classList.add("inputField");
-              span.appendChild(input);
-
-              let space = document.createElement("span");
-              space.innerHTML = "&nbsp;";
-              span.appendChild(space);
-
-              let feedback = document.createElement("span");
-              feedback.innerHTML = "FEEDBACK";
-              span.appendChild(feedback);
-
-              return span;
-            }
-            default: {
-              let span = document.createElement("span");
-              span.style.color = "red";
-              span.innerHTML = "UNIMPLEMENTED(" + node.type + ")";
-              return span;
-            }
-          }
-        }
-      }
-
-      let questions = [];
-      let questionsDiv = document.getElementById("questions");
-      for (let questionSrc of quizSrc.questions) {
-        let question = new Question(questionSrc);
-        questions.push(question);
-        question.populateDom(questionsDiv);
-      }
-
-      const iconOK =
-        '<svg xmlns="http://www.w3.org/2000/svg" height="28" viewBox="0 0 512 512" fill="green"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z" /></svg>';
-      const iconError = `
-        <svg xmlns="http://www.w3.org/2000/svg" height="28" viewBox="0 0 512 512" fill="#cc0000"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/></svg>
-        `;
-      let element = document.getElementById("equation");
-      katex.render("c = \\pm\\sqrt{a^2 + b^2}", element, {
-        throwOnError: false,
-      });
-      document.getElementById("inputFeedback1").innerHTML = iconOK;
-      document.getElementById("inputFeedback2").innerHTML = iconError;
+    <p style="font-size: 8pt; font-style: italic; text-align: center">
+      Technology: SELL Quiz by Andreas Schwenk
+    </p>
+    <!-- @begin(test) -->
+    <script type="module">
+      import { quizSrc } from "./src/example.js";
+      import { init } from "./src/index.js";
+      init(quizSrc);
     </script>
+    <!-- @end(test) -->
   </body>
 </html>

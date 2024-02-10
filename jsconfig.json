@@ -1,0 +1,11 @@
+{
+  "include": ["src/**/*.js"],
+  "exclude": ["node_modules/"],
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "target": "ES2021",
+    "module": "NodeNext",
+    "moduleResolution": "nodenext"
+  }
+}

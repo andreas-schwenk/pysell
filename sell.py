@@ -22,7 +22,7 @@ class Lexer:
         stop = False
         while not stop and self.pos < len(self.src):
             ch = self.src[self.pos]
-            if ch in "#*$ ":
+            if ch in "#*$()[]{},.:;+-*/_!<> ":
                 if len(self.token) > 0:
                     return
                 stop = True

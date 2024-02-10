@@ -7,32 +7,32 @@
     {
       "title": "Addition",
       "error": "",
-      "variables": ["z", "x", "y"],
+      "variables": ["y", "z", "x"],
       "instances": [
         {
-          "x": { "type": "int", "value": "18" },
-          "y": { "type": "int", "value": "15" },
-          "z": { "type": "int", "value": "33" }
+          "x": { "type": "int", "value": "12" },
+          "y": { "type": "int", "value": "16" },
+          "z": { "type": "int", "value": "28" }
+        },
+        {
+          "x": { "type": "int", "value": "12" },
+          "y": { "type": "int", "value": "20" },
+          "z": { "type": "int", "value": "32" }
+        },
+        {
+          "x": { "type": "int", "value": "19" },
+          "y": { "type": "int", "value": "16" },
+          "z": { "type": "int", "value": "35" }
+        },
+        {
+          "x": { "type": "int", "value": "15" },
+          "y": { "type": "int", "value": "19" },
+          "z": { "type": "int", "value": "34" }
         },
         {
           "x": { "type": "int", "value": "10" },
           "y": { "type": "int", "value": "17" },
           "z": { "type": "int", "value": "27" }
-        },
-        {
-          "x": { "type": "int", "value": "16" },
-          "y": { "type": "int", "value": "17" },
-          "z": { "type": "int", "value": "33" }
-        },
-        {
-          "x": { "type": "int", "value": "13" },
-          "y": { "type": "int", "value": "20" },
-          "z": { "type": "int", "value": "33" }
-        },
-        {
-          "x": { "type": "int", "value": "16" },
-          "y": { "type": "int", "value": "14" },
-          "z": { "type": "int", "value": "30" }
         }
       ],
       "text": {
@@ -472,91 +472,91 @@
     },
     {
       "title": "Vigen\u00e8re Cipher: Encryption",
-      "error": "Unknown input variable 'c1,'. Unknown input variable 'c2,'. Unknown input variable 'c3,'. Unknown input variable 'c4,'. ",
+      "error": "",
       "variables": [
-        "k1",
-        "m2",
-        "m5",
-        "m3",
-        "c3",
+        "c1",
+        "m4",
+        "k2",
         "c4",
         "c5",
-        "m4",
-        "m1",
         "c2",
-        "k2",
-        "c1"
+        "m3",
+        "m5",
+        "m2",
+        "c3",
+        "k1",
+        "m1"
       ],
       "instances": [
         {
-          "m1": { "type": "int", "value": "11" },
-          "m2": { "type": "int", "value": "12" },
-          "m3": { "type": "int", "value": "25" },
-          "m4": { "type": "int", "value": "21" },
-          "m5": { "type": "int", "value": "19" },
-          "k1": { "type": "int", "value": "2" },
-          "k2": { "type": "int", "value": "5" },
-          "c1": { "type": "int", "value": "13" },
-          "c2": { "type": "int", "value": "17" },
-          "c3": { "type": "int", "value": "1" },
-          "c4": { "type": "int", "value": "0" },
-          "c5": { "type": "int", "value": "21" }
-        },
-        {
-          "m1": { "type": "int", "value": "9" },
-          "m2": { "type": "int", "value": "12" },
-          "m3": { "type": "int", "value": "5" },
-          "m4": { "type": "int", "value": "0" },
-          "m5": { "type": "int", "value": "16" },
-          "k1": { "type": "int", "value": "1" },
-          "k2": { "type": "int", "value": "5" },
-          "c1": { "type": "int", "value": "10" },
-          "c2": { "type": "int", "value": "17" },
-          "c3": { "type": "int", "value": "6" },
-          "c4": { "type": "int", "value": "5" },
-          "c5": { "type": "int", "value": "17" }
-        },
-        {
           "m1": { "type": "int", "value": "12" },
-          "m2": { "type": "int", "value": "1" },
-          "m3": { "type": "int", "value": "0" },
-          "m4": { "type": "int", "value": "12" },
-          "m5": { "type": "int", "value": "4" },
+          "m2": { "type": "int", "value": "23" },
+          "m3": { "type": "int", "value": "21" },
+          "m4": { "type": "int", "value": "9" },
+          "m5": { "type": "int", "value": "23" },
           "k1": { "type": "int", "value": "1" },
-          "k2": { "type": "int", "value": "5" },
+          "k2": { "type": "int", "value": "4" },
           "c1": { "type": "int", "value": "13" },
-          "c2": { "type": "int", "value": "6" },
-          "c3": { "type": "int", "value": "1" },
-          "c4": { "type": "int", "value": "17" },
-          "c5": { "type": "int", "value": "5" }
+          "c2": { "type": "int", "value": "1" },
+          "c3": { "type": "int", "value": "22" },
+          "c4": { "type": "int", "value": "13" },
+          "c5": { "type": "int", "value": "24" }
         },
         {
-          "m1": { "type": "int", "value": "23" },
-          "m2": { "type": "int", "value": "24" },
-          "m3": { "type": "int", "value": "13" },
-          "m4": { "type": "int", "value": "21" },
+          "m1": { "type": "int", "value": "6" },
+          "m2": { "type": "int", "value": "15" },
+          "m3": { "type": "int", "value": "10" },
+          "m4": { "type": "int", "value": "9" },
+          "m5": { "type": "int", "value": "8" },
+          "k1": { "type": "int", "value": "1" },
+          "k2": { "type": "int", "value": "5" },
+          "c1": { "type": "int", "value": "7" },
+          "c2": { "type": "int", "value": "20" },
+          "c3": { "type": "int", "value": "11" },
+          "c4": { "type": "int", "value": "14" },
+          "c5": { "type": "int", "value": "9" }
+        },
+        {
+          "m1": { "type": "int", "value": "3" },
+          "m2": { "type": "int", "value": "25" },
+          "m3": { "type": "int", "value": "2" },
+          "m4": { "type": "int", "value": "19" },
           "m5": { "type": "int", "value": "20" },
           "k1": { "type": "int", "value": "3" },
           "k2": { "type": "int", "value": "4" },
-          "c1": { "type": "int", "value": "0" },
-          "c2": { "type": "int", "value": "2" },
-          "c3": { "type": "int", "value": "16" },
-          "c4": { "type": "int", "value": "25" },
+          "c1": { "type": "int", "value": "6" },
+          "c2": { "type": "int", "value": "3" },
+          "c3": { "type": "int", "value": "5" },
+          "c4": { "type": "int", "value": "23" },
           "c5": { "type": "int", "value": "23" }
         },
         {
-          "m1": { "type": "int", "value": "5" },
-          "m2": { "type": "int", "value": "4" },
-          "m3": { "type": "int", "value": "25" },
-          "m4": { "type": "int", "value": "17" },
-          "m5": { "type": "int", "value": "16" },
-          "k1": { "type": "int", "value": "3" },
+          "m1": { "type": "int", "value": "6" },
+          "m2": { "type": "int", "value": "25" },
+          "m3": { "type": "int", "value": "7" },
+          "m4": { "type": "int", "value": "2" },
+          "m5": { "type": "int", "value": "13" },
+          "k1": { "type": "int", "value": "2" },
           "k2": { "type": "int", "value": "4" },
           "c1": { "type": "int", "value": "8" },
+          "c2": { "type": "int", "value": "3" },
+          "c3": { "type": "int", "value": "9" },
+          "c4": { "type": "int", "value": "6" },
+          "c5": { "type": "int", "value": "15" }
+        },
+        {
+          "m1": { "type": "int", "value": "23" },
+          "m2": { "type": "int", "value": "4" },
+          "m3": { "type": "int", "value": "24" },
+          "m4": { "type": "int", "value": "22" },
+          "m5": { "type": "int", "value": "6" },
+          "k1": { "type": "int", "value": "2" },
+          "k2": { "type": "int", "value": "4" },
+          "c1": { "type": "int", "value": "25" },
           "c2": { "type": "int", "value": "8" },
-          "c3": { "type": "int", "value": "2" },
-          "c4": { "type": "int", "value": "21" },
-          "c5": { "type": "int", "value": "19" }
+          "c3": { "type": "int", "value": "0" },
+          "c4": { "type": "int", "value": "0" },
+          "c5": { "type": "int", "value": "8" }
         }
       ],
       "text": {
@@ -576,11 +576,17 @@
                     "type": "math",
                     "data": "",
                     "children": [
-                      {
-                        "type": "text",
-                        "data": "m=(m1,m2,m3,m4,m5)",
-                        "children": []
-                      }
+                      { "type": "text", "data": "m=(", "children": [] },
+                      { "type": "var", "data": "m1", "children": [] },
+                      { "type": "text", "data": ",", "children": [] },
+                      { "type": "var", "data": "m2", "children": [] },
+                      { "type": "text", "data": ",", "children": [] },
+                      { "type": "var", "data": "m3", "children": [] },
+                      { "type": "text", "data": ",", "children": [] },
+                      { "type": "var", "data": "m4", "children": [] },
+                      { "type": "text", "data": ",", "children": [] },
+                      { "type": "var", "data": "m5", "children": [] },
+                      { "type": "text", "data": ")", "children": [] }
                     ]
                   },
                   { "type": "text", "data": " using the key ", "children": [] },
@@ -588,7 +594,11 @@
                     "type": "math",
                     "data": "",
                     "children": [
-                      { "type": "text", "data": "k=(k1,k2)", "children": [] }
+                      { "type": "text", "data": "k=(", "children": [] },
+                      { "type": "var", "data": "k1", "children": [] },
+                      { "type": "text", "data": ",", "children": [] },
+                      { "type": "var", "data": "k2", "children": [] },
+                      { "type": "text", "data": ")", "children": [] }
                     ]
                   },
                   { "type": "text", "data": ".", "children": [] }
@@ -616,14 +626,14 @@
                         ]
                       },
                       { "type": "text", "data": " ", "children": [] },
-                      { "type": "input", "data": "c1,", "children": [] },
-                      { "type": "text", "data": " ", "children": [] },
-                      { "type": "input", "data": "c2,", "children": [] },
-                      { "type": "text", "data": " ", "children": [] },
-                      { "type": "input", "data": "c3,", "children": [] },
-                      { "type": "text", "data": " ", "children": [] },
-                      { "type": "input", "data": "c4,", "children": [] },
-                      { "type": "text", "data": " ", "children": [] },
+                      { "type": "input", "data": "c1", "children": [] },
+                      { "type": "text", "data": ", ", "children": [] },
+                      { "type": "input", "data": "c2", "children": [] },
+                      { "type": "text", "data": ", ", "children": [] },
+                      { "type": "input", "data": "c3", "children": [] },
+                      { "type": "text", "data": ", ", "children": [] },
+                      { "type": "input", "data": "c4", "children": [] },
+                      { "type": "text", "data": ", ", "children": [] },
                       { "type": "input", "data": "c5", "children": [] },
                       { "type": "text", "data": " ", "children": [] },
                       {
