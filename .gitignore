@@ -2,3 +2,5 @@
 node_modules/
 package-lock.json
 dist/
+examples/*.json
+examples/*.html
