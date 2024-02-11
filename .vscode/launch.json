@@ -5,7 +5,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "test",
+      "name": "test sell.py",
       "type": "debugpy",
       "request": "launch",
       "program": "sell.py",
@@ -16,7 +16,7 @@
       }
     },
     {
-      "name": "Launch Chrome",
+      "name": "test index.html",
       "request": "launch",
       "type": "chrome",
       "url": "http://localhost:5501",

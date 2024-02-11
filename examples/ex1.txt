@@ -10,6 +10,13 @@ Mark the correct answers
 [ ] This answer is incorrect
 
 
+QUESTION Single-Choice
+Mark the correct answers
+(x) This answer is correct
+( ) This answer is incorrect
+( ) This answer is incorrect
+
+
 QUESTION Addition
 """
 import random
@@ -18,3 +25,11 @@ y = random.randint(10, 20)
 z = x + y
 """
 Calculate $x + y =$ #z
+
+
+#QUESTION Sets
+#"""
+#import random
+#x = set([-2,2])
+#"""
+#Calculate $x + y =$ #z

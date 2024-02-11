@@ -1,8 +1,5 @@
-import {
-  iconCheckBoxChecked,
-  iconCheckBoxUnchecked,
-  iconPlay,
-} from "./icons.js";
+import { iconSquareChecked, iconSquareUnchecked, iconPlay } from "./icons.js";
+import { courseInfo1, courseInfo2, courseInfo3 } from "./lang.js";
 
 /**
  * @param {number} n
@@ -33,6 +30,8 @@ class Question {
     this.expectedTypes = {};
     this.studentValues = {};
     this.qDiv = null;
+    this.checkBtn = null;
+    this.showSolution = false;
   }
 
   /**
@@ -64,12 +63,12 @@ class Question {
     this.qDiv.appendChild(buttonDiv);
     buttonDiv.classList.add("buttonRow");
     // (a) check button
-    let checkBtn = document.createElement("button");
-    buttonDiv.appendChild(checkBtn);
-    checkBtn.type = "button";
-    checkBtn.classList.add("button");
-    //checkBtn.innerHTML = "check";
-    checkBtn.innerHTML = iconPlay;
+    this.checkBtn = document.createElement("button");
+    buttonDiv.appendChild(this.checkBtn);
+    this.checkBtn.type = "button";
+    this.checkBtn.classList.add("button");
+    //this.checkBtn.innerHTML = "check";
+    this.checkBtn.innerHTML = iconPlay;
     // (b) spacing
     let space = document.createElement("span");
     space.innerHTML = "&nbsp;&nbsp;&nbsp;";
@@ -79,7 +78,7 @@ class Question {
     buttonDiv.appendChild(feedbackSpan);
     feedbackSpan.innerHTML = "";
     // evaluation
-    checkBtn.addEventListener("click", () => {
+    this.checkBtn.addEventListener("click", () => {
       let numChecked = 0;
       let numCorrect = 0;
       for (let id in this.expectedValues) {
@@ -102,13 +101,13 @@ class Question {
       }
       if (numCorrect == numChecked) {
         feedbackSpan.style.color =
-          checkBtn.style.backgroundColor =
+          this.checkBtn.style.backgroundColor =
           this.qDiv.style.borderColor =
             "rgb(0,150,0)";
         this.qDiv.style.backgroundColor = "rgba(0,150,0, 0.05)";
       } else {
         feedbackSpan.style.color =
-          checkBtn.style.backgroundColor =
+          this.checkBtn.style.backgroundColor =
           this.qDiv.style.borderColor =
             "rgb(150,0,0)";
         this.qDiv.style.backgroundColor = "rgba(150,0,0, 0.05)";
@@ -193,6 +192,10 @@ class Question {
           this.studentValues[varId] = input.value.trim();
         });
 
+        if (this.showSolution) {
+          this.studentValues[varId] = input.value = expected.value;
+        }
+
         let space = document.createElement("span");
         space.innerHTML = "&nbsp;";
         span.appendChild(space);
@@ -225,7 +228,9 @@ class Question {
           let expectedValue = answer.children[0].data;
           this.expectedValues[answerId] = expectedValue;
           this.expectedTypes[answerId] = "bool";
-          this.studentValues[answerId] = "false";
+          this.studentValues[answerId] = this.showSolution
+            ? expectedValue
+            : "false";
           let text = this.generateText(answer.children[1], true);
 
           let tr = document.createElement("tr");
@@ -233,7 +238,10 @@ class Question {
           tr.style.cursor = "pointer";
           let tdCheckBox = document.createElement("td");
           tr.appendChild(tdCheckBox);
-          tdCheckBox.innerHTML = iconCheckBoxUnchecked;
+          tdCheckBox.innerHTML =
+            this.studentValues[answerId] == "true"
+              ? iconSquareChecked
+              : iconSquareUnchecked;
           let tdText = document.createElement("td");
           tr.appendChild(tdText);
           tdText.appendChild(text);
@@ -242,9 +250,9 @@ class Question {
             this.studentValues[answerId] =
               this.studentValues[answerId] === "true" ? "false" : "true";
             if (this.studentValues[answerId] === "true") {
-              tdCheckBox.innerHTML = iconCheckBoxChecked;
+              tdCheckBox.innerHTML = iconSquareChecked;
             } else {
-              tdCheckBox.innerHTML = iconCheckBoxUnchecked;
+              tdCheckBox.innerHTML = iconSquareUnchecked;
             }
           });
         }
@@ -263,17 +271,30 @@ class Question {
 
 /**
  * @param {Object.<Object,Object>} quizSrc
+ * @param {boolean} debug
  */
-export function init(quizSrc) {
+export function init(quizSrc, debug) {
+  if (debug) document.getElementById("debug").style.display = "block";
   document.getElementById("title").innerHTML = quizSrc.title;
   document.getElementById("author").innerHTML = quizSrc.author;
+  document.getElementById("courseInfo1").innerHTML = courseInfo1[quizSrc.lang];
+  let reload =
+    '<span onclick="location.reload()" style="text-decoration: underline; font-weight: bold; cursor: pointer">' +
+    courseInfo3[quizSrc.lang] +
+    "</span>";
+  document.getElementById("courseInfo2").innerHTML = courseInfo2[
+    quizSrc.lang
+  ].replace("*", reload);
+
   /** @type {Question[]} */
   let questions = [];
   /** @type {HTMLElement} */
   let questionsDiv = document.getElementById("questions");
   for (let questionSrc of quizSrc.questions) {
     let question = new Question(questionSrc);
+    question.showSolution = debug;
     questions.push(question);
     question.populateDom(questionsDiv);
+    if (debug) question.checkBtn.click();
   }
 }

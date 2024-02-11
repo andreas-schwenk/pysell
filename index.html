@@ -100,28 +100,23 @@
   </head>
   <body>
     <h1 id="title"></h1>
+    <h1 id="debug" style="color: red; display: none">DEBUG</h1>
     <div class="author" id="author"></div>
-    <p class="courseInfo">
-      This page runs in your browser and does not store any data on servers.
-    </p>
-    <p class="courseInfo">
-      You can
-      <span
-        onclick="location.reload()"
-        style="text-decoration: underline; font-weight: bold; cursor: pointer"
-        >reload</span
-      >
-      this page in order to get new randomized tasks.
-    </p>
+    <p id="courseInfo1" class="courseInfo"></p>
+    <p id="courseInfo2" class="courseInfo"></p>
     <div id="questions"></div>
     <p style="font-size: 8pt; font-style: italic; text-align: center">
       Technology: SELL Quiz by Andreas Schwenk
     </p>
     <!-- @begin(test) -->
     <script type="module">
-      import { quizSrc } from "./src/example.js";
       import { init } from "./src/index.js";
-      init(quizSrc);
+      fetch("test/example.json?v=" + Date.now())
+        .then((data) => data.json())
+        .then((quizSrc) => {
+          let debug = true;
+          init(quizSrc, debug);
+        });
     </script>
     <!-- @end(test) -->
   </body>

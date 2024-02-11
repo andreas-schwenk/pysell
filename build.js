@@ -28,7 +28,9 @@ html = html.replaceAll("  ", "").replaceAll("\n", " ");
 //   insert javascript code
 html = html.replace(
   "</body>",
-  "<script>let quizSrc = {};" + js + "sell.init(quizSrc);</script>"
+  "<script>let debug = false; let quizSrc = {};" +
+    js +
+    "sell.init(quizSrc,debug);</script>"
 );
 //   update file "sell.py" between "# @begin(html" and "# @end(html)"
 lines = fs.readFileSync("sell.py", "utf-8").split("\n");

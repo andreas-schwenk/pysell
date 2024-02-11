@@ -249,21 +249,21 @@ class Question:
 
 
 def compile(src: str) -> str:
-    """compiles an"""
-
-    lines = src.split("\n")
-
+    """compiles a SELL input file to JSON"""
     lang = "en"
     title = ""
     author = ""
     info = ""
     questions = []
-
     question = None
     parsing_python = False
+    lines = src.split("\n")
     for line in lines:
+        line = line.split("#")[0]  # remove comments
         lineUnStripped = line
         line = line.strip()
+        if len(line) == 0:
+            continue
         if line.startswith("LANG"):
             lang = line[4:].strip()
         elif line.startswith("TITLE"):
@@ -312,6 +312,7 @@ if __name__ == "__main__":
     debug = "-D" in sys.argv
     input_path = sys.argv[-1]
     output_path = input_path.replace(".txt", ".html")
+    output_debug_path = input_path.replace(".txt", "_DEBUG.html")
     if os.path.isfile(input_path) == False:
         print("error: input file path does not exist")
         exit(-1)
@@ -327,8 +328,17 @@ if __name__ == "__main__":
         f.write(out)
         f.close()
     # write html
+    # (a) release version (*.html)
     f = open(output_path, "w")
     f.write(html.replace("let quizSrc = {};", "let quizSrc = " + out + ";"))
+    f.close()
+    # (a) debug version (*_DEBUG.html)
+    f = open(output_debug_path, "w")
+    f.write(
+        html.replace("let quizSrc = {};", "let quizSrc = " + out + ";").replace(
+            "let debug = false;", "let debug = true;"
+        )
+    )
     f.close()
     # exit normally
     sys.exit(0)

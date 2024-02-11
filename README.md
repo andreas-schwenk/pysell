@@ -33,7 +33,7 @@ Command:
 python sell.py ex1.txt
 ```
 
-File `ex1.html` will be generated.
+Files `ex1.html` and `ex1_DEBUG.html` will be generated. The latter file shows the sample solution.
 
 Contents of `ex1.txt`;
 
@@ -68,6 +68,7 @@ Calculate $x + y =$ #z
 - `TITLE` defines the pages title.
 - `AUTHOR` defines the author/institution of the quizzes.
 - `QUESTION` marks the beginning of a new question. The title of the question is written into the same line.
+- `#` introduces a comment, i.e. text that is not considered.
 
 ### Question
 
@@ -86,9 +87,9 @@ A question consists of a textual part, and optionally of Python code, to generat
 
 To generate randomized variables, arbitrary Python-Code can be evaluated (this is secure, since the code is executed only locally on the teachers computer).
 
-For each question, 5 instances are drawn. In case that you won't use random numbers, all instances are equal.
+For each question, 5 instances are drawn. In case that you won't use random numbers, all generated instances are equal.
 
-- Python code is embedded into a pair of `"""`. The triple-quotations must written in distinct lines, without any other characters. Python code be provided before its variables are accessed in the textual part.
+- Python code is embedded into a pair of `"""`. The triple-quotations must be written in distinct lines, without any other characters. Python code be provided before its variables are accessed in the textual part.
 
 - Variables denoted in math mode in text are replaced by its actual values (the execution environment randomly chooses one of the 5 instances).
 
