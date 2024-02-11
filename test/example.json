@@ -5,6 +5,113 @@
   "info": "",
   "questions": [
     {
+      "title": "Single-Choice",
+      "error": "",
+      "variables": [],
+      "instances": [],
+      "text": {
+        "type": "root",
+        "data": "",
+        "children": [
+          {
+            "type": "paragraph",
+            "data": "",
+            "children": [
+              {
+                "type": "span",
+                "data": "",
+                "children": [
+                  {
+                    "type": "text",
+                    "data": "Mark the correct answers",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "single-choice",
+            "data": "",
+            "children": [
+              {
+                "type": "answer",
+                "data": "",
+                "children": [
+                  { "type": "bool", "data": "true", "children": [] },
+                  {
+                    "type": "paragraph",
+                    "data": "",
+                    "children": [
+                      {
+                        "type": "span",
+                        "data": "",
+                        "children": [
+                          {
+                            "type": "text",
+                            "data": "This answer is correct",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "answer",
+                "data": "",
+                "children": [
+                  { "type": "bool", "data": "false", "children": [] },
+                  {
+                    "type": "paragraph",
+                    "data": "",
+                    "children": [
+                      {
+                        "type": "span",
+                        "data": "",
+                        "children": [
+                          {
+                            "type": "text",
+                            "data": "This answer is incorrect",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "answer",
+                "data": "",
+                "children": [
+                  { "type": "bool", "data": "false", "children": [] },
+                  {
+                    "type": "paragraph",
+                    "data": "",
+                    "children": [
+                      {
+                        "type": "span",
+                        "data": "",
+                        "children": [
+                          {
+                            "type": "text",
+                            "data": "This answer is incorrect",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "title": "Addition",
       "error": "",
       "variables": ["y", "z", "x"],
@@ -474,89 +581,95 @@
       "title": "Vigen\u00e8re Cipher: Encryption",
       "error": "",
       "variables": [
-        "c1",
         "m4",
-        "k2",
-        "c4",
-        "c5",
-        "c2",
-        "m3",
         "m5",
         "m2",
+        "c1",
+        "m3",
         "c3",
-        "k1",
-        "m1"
+        "v",
+        "c4",
+        "c2",
+        "c5",
+        "k2",
+        "m1",
+        "k1"
       ],
       "instances": [
         {
           "m1": { "type": "int", "value": "12" },
-          "m2": { "type": "int", "value": "23" },
-          "m3": { "type": "int", "value": "21" },
-          "m4": { "type": "int", "value": "9" },
-          "m5": { "type": "int", "value": "23" },
-          "k1": { "type": "int", "value": "1" },
-          "k2": { "type": "int", "value": "4" },
-          "c1": { "type": "int", "value": "13" },
-          "c2": { "type": "int", "value": "1" },
-          "c3": { "type": "int", "value": "22" },
-          "c4": { "type": "int", "value": "13" },
-          "c5": { "type": "int", "value": "24" }
-        },
-        {
-          "m1": { "type": "int", "value": "6" },
-          "m2": { "type": "int", "value": "15" },
-          "m3": { "type": "int", "value": "10" },
-          "m4": { "type": "int", "value": "9" },
-          "m5": { "type": "int", "value": "8" },
-          "k1": { "type": "int", "value": "1" },
+          "m2": { "type": "int", "value": "24" },
+          "m3": { "type": "int", "value": "13" },
+          "m4": { "type": "int", "value": "11" },
+          "m5": { "type": "int", "value": "3" },
+          "k1": { "type": "int", "value": "2" },
           "k2": { "type": "int", "value": "5" },
-          "c1": { "type": "int", "value": "7" },
-          "c2": { "type": "int", "value": "20" },
-          "c3": { "type": "int", "value": "11" },
-          "c4": { "type": "int", "value": "14" },
-          "c5": { "type": "int", "value": "9" }
-        },
-        {
-          "m1": { "type": "int", "value": "3" },
-          "m2": { "type": "int", "value": "25" },
-          "m3": { "type": "int", "value": "2" },
-          "m4": { "type": "int", "value": "19" },
-          "m5": { "type": "int", "value": "20" },
-          "k1": { "type": "int", "value": "3" },
-          "k2": { "type": "int", "value": "4" },
-          "c1": { "type": "int", "value": "6" },
+          "c1": { "type": "int", "value": "14" },
           "c2": { "type": "int", "value": "3" },
-          "c3": { "type": "int", "value": "5" },
-          "c4": { "type": "int", "value": "23" },
-          "c5": { "type": "int", "value": "23" }
+          "c3": { "type": "int", "value": "15" },
+          "c4": { "type": "int", "value": "16" },
+          "c5": { "type": "int", "value": "5" },
+          "v": { "type": "vector", "value": "14, 3, 15, 16, 5" }
         },
         {
-          "m1": { "type": "int", "value": "6" },
+          "m1": { "type": "int", "value": "17" },
           "m2": { "type": "int", "value": "25" },
-          "m3": { "type": "int", "value": "7" },
-          "m4": { "type": "int", "value": "2" },
+          "m3": { "type": "int", "value": "25" },
+          "m4": { "type": "int", "value": "8" },
           "m5": { "type": "int", "value": "13" },
           "k1": { "type": "int", "value": "2" },
           "k2": { "type": "int", "value": "4" },
-          "c1": { "type": "int", "value": "8" },
+          "c1": { "type": "int", "value": "19" },
           "c2": { "type": "int", "value": "3" },
-          "c3": { "type": "int", "value": "9" },
-          "c4": { "type": "int", "value": "6" },
-          "c5": { "type": "int", "value": "15" }
+          "c3": { "type": "int", "value": "1" },
+          "c4": { "type": "int", "value": "12" },
+          "c5": { "type": "int", "value": "15" },
+          "v": { "type": "vector", "value": "19, 3, 1, 12, 15" }
         },
         {
-          "m1": { "type": "int", "value": "23" },
-          "m2": { "type": "int", "value": "4" },
-          "m3": { "type": "int", "value": "24" },
-          "m4": { "type": "int", "value": "22" },
-          "m5": { "type": "int", "value": "6" },
-          "k1": { "type": "int", "value": "2" },
+          "m1": { "type": "int", "value": "24" },
+          "m2": { "type": "int", "value": "5" },
+          "m3": { "type": "int", "value": "17" },
+          "m4": { "type": "int", "value": "7" },
+          "m5": { "type": "int", "value": "16" },
+          "k1": { "type": "int", "value": "3" },
+          "k2": { "type": "int", "value": "5" },
+          "c1": { "type": "int", "value": "1" },
+          "c2": { "type": "int", "value": "10" },
+          "c3": { "type": "int", "value": "20" },
+          "c4": { "type": "int", "value": "12" },
+          "c5": { "type": "int", "value": "19" },
+          "v": { "type": "vector", "value": "1, 10, 20, 12, 19" }
+        },
+        {
+          "m1": { "type": "int", "value": "12" },
+          "m2": { "type": "int", "value": "21" },
+          "m3": { "type": "int", "value": "2" },
+          "m4": { "type": "int", "value": "18" },
+          "m5": { "type": "int", "value": "9" },
+          "k1": { "type": "int", "value": "3" },
           "k2": { "type": "int", "value": "4" },
-          "c1": { "type": "int", "value": "25" },
-          "c2": { "type": "int", "value": "8" },
-          "c3": { "type": "int", "value": "0" },
-          "c4": { "type": "int", "value": "0" },
-          "c5": { "type": "int", "value": "8" }
+          "c1": { "type": "int", "value": "15" },
+          "c2": { "type": "int", "value": "25" },
+          "c3": { "type": "int", "value": "5" },
+          "c4": { "type": "int", "value": "22" },
+          "c5": { "type": "int", "value": "12" },
+          "v": { "type": "vector", "value": "15, 25, 5, 22, 12" }
+        },
+        {
+          "m1": { "type": "int", "value": "4" },
+          "m2": { "type": "int", "value": "8" },
+          "m3": { "type": "int", "value": "17" },
+          "m4": { "type": "int", "value": "14" },
+          "m5": { "type": "int", "value": "7" },
+          "k1": { "type": "int", "value": "1" },
+          "k2": { "type": "int", "value": "4" },
+          "c1": { "type": "int", "value": "5" },
+          "c2": { "type": "int", "value": "12" },
+          "c3": { "type": "int", "value": "18" },
+          "c4": { "type": "int", "value": "18" },
+          "c5": { "type": "int", "value": "8" },
+          "v": { "type": "vector", "value": "5, 12, 18, 18, 8" }
         }
       ],
       "text": {
@@ -643,6 +756,27 @@
                           { "type": "text", "data": ")", "children": [] }
                         ]
                       }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "data": "",
+                "children": [
+                  {
+                    "type": "span",
+                    "data": "",
+                    "children": [
+                      {
+                        "type": "math",
+                        "data": "",
+                        "children": [
+                          { "type": "text", "data": "c=", "children": [] }
+                        ]
+                      },
+                      { "type": "text", "data": " ", "children": [] },
+                      { "type": "input", "data": "v", "children": [] }
                     ]
                   }
                 ]

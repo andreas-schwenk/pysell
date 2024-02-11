@@ -1,22 +1,23 @@
 LANG    en
-TITLE   SELL Demo Page
-AUTHOR  by Andreas Schwenk
+TITLE   Demo
+AUTHOR  Andreas Schwenk
 
 
 QUESTION Multiple-Choice
-Mark the correct answers
+Mark the correct answer(s)
 [x] This answer is correct
 [x] This answer is correct
 [ ] This answer is incorrect
 
 
 QUESTION Single-Choice
-Mark the correct answers
+Mark the correct answer
 (x) This answer is correct
 ( ) This answer is incorrect
 ( ) This answer is incorrect
 
 
+# this is a comment line
 QUESTION Addition
 """
 import random
@@ -24,12 +25,15 @@ x = random.randint(10, 20)
 y = random.randint(10, 20)
 z = x + y
 """
-Calculate $x + y =$ #z
+Calculate $x + y =$ %z
 
 
-#QUESTION Sets
-#"""
-#import random
-#x = set([-2,2])
-#"""
-#Calculate $x + y =$ #z
+QUESTION Fibonacci
+"""
+fib = [1] * 7
+for i in range(2,len(fib)):
+    fib[i] = fib[i-2] + fib[i-1]
+fib3 = fib[3:]
+"""
+Complete the Fibonacci sequence
+- $ 1, 1, 2, $ %fib3, ...

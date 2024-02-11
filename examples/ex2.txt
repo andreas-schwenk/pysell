@@ -10,7 +10,7 @@ x = random.randint(10, 20)
 y = random.randint(10, 20)
 z = x + y
 """
-Calculate $x + y =$ #z
+Calculate $x + y =$ %z
 
 
 QUESTION CPA-Security
@@ -33,6 +33,17 @@ an itemization:
 - blub
 
 
+QUESTION Fibonacci
+"""
+fib = [1] * 7
+for i in range(2,len(fib)):
+    fib[i] = fib[i-2] + fib[i-1]
+fib3 = fib[3:]
+"""
+Complete the Fibonacci sequence
+- $ 1, 1, 2, $ %fib3, ...
+
+
 QUESTION Vigenère Cipher: Encryption
 """
 import random
@@ -48,6 +59,7 @@ c2 = (m2+k2) % 26
 c3 = (m3+k1) % 26
 c4 = (m4+k2) % 26
 c5 = (m5+k1) % 26
+c = [c1,c2,c3,c4,c5]
 """
 Encrypt $m=(m1,m2,m3,m4,m5)$ using the key $k=(k1,k2)$.
-- $c=($ #c1, #c2, #c3, #c4, #c5 $)$
+- $c=($ %c $)$

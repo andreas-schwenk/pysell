@@ -1,4 +1,10 @@
-import { iconSquareChecked, iconSquareUnchecked, iconPlay } from "./icons.js";
+import {
+  iconSquareChecked,
+  iconSquareUnchecked,
+  iconPlay,
+  iconCircleUnchecked,
+  iconCircleChecked,
+} from "./icons.js";
 import { courseInfo1, courseInfo2, courseInfo3 } from "./lang.js";
 
 /**
@@ -18,6 +24,39 @@ function shuffledIndices(n) {
   return arr;
 }
 
+/**
+ * @returns {HTMLInputElement}
+ */
+function genInputField() {
+  let input = document.createElement("input");
+  input.type = "text";
+  input.classList.add("inputField");
+  return input;
+}
+
+/**
+ * @param {string} innerHTML
+ * @returns {HTMLSpanElement}
+ */
+function genSpan(innerHTML) {
+  let span = document.createElement("span");
+  span.innerHTML = innerHTML;
+  return span;
+}
+
+/**
+ * @param {string} tex
+ * @returns {HTMLSpanElement}
+ */
+function genMathSpan(tex) {
+  let span = document.createElement("span");
+  // @ts-ignore
+  katex.render(tex, span, {
+    throwOnError: false,
+  });
+  return span;
+}
+
 class Question {
   /**
    * @param {Object.<Object,Object>} src
@@ -26,10 +65,11 @@ class Question {
     this.src = src;
     this.instanceIdx = Math.floor(Math.random() * src.instances.length);
     this.choiceIdx = 0; // distinct index for every multi or single choice
-    this.expectedValues = {};
-    this.expectedTypes = {};
-    this.studentValues = {};
+    this.expected = {};
+    this.types = {}; // variable types of this.expected
+    this.student = {};
     this.qDiv = null;
+    this.titleDiv = null;
     this.checkBtn = null;
     this.showSolution = false;
   }
@@ -43,10 +83,10 @@ class Question {
     parent.appendChild(this.qDiv);
     this.qDiv.classList.add("question");
     // generate question title
-    let titleDiv = document.createElement("div");
-    this.qDiv.appendChild(titleDiv);
-    titleDiv.classList.add("questionTitle");
-    titleDiv.innerHTML = this.src["title"];
+    this.titleDiv = document.createElement("div");
+    this.qDiv.appendChild(this.titleDiv);
+    this.titleDiv.classList.add("questionTitle");
+    this.titleDiv.innerHTML = this.src["title"];
     // error?
     if (this.src["error"].length > 0) {
       let errorSpan = document.createElement("span");
@@ -76,19 +116,19 @@ class Question {
     // (c) feedback text
     let feedbackSpan = document.createElement("span");
     buttonDiv.appendChild(feedbackSpan);
-    feedbackSpan.innerHTML = "";
     // evaluation
     this.checkBtn.addEventListener("click", () => {
+      feedbackSpan.innerHTML = "";
       let numChecked = 0;
       let numCorrect = 0;
-      for (let id in this.expectedValues) {
-        console.log("comparing answer " + id);
-        let type = this.expectedTypes[id];
-        console.log("type = " + type);
-        let student = this.studentValues[id];
-        console.log("student = " + student);
-        let expected = this.expectedValues[id];
-        console.log("expected = " + expected);
+      for (let id in this.expected) {
+        //console.log("comparing answer " + id);
+        let type = this.types[id];
+        //console.log("type = " + type);
+        let student = this.student[id];
+        //console.log("student = " + student);
+        let expected = this.expected[id];
+        //console.log("expected = " + expected);
         switch (type) {
           case "int":
           case "bool":
@@ -101,16 +141,18 @@ class Question {
       }
       if (numCorrect == numChecked) {
         feedbackSpan.style.color =
+          this.titleDiv.style.color =
           this.checkBtn.style.backgroundColor =
           this.qDiv.style.borderColor =
             "rgb(0,150,0)";
-        this.qDiv.style.backgroundColor = "rgba(0,150,0, 0.05)";
+        this.qDiv.style.backgroundColor = "rgba(0,150,0, 0.025)";
       } else {
-        feedbackSpan.style.color =
+        this.titleDiv.style.color =
+          feedbackSpan.style.color =
           this.checkBtn.style.backgroundColor =
           this.qDiv.style.borderColor =
             "rgb(150,0,0)";
-        this.qDiv.style.backgroundColor = "rgba(150,0,0, 0.05)";
+        this.qDiv.style.backgroundColor = "rgba(150,0,0, 0.025)";
         if (numChecked >= 5) {
           feedbackSpan.innerHTML = "" + numCorrect + " / " + numChecked;
         }
@@ -167,43 +209,52 @@ class Question {
         return span;
       }
       case "math": {
-        let span = document.createElement("span");
         let str = this.generateMathString(node);
-        // @ts-ignore
-        katex.render(str, span, {
-          throwOnError: false,
-        });
-        return span;
+        return genMathSpan(str);
       }
       case "input": {
         let span = document.createElement("span");
 
         let varId = node.data;
         let expected = this.src.instances[this.instanceIdx][varId];
-        this.expectedValues[varId] = expected.value;
-        this.expectedTypes[varId] = expected.type;
 
-        let input = document.createElement("input");
-        input.type = "text";
-        input.classList.add("inputField");
-        span.appendChild(input);
-
-        input.addEventListener("keyup", () => {
-          this.studentValues[varId] = input.value.trim();
-        });
-
-        if (this.showSolution) {
-          this.studentValues[varId] = input.value = expected.value;
+        if (expected.type == "vector") {
+          // vector
+          let elements = expected.value.split(",").map((e) => e.trim());
+          let n = elements.length;
+          span.appendChild(genSpan(" "));
+          for (let i = 0; i < n; i++) {
+            this.expected[varId + i] = elements[i];
+            this.types[varId + i] = "int"; // TODO
+            if (i > 0) span.appendChild(genSpan(" , "));
+            let input = genInputField();
+            span.appendChild(input);
+            input.addEventListener("keyup", () => {
+              this.student[varId + i] = input.value.trim();
+            });
+            if (this.showSolution)
+              this.student[varId + i] = input.value = elements[i];
+          }
+          span.appendChild(genSpan(" "));
+        } else {
+          // scalar
+          this.expected[varId] = expected.value;
+          this.types[varId] = expected.type;
+          let input = genInputField();
+          span.appendChild(input);
+          input.addEventListener("keyup", () => {
+            this.student[varId] = input.value.trim();
+          });
+          if (this.showSolution)
+            this.student[varId] = input.value = expected.value;
         }
 
-        let space = document.createElement("span");
-        space.innerHTML = "&nbsp;";
-        span.appendChild(space);
-
+        // let space = document.createElement("span");
+        // space.innerHTML = "&nbsp;";
+        // span.appendChild(space);
         // let feedback = document.createElement("span");
         // feedback.innerHTML = "FEEDBACK";
         // span.appendChild(feedback);
-
         return span;
       }
       case "itemize": {
@@ -215,46 +266,60 @@ class Question {
         }
         return ul;
       }
-      // TODO: single-choice
+      case "single-choice":
       case "multi-choice": {
+        let mc = node.type == "multi-choice";
         let table = document.createElement("table");
         let n = node.children.length;
         let order = shuffledIndices(n);
+        let iconCorrect = mc ? iconSquareChecked : iconCircleChecked;
+        let iconIncorrect = mc ? iconSquareUnchecked : iconCircleUnchecked;
+        let checkboxes = [];
+        let answerIDs = [];
         for (let i = 0; i < n; i++) {
           let idx = order[i];
           let answer = node.children[idx];
           let answerId = "mc-" + this.choiceIdx + "-" + idx;
+          answerIDs.push(answerId);
 
           let expectedValue = answer.children[0].data;
-          this.expectedValues[answerId] = expectedValue;
-          this.expectedTypes[answerId] = "bool";
-          this.studentValues[answerId] = this.showSolution
-            ? expectedValue
-            : "false";
+          this.expected[answerId] = expectedValue;
+          this.types[answerId] = "bool";
+          this.student[answerId] = this.showSolution ? expectedValue : "false";
           let text = this.generateText(answer.children[1], true);
 
           let tr = document.createElement("tr");
           table.appendChild(tr);
           tr.style.cursor = "pointer";
           let tdCheckBox = document.createElement("td");
+          checkboxes.push(tdCheckBox);
           tr.appendChild(tdCheckBox);
           tdCheckBox.innerHTML =
-            this.studentValues[answerId] == "true"
-              ? iconSquareChecked
-              : iconSquareUnchecked;
+            this.student[answerId] == "true" ? iconCorrect : iconIncorrect;
           let tdText = document.createElement("td");
           tr.appendChild(tdText);
           tdText.appendChild(text);
-
-          tr.addEventListener("click", () => {
-            this.studentValues[answerId] =
-              this.studentValues[answerId] === "true" ? "false" : "true";
-            if (this.studentValues[answerId] === "true") {
-              tdCheckBox.innerHTML = iconSquareChecked;
-            } else {
-              tdCheckBox.innerHTML = iconSquareUnchecked;
-            }
-          });
+          if (mc) {
+            tr.addEventListener("click", () => {
+              this.student[answerId] =
+                this.student[answerId] === "true" ? "false" : "true";
+              if (this.student[answerId] === "true")
+                tdCheckBox.innerHTML = iconCorrect;
+              else tdCheckBox.innerHTML = iconIncorrect;
+            });
+          } else {
+            tr.addEventListener("click", () => {
+              for (let id of answerIDs) this.student[id] = "false";
+              this.student[answerId] = "true";
+              for (let i = 0; i < answerIDs.length; i++) {
+                let idx = order[i];
+                checkboxes[idx].innerHTML =
+                  this.student[answerIDs[idx]] == "true"
+                    ? iconCorrect
+                    : iconIncorrect;
+              }
+            });
+          }
         }
         this.choiceIdx++;
         return table;
@@ -295,6 +360,6 @@ export function init(quizSrc, debug) {
     question.showSolution = debug;
     questions.push(question);
     question.populateDom(questionsDiv);
-    if (debug) question.checkBtn.click();
+    if (debug && questionSrc.error.length == 0) question.checkBtn.click();
   }
 }

@@ -19,6 +19,7 @@
 
     <style>
       html {
+        /*background-color: rgb(15, 15, 15);*/
         font-family: Arial, Helvetica, sans-serif;
       }
       body {
@@ -43,9 +44,11 @@
         text-align: center;
       }
       .question {
+        color: black;
+        background-color: white;
         border-style: solid;
         border-radius: 5px;
-        border-width: 2px;
+        border-width: 3px;
         border-color: black;
         padding: 8px;
         margin-top: 20px;
@@ -54,8 +57,7 @@
         box-shadow: 4px 6px 8px -1px rgba(0, 0, 0, 0.1);
       }
       .questionTitle {
-        font-size: 18pt;
-        font-weight: bold;
+        font-size: 24pt;
       }
       ul {
         margin-top: 0;
@@ -76,34 +78,37 @@
         background-color: transparent;
       }
       .inputField:focus {
-        outline-color: gray;
+        outline-color: maroon;
       }
       .button {
         padding-left: 8px;
         padding-right: 8px;
-        padding-top: 3px;
-        padding-bottom: 3px;
+        padding-top: 5px;
+        padding-bottom: 5px;
         font-size: 12pt;
         /*background-color: rgba(62, 146, 3, 0.767);*/
         background-color: green;
         color: white;
         border-style: none;
-        border-radius: 2px;
-        height: 32px;
+        border-radius: 4px;
+        height: 36px;
         cursor: pointer;
       }
       .buttonRow {
         display: flex;
         align-items: baseline;
+        margin-top: 12px;
       }
     </style>
   </head>
   <body>
     <h1 id="title"></h1>
-    <h1 id="debug" style="color: red; display: none">DEBUG</h1>
     <div class="author" id="author"></div>
     <p id="courseInfo1" class="courseInfo"></p>
     <p id="courseInfo2" class="courseInfo"></p>
+    <h1 id="debug" style="font-size: 12pt; color: red; display: none">
+      !! DEBUG VERSION !!
+    </h1>
     <div id="questions"></div>
     <p style="font-size: 8pt; font-style: italic; text-align: center">
       Technology: SELL Quiz by Andreas Schwenk
