@@ -7,10 +7,9 @@ LICENSE: GPLv3
 
 import json, sys, numpy, types, sys, os
 
-# TODO: publish
-# TODO: debug output (show variables + solution)
+# TODO: publish python package
+# TODO: debug output: show all python variable values
 # TODO: matrix input, set input, complex numbers, ...
-# TODO: support for single choice questions
 
 
 class Lexer:

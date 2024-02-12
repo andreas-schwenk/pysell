@@ -1,4 +1,4 @@
-# sell4ever
+# pySELL
 
 Re-implementation of the essentials of the Simple E-Learning Language (SELL) for Longevity.
 
