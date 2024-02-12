@@ -23,7 +23,7 @@ Run `npm run build` or `node build.js` to update variable `html` in file `sell.p
 
 ## Example
 
-The following example code generates two questions, as seen in the figure.
+The following example code generates some questions, as seen in the figure and available for testing [here](https://andreas-schwenk.github.io/pysell/ex1.html).
 
 ![](img/example.png)
 
