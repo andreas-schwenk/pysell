@@ -9,7 +9,7 @@
       "type": "debugpy",
       "request": "launch",
       "program": "sell.py",
-      "args": ["-D", "examples/ex1.txt"],
+      "args": ["-J", "examples/ex1.txt"],
       "console": "integratedTerminal",
       "env": {
         "PYTHONPATH": "${workspaceFolder}"
@@ -21,6 +21,14 @@
       "type": "chrome",
       "url": "http://localhost:5501",
       "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "Node.js: current file",
+      "program": "${file}",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node",
+      "console": "integratedTerminal"
     }
   ]
 }

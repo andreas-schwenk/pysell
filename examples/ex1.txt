@@ -2,6 +2,7 @@ LANG    en
 TITLE   Demo
 AUTHOR  Andreas Schwenk
 
+# this is a comment line
 
 QUESTION Multiple-Choice
 Mark the correct answer(s)
@@ -12,17 +13,30 @@ Mark the correct answer(s)
 
 QUESTION Single-Choice
 Mark the correct answer
-(x) This answer is correct
-( ) This answer is incorrect
-( ) This answer is incorrect
+(x) This answer is **correct**
+( ) This answer is *incorrect*
+( ) This answer is *incorrect*
 
 
-# this is a comment line
+QUESTION Programming
+Will the following loop terminate:
+`while (true || x) { ... }`?
+(x) no
+( ) yes
+
+
+QUESTION Gap
+- Write 3 as a word %"three".
+- Write 7 as a word %"seven".
+
+
 QUESTION Addition
 """
 import random
-x = random.randint(10, 20)
-y = random.randint(10, 20)
+#x = random.randint(10, 20)
+#y = random.randint(10, 20)
+x = random.randint(1, 5)
+y = 2
 z = x + y
 """
 Calculate $x + y =$ %z
@@ -36,4 +50,47 @@ for i in range(2,len(fib)):
 fib3 = fib[3:]
 """
 Complete the Fibonacci sequence
-- $ 1, 1, 2, $ %fib3, ...
+- $ 1, 1, 2, $ %!fib3, ...
+
+
+QUESTION Set
+"""
+import random
+x = {2,4,5}
+y = {3,4,6}
+z = x.union(y)
+"""
+$x \cup y = $ %z
+
+
+QUESTION Complex
+"""
+import random
+[a,b,c,d] = random.choices(range(2,10+1),k=4)
+u = a + b*1j
+v = c + d*1j
+z1 = u + v
+z2 = u * v
+"""
+- $(u)+(v)=$ %z1
+- $(u)\cdot(v)=$ %z2
+
+
+QUESTION Matrix
+"""
+import numpy
+A = numpy.asmatrix(numpy.random.randint(20, size=(4, 3)))
+B = A.transpose()
+"""
+- $A^T =$ %B
+
+
+QUESTION Term
+"""
+from sympy import *
+x = symbols('x')
+f = 3 * cos(x)
+fd = diff(f,x)
+"""
+- $"f"(x)=f$
+- $"f"'(x)=$ %fd

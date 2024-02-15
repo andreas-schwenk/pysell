@@ -1,0 +1,6 @@
+# TODO: syntax for manual line feeds (e.g. "\\")
+# TODO: support for math terms (math.js)
+# TODO: publish python package
+# TODO: include description from README.md into sell.py preamble
+# TODO: test "\n" in Windows
+# TODO: sympy and numpy loading times slow: exclude optionally?

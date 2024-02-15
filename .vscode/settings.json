@@ -2,11 +2,18 @@
   "cSpell.language": "en,de",
   "cSpell.words": [
     "Andreas",
+    "asmatrix",
+    "bmatrix",
+    "isinstance",
     "katex",
+    "keyup",
     "numpy",
     "outfile",
+    "pmatrix",
     "randint",
-    "Schwenk"
+    "Schwenk",
+    "sympy",
+    "Tribonacci"
   ],
   "editor.insertSpaces": true,
   "editor.rulers": [80],

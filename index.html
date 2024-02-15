@@ -2,9 +2,8 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>SELL Quiz</title>
+    <title>pySELL</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
@@ -16,10 +15,8 @@
       integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8"
       crossorigin="anonymous"
     ></script>
-
     <style>
       html {
-        /*background-color: rgb(15, 15, 15);*/
         font-family: Arial, Helvetica, sans-serif;
       }
       body {
@@ -59,13 +56,36 @@
       .questionTitle {
         font-size: 24pt;
       }
+      .code {
+        font-family: "Courier New", Courier, monospace;
+        color: black;
+        background-color: rgb(235, 235, 235);
+        padding: 2px 5px;
+        border-radius: 5px;
+        margin: 1px 2px;
+      }
+      .debugCode {
+        font-family: "Courier New", Courier, monospace;
+        padding: 4px;
+        margin-bottom: 5px;
+        background-color: black;
+        color: white;
+        border-radius: 5px;
+        opacity: 0.85;
+        overflow-x: scroll;
+      }
+      .debugInfo {
+        text-align: center;
+        font-size: 8pt;
+        margin-top: 2px;
+      }
       ul {
         margin-top: 0;
         margin-left: 0px;
         padding-left: 20px;
       }
       .inputField {
-        width: 64px;
+        width: 32px;
         height: 24px;
         font-size: 14pt;
         border-style: solid;
@@ -76,6 +96,7 @@
         padding-right: 5px;
         outline-color: black;
         background-color: transparent;
+        margin: 1px;
       }
       .inputField:focus {
         outline-color: maroon;
@@ -106,17 +127,18 @@
     <div class="author" id="author"></div>
     <p id="courseInfo1" class="courseInfo"></p>
     <p id="courseInfo2" class="courseInfo"></p>
-    <h1 id="debug" style="font-size: 12pt; color: red; display: none">
-      !! DEBUG VERSION !!
-    </h1>
+    <h1 id="debug" class="debugInfo" style="display: none">DEBUG VERSION</h1>
     <div id="questions"></div>
     <p style="font-size: 8pt; font-style: italic; text-align: center">
-      Technology: SELL Quiz by Andreas Schwenk
+      This quiz was created using pySELL (Python-based Simple E-Learning
+      Langauge, written by Andreas Schwenk)
     </p>
     <!-- @begin(test) -->
     <script type="module">
       import { init } from "./src/index.js";
-      fetch("test/example.json?v=" + Date.now())
+      // create json file via
+      //   python3 sell.py -J examples/ex1.txt
+      fetch("examples/ex1.json?v=" + Date.now())
         .then((data) => data.json())
         .then((quizSrc) => {
           let debug = true;
