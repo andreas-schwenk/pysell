@@ -3,24 +3,6 @@ TITLE   Demo
 AUTHOR  Andreas Schwenk
 
 
-
-##############
-QUESTION Conditional Multiple Choice
-"""
-import random
-[a,b,c,d] = random.sample(range(2,20+1),k=4)
-ab = a > b
-bc = b > c
-cd = c > d
-"""
-Mark the correct answer(s)
-[!ab] $a>b$
-[!bc] $b>c$
-[!cd] $c>d$
-##############
-
-
-
 # this is a comment line
 
 
