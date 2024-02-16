@@ -6,6 +6,7 @@ LICENSE: GPLv3
 """
 
 import json, sys, os, re
+from typing import Self
 
 
 class Lexer:
@@ -214,7 +215,7 @@ class TextNode:
         else:
             raise Exception("unimplemented")
 
-    def parse_span(self, lex: Lexer):
+    def parse_span(self, lex: Lexer) -> Self:
         # grammar: span = { item };
         #          item = bold | math | text | input;
         #          bold = "*" { item } "*";
@@ -226,7 +227,7 @@ class TextNode:
             span.children.append(self.parse_item(lex))
         return span
 
-    def parse_item(self, lex: Lexer, math_mode=False):
+    def parse_item(self, lex: Lexer, math_mode=False) -> Self:
         if not math_mode and lex.token == "*":
             return self.parse_bold_italic(lex)
         elif lex.token == "$":
@@ -243,7 +244,7 @@ class TextNode:
             lex.next()
             return n
 
-    def parse_bold_italic(self, lex: Lexer):
+    def parse_bold_italic(self, lex: Lexer) -> Self:
         node = TextNode("italic")
         if lex.token == "*":
             lex.next()
@@ -258,7 +259,7 @@ class TextNode:
             lex.next()
         return node
 
-    def parse_math(self, lex: Lexer):
+    def parse_math(self, lex: Lexer) -> Self:
         math = TextNode("math")
         if lex.token == "$":
             lex.next()
@@ -273,7 +274,7 @@ class TextNode:
             lex.next()
         return math
 
-    def parse_input(self, lex: Lexer):
+    def parse_input(self, lex: Lexer) -> Self:
         input = TextNode("input")
         if lex.token == "%":
             lex.next()
@@ -284,7 +285,7 @@ class TextNode:
         lex.next()
         return input
 
-    def optimize(self):
+    def optimize(self) -> Self:
         children_opt = []
         for c in self.children:
             opt = c.optimize()
@@ -347,7 +348,7 @@ class Question:
         self.post_process_text(self.text)
         self.text.optimize()
 
-    def post_process_text(self, node, math=False):
+    def post_process_text(self, node: TextNode, math=False):
         for c in node.children:
             self.post_process_text(
                 c, math or node.type == "math" or node.type == "display-math"
@@ -380,7 +381,7 @@ class Question:
                 node.type = "code"
                 node.data = node.data[1:-1]
 
-    def format_float(self, v) -> str:
+    def format_float(self, v: float) -> str:
         s = str(v)
         if s.endswith(".0"):
             return s[:-2]
@@ -477,7 +478,7 @@ class Question:
             "python_src_tokens": list(self.python_src_tokens),
         }
 
-    def syntax_highlight_text_line(self, src):
+    def syntax_highlight_text_line(self, src: str) -> str:
         html = ""
         math = False
         code = False
@@ -553,7 +554,7 @@ class Question:
     def red_colored_span(self, innerHTML: str) -> str:
         return '<span style="color:#FF5733; font-weight:bold">' + innerHTML + "</span>"
 
-    def syntax_highlight_text(self, src):
+    def syntax_highlight_text(self, src: str) -> str:
         html = ""
         lines = src.split("\n")
         for line in lines:
@@ -574,7 +575,7 @@ class Question:
             html += "<br/>"
         return html
 
-    def syntax_highlight_python(self, src):
+    def syntax_highlight_python(self, src: str) -> str:
         lines = src.split("\n")
         html = ""
         for line in lines:
