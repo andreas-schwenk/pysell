@@ -1,3 +1,9 @@
+/*******************************************************************************
+ * SELL - Simple E-Learning Language
+ * AUTHOR:  Andreas Schwenk <mailto:contact@compiler-construction.com>
+ * LICENSE: GPLv3
+ ******************************************************************************/
+
 /**
  * @param {HTMLElement[]} children
  * @returns {HTMLDivElement}
@@ -34,6 +40,7 @@ export function genLi(child) {
  */
 export function genInputField(width) {
   let input = document.createElement("input");
+  input.spellcheck = false;
   input.type = "text";
   input.classList.add("inputField");
   input.style.width = width + "px";
@@ -66,11 +73,18 @@ export function genSpan(innerHTML, children = []) {
  * @param {string} tex
  * @returns {HTMLSpanElement}
  */
-export function genMathSpan(tex) {
+export function genMathSpan(tex, displayStyle = false) {
   let span = document.createElement("span");
   // @ts-ignore
   katex.render(tex, span, {
     throwOnError: false,
+    displayMode: displayStyle,
+    macros: {
+      "\\RR": "\\mathbb{R}",
+      "\\NN": "\\mathbb{N}",
+      "\\QQ": "\\mathbb{Q}",
+      "\\ZZ": "\\mathbb{Z}",
+    },
   });
   return span;
 }

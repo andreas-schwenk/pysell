@@ -120,6 +120,22 @@
         align-items: baseline;
         margin-top: 12px;
       }
+      .matrixResizeButton {
+        width: 20px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 3px;
+        position: absolute;
+        z-index: 1;
+        height: 20px;
+        cursor: pointer;
+        margin-bottom: 3px;
+      }
+      a {
+        color: black;
+        text-decoration: underline;
+      }
     </style>
   </head>
   <body>
@@ -127,11 +143,15 @@
     <div class="author" id="author"></div>
     <p id="courseInfo1" class="courseInfo"></p>
     <p id="courseInfo2" class="courseInfo"></p>
-    <h1 id="debug" class="debugInfo" style="display: none">DEBUG VERSION</h1>
+    <h1 id="debug" class="debugCode" style="display: none">DEBUG VERSION</h1>
     <div id="questions"></div>
     <p style="font-size: 8pt; font-style: italic; text-align: center">
-      This quiz was created using pySELL (Python-based Simple E-Learning
-      Langauge, written by Andreas Schwenk)
+      This quiz was created using
+      <a href="https://github.com/andreas-schwenk/pysell">pySELL</a>, the
+      <i>Python-based Simple E-Learning Language</i>, written by Andreas
+      Schwenk, GPLv3<br />
+      last update on
+      <span id="date"></span>
     </p>
     <!-- @begin(test) -->
     <script type="module">

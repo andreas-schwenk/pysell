@@ -1,17 +1,23 @@
 {
   "cSpell.language": "en,de",
   "cSpell.words": [
+    "acoth",
     "Andreas",
     "asmatrix",
+    "blub",
     "bmatrix",
+    "elif",
     "isinstance",
     "katex",
     "keyup",
+    "mathbb",
+    "ndarray",
     "numpy",
     "outfile",
     "pmatrix",
     "randint",
     "Schwenk",
+    "sinc",
     "sympy",
     "Tribonacci"
   ],

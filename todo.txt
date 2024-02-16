@@ -1,6 +1,75 @@
-# TODO: syntax for manual line feeds (e.g. "\\")
-# TODO: support for math terms (math.js)
+# TODO: doc: if a variable in math mode is a matrix and contains "augmented" as subterm, then it is represented as augmented matrix
+
+# TODO: doc: note on packages -> which error occurs, if e.g. numpy is NOT installed??
+
+# TODO: documentation for Conditional Multiple Choice (NOT available for single choice!)
+
+# TODO: readme notes on libraries: numpy, sympy, sage, ... (sympy and numpy loading times slow: exclude optionally?)
+
 # TODO: publish python package
+
 # TODO: include description from README.md into sell.py preamble
-# TODO: test "\n" in Windows
-# TODO: sympy and numpy loading times slow: exclude optionally?
+
+# TODO: test "\n" in Windows (must replace "\r" after reading file??)
+
+# TODO: large feedback text "awesome, try again, ..."
+
+# TODO: accept+correct (with e.g. yellow bg-color) gaps that are almost correct
+
+# TODO: readme: add hints on fractions (sympy Fraction), ... + give more examples in general
+
+# TODO: render typed equation next to input field as "tooltip" with katex
+
+# TODO: in debug view: write source line number + file name above each question
+
+# TODO: automatically switch between round parentheses and brackets for vectors/matrices; based on LANG (de: round parentheses, otherwise: brackets)
+
+# TODO: plot: e.g. https://pythonforundergradengineers.com/plotting-sin-cos-with-matplotlib.html
+
+
+sage -python sell.py INPUT_PATH
+
+from sage.all import *
+sage.all.factorial(3)
+x = sage.all.power_mod(2,100,123)
+type(x)
+# <class 'int'>
+p = sage.all.random_prime(2^1536)
+type(p)
+# <class 'sage.rings.integer.Integer'>
+
+----> TODO: more types (from old sellquiz-language-workbench: if type(value) == Integer or type(value) == int or type(value) == sage.rings.finite_rings.integer_mod.IntegerMod_int:)
+
+
+# https://doc.sagemath.org/html/en/reference/py-modindex.html
+
+
+---
+Question.
+@title
+3. Restklassen
+@sage
+
+from sage.all import *
+import random             # MUST be imported AFTER sage
+n1 = 5
+a = -random.randint(42, 73)
+b = 100 * random.randint(2, 5)
+c = random.randint(2, 5)
+d = random.randint(11, 21)
+x = sage.all.mod( a*(b+c*2^d), n1 )
+
+
+
+n2 = 10
+e = randint(1000, 100000)
+f = randint(1000, 1000000)
+g = randint(1000, 10000000)
+h = randint(1000, 100000000)
+y = mod( e*f*g*h, n2 )
+@text
+Berechne die folgenden Restklassen und gib jeweils den **Standardrepräsentaten** an:
+- $ (e \cdot f \cdot g \cdot h) \mod n2 = $ #y
+- $ a \cdot (b + c \cdot 2^{d}) \mod n1 = $ #x
+---
+

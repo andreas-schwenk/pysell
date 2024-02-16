@@ -1,3 +1,9 @@
+/*******************************************************************************
+ * SELL - Simple E-Learning Language
+ * AUTHOR:  Andreas Schwenk <mailto:contact@compiler-construction.com>
+ * LICENSE: GPLv3
+ ******************************************************************************/
+
 // icons SVG data (c) by fontawesome.com
 // added height and fill propierties
 

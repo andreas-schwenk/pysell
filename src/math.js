@@ -1,3 +1,9 @@
+/*******************************************************************************
+ * SELL - Simple E-Learning Language
+ * AUTHOR:  Andreas Schwenk <mailto:contact@compiler-construction.com>
+ * LICENSE: GPLv3
+ ******************************************************************************/
+
 /**
  * @param {number} n
  * @returns {number[]}
@@ -25,6 +31,7 @@ export function shuffledIndices(n) {
   return arr;
 }
 
+// TODO: also support terms as elements???
 export class Vector {
   constructor() {
     /** @type {number} */
@@ -44,13 +51,54 @@ export class Vector {
 }
 
 export class Matrix {
-  constructor() {
+  /**
+   * Matrix elements are strings that represent arbitrary terms
+   * @param {number} m
+   * @param {number} n
+   */
+  constructor(m, n) {
     /** @type {number} */
-    this.m = 0;
+    this.m = m;
     /** @type {number} */
-    this.n = 0;
-    /** @type {number[]} */
-    this.v = [];
+    this.n = n;
+    /** @type {string[]} */
+    this.v = new Array(m * n).fill("0");
+  }
+
+  /**
+   * @param {number} i
+   * @param {number} j
+   * @returns {string} -- "0", if indices are invalid
+   */
+  getElement(i, j) {
+    if (i < 0 || i >= this.m || j < 0 || j >= this.n) return "0";
+    return this.v[i * this.n + j];
+  }
+
+  /**
+   * @param {number} m
+   * @param {number} n
+   * @param {string} init
+   * @returns {boolean} -- success
+   */
+  resize(m, n, init) {
+    if (m < 1 || m > 50 || n < 1 || n > 50) return false;
+    let mat = new Matrix(m, n);
+    mat.v.fill(init);
+    for (let i = 0; i < mat.m; i++)
+      for (let j = 0; j < mat.n; j++)
+        mat.v[i * mat.n + j] = this.getElement(i, j);
+    this.fromMatrix(mat);
+    return true;
+  }
+
+  /**
+   * @param {Matrix} mat
+   */
+  fromMatrix(mat) {
+    this.m = mat.m;
+    this.n = mat.n;
+    this.v = [...mat.v];
   }
 
   /**
@@ -58,12 +106,12 @@ export class Matrix {
    * @param {string} s
    */
   fromString(s) {
-    this.m = s.split("],[").length;
+    this.m = s.split("],").length;
     this.v = s
       .replaceAll("[", "")
       .replaceAll("]", "")
       .split(",")
-      .map((e) => parseFloat(e));
+      .map((e) => e.trim());
     this.n = this.v.length / this.m;
   }
 
@@ -73,10 +121,30 @@ export class Matrix {
   getMaxCellStrlen() {
     let m = 0;
     for (let vi of this.v) {
-      let s = vi.toString();
-      if (s.length > m) m = s.length;
+      if (vi.length > m) m = vi.length;
     }
     return m;
+  }
+
+  /**
+   * @param {boolean} [augmented=false]
+   * @returns {string}
+   */
+  toTeX(augmented = false) {
+    // TODO switch "[]" and "()" based on language
+    let s = augmented ? "\\left[\\begin{array}" : "\\begin{bmatrix}";
+    if (augmented) s += "{" + "c".repeat(this.n - 1) + "|c}";
+    for (let i = 0; i < this.m; i++) {
+      for (let j = 0; j < this.n; j++) {
+        if (j > 0) s += "&";
+        let e = this.getElement(i, j);
+        // TODO: parse term + output term as TeX
+        s += e;
+      }
+      s += "\\\\";
+    }
+    s += augmented ? "\\end{array}\\right]" : "\\end{bmatrix}";
+    return s;
   }
 }
 
@@ -258,7 +326,6 @@ export class Term {
    * @returns {Node}
    */
   parseMul() {
-    // TODO: implicit mul
     let node = this.parsePow();
     while (
       ["*", "/", "("].includes(this.token) ||
@@ -278,7 +345,6 @@ export class Term {
    * @returns {Node}
    */
   parsePow() {
-    // TODO: implicit mul
     let node = this.parseUnary();
     if (["^"].includes(this.token)) {
       let op = this.token;
@@ -326,7 +392,7 @@ export class Term {
         paren = true;
         this.next();
       }
-      let fun = new Node(op, [this.parseMul()]);
+      let fun = new Node(op, [paren ? this.parseExpr() : this.parseMul()]);
       if (paren) {
         if (this.token === ")") this.next();
         else throw Error("expected ')'");
@@ -357,6 +423,8 @@ export class Term {
    * @return {boolean}
    */
   compare(term) {
+    // TODO: e.g. sqrt(x) with random x < 0 is a problem,
+    //       as long as complex numbers are not yet implemented in eval()...
     const NUM_TESTS = 10;
     let vars = new Set();
     this.getVars(vars);

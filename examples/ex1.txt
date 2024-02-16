@@ -2,7 +2,27 @@ LANG    en
 TITLE   Demo
 AUTHOR  Andreas Schwenk
 
+
+
+##############
+QUESTION Conditional Multiple Choice
+"""
+import random
+[a,b,c,d] = random.sample(range(2,20+1),k=4)
+ab = a > b
+bc = b > c
+cd = c > d
+"""
+Mark the correct answer(s)
+[!ab] $a>b$
+[!bc] $b>c$
+[!cd] $c>d$
+##############
+
+
+
 # this is a comment line
+
 
 QUESTION Multiple-Choice
 Mark the correct answer(s)
@@ -76,13 +96,25 @@ z2 = u * v
 - $(u)\cdot(v)=$ %z2
 
 
-QUESTION Matrix
+QUESTION Matrices with Numpy
 """
 import numpy
-A = numpy.asmatrix(numpy.random.randint(20, size=(4, 3)))
+A = numpy.random.randint(20, size=(4, 3))
 B = A.transpose()
 """
 - $A^T =$ %B
+
+
+QUESTION Matrices with Sympy
+"""
+from sympy import *
+A = randMatrix(2,3, min=-2, max=2, symmetric=False)
+B = randMatrix(2,3, min=-2, max=2, symmetric=False)
+x = symbols('x')
+B[0,0] = cos(x) + sin(5)
+C = A * B.transpose()
+"""
+- $A \cdot B^T=$ %C
 
 
 QUESTION Term
@@ -94,3 +126,17 @@ fd = diff(f,x)
 """
 - $"f"(x)=f$
 - $"f"'(x)=$ %fd
+
+
+QUESTION Conditional Multiple Choice
+"""
+import random
+[a,b,c,d] = random.sample(range(2,20+1),k=4)
+ab = a > b
+bc = b > c
+cd = c > d
+"""
+Mark the correct answer(s)
+[!ab] $a>b$
+[!bc] $b>c$
+[!cd] $c>d$
