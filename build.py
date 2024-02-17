@@ -55,7 +55,7 @@ if __name__ == "__main__":
         "</body>",
         "<script>let debug = false; let quizSrc = {};"
         + js
-        + "sell.init(quizSrc,debug);</script>",
+        + "sell.init(quizSrc,debug);</script></body>",
     )
     # update file "sell.py" between "# @begin(html" and "# @end(html)"
     py = ""
@@ -71,5 +71,5 @@ if __name__ == "__main__":
         elif skip is False:
             py += line
     # write new version of sell.py
-    f = open("sell__TESTXXX.py", "w")
+    f = open("sell.py", "w")
     f.write(py.strip() + "\n")
