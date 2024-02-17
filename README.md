@@ -207,7 +207,7 @@ Elements are limited to $\mathbb{R}$.
 
 ```python
 from sympy import *
-randMatrix(2,3, min=-2, max=5, symmetric=False)
+A = randMatrix(2,3, min=-2, max=5, symmetric=False)
 # overwrite element A_{0,0}
 x, y = symbols('x,y')
 A[0,0] = sin(x) * cos(y)
