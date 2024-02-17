@@ -1,10 +1,6 @@
 # pySELL
 
-The Python based Simple E-Learning Language (SELL).
-
-Push interactive STEM tasks to the web.
-
-<!--Re-implementation of the essentials of the Simple E-Learning Language (SELL) for Longevity.-->
+Python based Simple E-Learning Language for the simple creation of interactive courses
 
 ## Dependencies
 
@@ -82,7 +78,7 @@ Complete the Fibonacci sequence
 
 ### Global
 
-- `LANG` defines the language (currently, only `en` is supported).
+- `LANG` defines the language (currently, `en`, `de`, `es`, `it`, `fr` are supported).
 - `TITLE` defines the pages title.
 - `AUTHOR` defines the author/institution of the quizzes.
 - `QUESTION` marks the beginning of a new question. The title of the question is written into the same line.
@@ -179,9 +175,9 @@ x = random.sample(range(-2,5+1),k=3)
 y = set(random.sample(range(-2,5+1),k=3))
 ```
 
-#### _Note that the upper bound of `range` is **excluded**._
+_Note that the upper bound of `range` is **excluded**._
 
-Shuffle a list `[2,4,6,8]` (e.g. to `[6,8,4,2]`):
+#### Shuffle a list `[2,4,6,8]` (e.g. to `[6,8,4,2]`):
 
 ```python
 import random
@@ -201,7 +197,7 @@ A = numpy.random.randint(-2, 5, size=(2,3))
 A[0,0] = 1337
 ```
 
-Elements are limited to $\mathbb{R}$.
+Elements are limited to numbers.
 
 #### Generate a 2 x 3 matrix `A` with elements in range `{-2,-1,...,5}` using `sympy`:
 
@@ -229,7 +225,7 @@ Example to get 3 random numbers `a`, `b`, `c` in range `{-2,-1,1,2,3}` with repl
 ```python
 import random
 # get a single random number
-a = random.choice(rangeZ(-2,5+1))
+a = random.choice(rangeZ(-2,3+1))
 # get 3 numbers with replacement (some of a,b,c may be equal)
 [a,b,c] = random.choices(rangeZ(-2,3+1),k=3)
 # get 3 numbers without replacement (a,b,c are distinct)
@@ -242,7 +238,7 @@ _Note that the result of `rangeZ` is of type `list`, while the built-in function
 
 To debug (or extend) the web code, first convert an input file into a json file with the `-J` option enables, e.g. `python3 sell.py -J src/ex1.txt`. Then `src/ex1.json` is generated.
 
-Then start a local web server (e.g. using `python3 -m http.server 8000`) and open `index.html` (e.g. `localhost:8000`, if your port number is 8000). The uncompressed JavaScript code in directory `src/` is interpreted as module.
+Then start a local web server (e.g. using `python3 -m http.server 8000`) and open `web/index.html` (e.g. `localhost:8000/web/`, if your port number is 8000). The uncompressed JavaScript code in directory `web/src/` is interpreted as module.
 
-To update `sell.py` after any change in the JavaScript code, first install the dependency `esbuild` by `npm install`.
-Then run `npm run build` (or `node build.js`) to update variable `html` in file `sell.py`.
+To update `sell.py` after any change in the JavaScript code, first head to `cd web/`, and install the dependency `esbuild` via `npm install`.
+Then go back to the packages root dir, and run `python3 build.py` in order to update variable `html` in file `sell.py`.
