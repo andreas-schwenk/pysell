@@ -22,7 +22,9 @@
 
 # TODO: automatically switch between round parentheses and brackets for vectors/matrices; based on LANG (de: round parentheses, otherwise: brackets)
 
-# TODO: plot: e.g. https://pythonforundergradengineers.com/plotting-sin-cos-with-matplotlib.html
+# TODO: plots: e.g. https://pythonforundergradengineers.com/plotting-sin-cos-with-matplotlib.html
+
+# TODO: button to get the next instance of an exercises (only, if there are distinct instances)
 
 
 sage -python sell.py INPUT_PATH

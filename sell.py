@@ -347,6 +347,7 @@ class Question:
             instances_str = []
             for i in range(0, 5):
                 # try to generate instances distinct to prior once
+                # TODO: give up and keep less than 5, if applicable!
                 instance = {}
                 instance_str = ""
                 for k in range(0, 10):
