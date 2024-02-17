@@ -8,8 +8,6 @@
 
 # TODO: publish python package
 
-# TODO: include description from README.md into sell.py preamble
-
 # TODO: test "\n" in Windows (must replace "\r" after reading file??)
 
 # TODO: large feedback text "awesome, try again, ..."

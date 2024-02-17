@@ -1,5 +1,5 @@
 /*******************************************************************************
- * SELL - Simple E-Learning Language
+ * pySELL - Python based Simple E-Learning Language
  * AUTHOR:  Andreas Schwenk <mailto:contact@compiler-construction.com>
  * LICENSE: GPLv3
  ******************************************************************************/

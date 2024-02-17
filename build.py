@@ -1,17 +1,75 @@
+#!/usr/bin/env python3
+
 """
+pySELL - Python based Simple E-Learning Language for the simple creation of 
+         interactive courses
+AUTHOR:  Andreas Schwenk <mailto:contact@compiler-construction.com>
+LICENSE: GPLv3
+
 This script is only intended for pySELL development. 
-Users just use file 'sell.py'
+Users just use file 'sell.py' (python sell.py QUESTION_FILE.txt)
 """
 
 import subprocess
 
-try:
-    res = subprocess.run(["npm", "install"], cwd="web")
-    res = subprocess.run(["node", "build.js"], cwd="web")
-except Exception as e:
-    print(e)
-    print("pySELL dependencies: npm+nodejs")
-    print("          https://www.npmjs.com, https://nodejs.org/")
-    print("          https://nodejs.org/en/download/package-manager")
-    print("[Debian]  sudo apt install nodejs npm")
-    print("[macOS]   brew install node")
+print("pySELL builder - 2024 by Andreas Schwenk")
+
+if __name__ == "__main__":
+    # build web
+    try:
+        # install web dependencies
+        res = subprocess.run(["npm", "install"], cwd="web")
+        # build web
+        res = subprocess.run(["node", "build.js"], cwd="web")
+    except Exception as e:
+        print(e)
+        print("pySELL dependencies: npm+nodejs")
+        print("          https://www.npmjs.com, https://nodejs.org/")
+        print("          https://nodejs.org/en/download/package-manager")
+        print("[Debian]  sudo apt install nodejs npm")
+        print("[macOS]   brew install node")
+    # build html template and update sell.py
+    f = open("web/index.html")
+    index_html_lines = f.readlines()
+    f.close()
+    f = open("web/dist/sell.min.js")
+    js = f.read().strip()
+    f.close()
+    f = open("sell.py")
+    sell_py_lines = f.readlines()
+    f.close()
+    # remove code between @begin(test) and @end(test)
+    html = ""
+    skip = False
+    for line in index_html_lines:
+        if "@begin(test)" in line:
+            skip = True
+        elif "@end(test)" in line:
+            skip = False
+        elif skip is False:
+            html += line
+    # remove white spaces
+    html = html.replace("  ", "").replace("\n", " ")
+    # insert javascript code
+    html = html.replace(
+        "</body>",
+        "<script>let debug = false; let quizSrc = {};"
+        + js
+        + "sell.init(quizSrc,debug);</script>",
+    )
+    # update file "sell.py" between "# @begin(html" and "# @end(html)"
+    py = ""
+    skip = False
+    for line in sell_py_lines:
+        if "@begin(html)" in line:
+            skip = True
+        elif "@end(html)" in line:
+            skip = False
+            py += "# @begin(html)\n"
+            py += 'html = """' + html.strip() + '\n"""\n'
+            py += "# @end(html)\n"
+        elif skip is False:
+            py += line
+    # write new version of sell.py
+    f = open("sell__TESTXXX.py", "w")
+    f.write(py.strip() + "\n")
