@@ -137,85 +137,85 @@ Read the docs:
 
 Examples:
 
-- Random number `a` in range `{-2,-1,...,5}`:
+#### Random number `a` in range `{-2,-1,...,5}`:
 
-  ```python
-  import random
-  a = random.randint(-2,5)
-  # equivalent:
-  a = random.choice(range(-2,5+1))
-  ```
+```python
+import random
+a = random.randint(-2,5)
+# equivalent:
+a = random.choice(range(-2,5+1))
+```
 
-- Choose a random number `a` from a given set `{2,3,5,7}`:
+#### Choose a random number `a` from a given set `{2,3,5,7}`:
 
-  ```python
-  import random
-  a = random.choice([2,3,5,7])
-  ```
+```python
+import random
+a = random.choice([2,3,5,7])
+```
 
-  _Note that the parameter is actually a list._
+_Note that the parameter is actually a list._
 
-- Get 3 random numbers `a`, `b`, `c` in range `{-2,-1,...,5}` with replacement:
+#### Get 3 random numbers `a`, `b`, `c` in range `{-2,-1,...,5}` with replacement:
 
-  ```python
-  import random
-  # store in a, b, c
-  [a,b,c] = random.choices(range(-2,5+1),k=3)
-  # store as array x
-  x = random.choices(range(-2,5+1),k=3)
-  ```
+```python
+import random
+# store in a, b, c
+[a,b,c] = random.choices(range(-2,5+1),k=3)
+# store as array x
+x = random.choices(range(-2,5+1),k=3)
+```
 
-  _Note that the upper bound of `range` is **excluded**._
+_Note that the upper bound of `range` is **excluded**._
 
-- Get 3 **unique** (i.e. without replacement) random numbers `a`, `b`, `c` in range `{-2,-1,...,5}`:
+#### Get 3 **unique** (i.e. without replacement) random numbers `a`, `b`, `c` in range `{-2,-1,...,5}`:
 
-  ```python
-  import random
-  # store in scalar variables a, b, c
-  [a,b,c] = random.sample(range(-2,5+1),k=3)
-  # store as an array/list x
-  x = random.sample(range(-2,5+1),k=3)
-  # store as a set y
-  y = set(random.sample(range(-2,5+1),k=3))
-  ```
+```python
+import random
+# store in scalar variables a, b, c
+[a,b,c] = random.sample(range(-2,5+1),k=3)
+# store as an array/list x
+x = random.sample(range(-2,5+1),k=3)
+# store as a set y
+y = set(random.sample(range(-2,5+1),k=3))
+```
 
-  _Note that the upper bound of `range` is **excluded**._
+#### _Note that the upper bound of `range` is **excluded**._
 
-- Shuffle a list `[2,4,6,8]` (e.g. to `[6,8,4,2]`):
+Shuffle a list `[2,4,6,8]` (e.g. to `[6,8,4,2]`):
 
-  ```python
-  import random
-  # in place shuffling
-  x = [2,4,6,8]
-  random.shuffle(x)
-  # one liner with immutable input
-  x = random.sample([2,4,6,8],k=4)
-  ```
+```python
+import random
+# in place shuffling
+x = [2,4,6,8]
+random.shuffle(x)
+# one liner with immutable input
+x = random.sample([2,4,6,8],k=4)
+```
 
-- Generate a 2 x 3 matrix `A` with elements in range `{-2,-1,...,5}` using `numpy`:
+#### Generate a 2 x 3 matrix `A` with elements in range `{-2,-1,...,5}` using `numpy`:
 
-  ```python
-  import numpy
-  A = numpy.random.randint(-2, 5, size=(2,3))
-  # overwrite element A_{0,0}
-  A[0,0] = 1337
-  ```
+```python
+import numpy
+A = numpy.random.randint(-2, 5, size=(2,3))
+# overwrite element A_{0,0}
+A[0,0] = 1337
+```
 
-  Elements are limited to $\mathbb{R}$.
+Elements are limited to $\mathbb{R}$.
 
-- Generate a 2 x 3 matrix `A` with elements in range `{-2,-1,...,5}` using `sympy`:
+#### Generate a 2 x 3 matrix `A` with elements in range `{-2,-1,...,5}` using `sympy`:
 
-  ```python
-  from sympy import *
-  randMatrix(2,3, min=-2, max=5, symmetric=False)
-  # overwrite element A_{0,0}
-  x, y = symbols('x,y')
-  A[0,0] = sin(x) * cos(y)
-  ```
+```python
+from sympy import *
+randMatrix(2,3, min=-2, max=5, symmetric=False)
+# overwrite element A_{0,0}
+x, y = symbols('x,y')
+A[0,0] = sin(x) * cos(y)
+```
 
-  Elements can also be terms.
+Elements can also be terms.
 
-**Excluding the zero**
+#### Excluding the zero
 
 In some cases, it may be beneficial to exclude the zero from random number generation.
 
