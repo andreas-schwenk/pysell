@@ -12,6 +12,8 @@ import { Question } from "./question.js";
  * @param {boolean} debug
  */
 export function init(quizSrc, debug) {
+  if (["en", "de", "es", "it", "fr"].includes(quizSrc.lang) == false)
+    quizSrc.lang = "en";
   if (debug) document.getElementById("debug").style.display = "block";
   document.getElementById("date").innerHTML = new Date()
     .toISOString()
