@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
-"""SELL - Simple E-Learning Language
+"""
+pySELL - Python based Simple E-Learning Language
+         Push interactive STEM tasks to the web
 AUTHOR:  Andreas Schwenk <mailto:contact@compiler-construction.com>
 LICENSE: GPLv3
 """

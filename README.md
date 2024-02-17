@@ -1,6 +1,10 @@
 # pySELL
 
-Re-implementation of the essentials of the Simple E-Learning Language (SELL) for Longevity.
+The Python based Simple E-Learning Language (SELL).
+
+Push interactive STEM tasks to the web.
+
+<!--Re-implementation of the essentials of the Simple E-Learning Language (SELL) for Longevity.-->
 
 ## Dependencies
 
@@ -20,7 +24,7 @@ _A short developer guide can be found at the end of this document._
 
 The following example code generates some questions, as seen in the figure and available for testing [here](https://andreas-schwenk.github.io/pysell/ex1.html).
 
-![](docs/example.png)
+![](docs/example.jpg)
 
 Command:
 

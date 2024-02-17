@@ -158,7 +158,7 @@
       import { init } from "./src/index.js";
       // create json file via
       //   python3 sell.py -J examples/ex1.txt
-      fetch("examples/ex1.json?v=" + Date.now())
+      fetch("../examples/ex1.json?v=" + Date.now())
         .then((data) => data.json())
         .then((quizSrc) => {
           let debug = true;

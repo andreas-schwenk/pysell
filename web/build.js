@@ -12,6 +12,8 @@ esbuild.buildSync({
   outfile: "dist/sell.min.js",
 });
 
+process.exit(0);
+
 // build html template and update sell.py
 let lines = fs.readFileSync("index.html", "utf-8").split("\n");
 let js = fs.readFileSync("dist/sell.min.js", "utf-8").trim();
