@@ -1,31 +1,22 @@
+
 # TODO: doc: if a variable in math mode is a matrix and contains "augmented" as subterm, then it is represented as augmented matrix
-
 # TODO: doc: note on packages -> which error occurs, if e.g. numpy is NOT installed??
-
 # TODO: documentation for Conditional Multiple Choice (NOT available for single choice!)
-
 # TODO: readme notes on libraries: numpy, sympy, sage, ... (sympy and numpy loading times slow: exclude optionally?)
+# TODO: readme: add hints on fractions (sympy Fraction), ... + give more examples in general
+
 
 # TODO: publish python package
 
 # TODO: test "\n" in Windows (must replace "\r" after reading file??)
 
-# TODO: large feedback text "awesome, try again, ..."
-
-# TODO: accept+correct (with e.g. yellow bg-color) gaps that are almost correct
-
-# TODO: readme: add hints on fractions (sympy Fraction), ... + give more examples in general
-
-# TODO: render typed equation next to input field as "tooltip" with katex
-
-# TODO: in debug view: write source line number + file name above each question
-
 # TODO: automatically switch between round parentheses and brackets for vectors/matrices; based on LANG (de: round parentheses, otherwise: brackets)
 
 # TODO: plots: e.g. https://pythonforundergradengineers.com/plotting-sin-cos-with-matplotlib.html
 
-# TODO: button to get the next instance of an exercises (only, if there are distinct instances)
 
+
+# TODO: sagemath docs:
 
 sage -python sell.py INPUT_PATH
 

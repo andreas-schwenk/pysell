@@ -28,7 +28,6 @@ export let courseInfo3 = {
   fr: "recharger",
 };
 
-// TODO: not yet used
 export let feedbackOK = {
   en: ["awesome", "great", "correct", "well done"],
   de: ["super", "gut gemacht", "weiter so", "richtig"],
@@ -37,7 +36,6 @@ export let feedbackOK = {
   fr: ["génial", "super", "correct", "bien fait"],
 };
 
-// TODO: not yet used
 export let feedbackErr = {
   en: ["try again", "still some mistakes", "wrong answer"],
   de: ["leider falsch", "nicht richtig", "versuch's nochmal"],

@@ -13,6 +13,7 @@ import {
   genSpan,
   genUl,
 } from "./dom.js";
+import { evalQuestion } from "./eval.js";
 import {
   iconSquareChecked,
   iconSquareUnchecked,
@@ -20,69 +21,170 @@ import {
   iconCircleUnchecked,
   iconCircleChecked,
 } from "./icons.js";
-import { Matrix, Term, shuffledIndices, unShuffledIndices } from "./math.js";
+import { MatrixInput, TermInput } from "./input.js";
+import { Matrix, Term, range } from "./math.js";
+
+export let QuestionState = {
+  init: 0, // not evaluated
+  errors: 1, // evaluated with errors
+  passed: 2, // evaluated with no errors
+};
 
 export class Question {
   /**
+   * @param {HTMLElement} parentDiv
    * @param {Object.<Object,Object>} src
-   * @param {boolean} [debug=false]
+   * @param {string} language
+   * @param {boolean} debug
    */
-  constructor(src, debug = false) {
+  constructor(parentDiv, src, language, debug) {
+    /** @type {number} */
+    this.state = QuestionState.init;
+    /** @type {string} */
+    this.language = language;
+    /** @type {Object.<Object,Object>} */
     this.src = src;
+    /** @type {boolean} */
     this.debug = debug;
-    this.instanceIdx = Math.floor(Math.random() * src.instances.length);
+    /** @type {number[]} */
+    this.instanceOrder = range(src.instances.length, true);
+    /** @type {number} */
+    this.instanceIdx = 0;
+    /** @type {number} */
     this.choiceIdx = 0; // distinct index for every multi or single choice
+    /** @type {number} */
     this.gapIdx = 0; // distinct index for every gap field
+    /** @type {Object.<string,string>} */
     this.expected = {};
+    /** @type {Object.<string,string>} */
     this.types = {}; // variable types of this.expected
+    /** @type {Object.<string,string>} */
     this.student = {};
-    this.inputs = {}; // html input elements (currently ONLY used for type gap)
-    this.qDiv = null;
+    /** @type {Object.<Object,HTMLInputElement>} */
+    this.gapInputs = {}; // html input elements (currently ONLY used for type gap)
+    /** @type {HTMLElement} */
+    this.parentDiv = parentDiv;
+    /** @type {HTMLDivElement} */
+    this.questionDiv = null;
+    /** @type {HTMLDivElement} */
+    this.feedbackDiv = null;
+    /** @type {HTMLDivElement} */
     this.titleDiv = null;
-    this.checkBtn = null;
+    /** @type {HTMLButtonElement} */
+    this.checkAndRepeatBtn = null;
+    /** @type {string} */
+    this.checkAndRepeatBtnState = "check";
+    /** @type {boolean} */
     this.showSolution = false;
+    /** @type {HTMLSpanElement} */
+    this.feedbackSpan = null;
+    /** @type {number} */
+    this.numCorrect = 0;
+    /** @type {number} */
+    this.numChecked = 0;
+  }
+
+  reset() {
+    this.instanceIdx = (this.instanceIdx + 1) % this.src.instances.length;
   }
 
   /**
-   * @param {HTMLElement} parent
+   * @returns {Object.<string,Object>}
    */
-  populateDom(parent) {
+  getCurrentInstance() {
+    return this.src.instances[this.instanceOrder[this.instanceIdx]];
+  }
+
+  editedQuestion() {
+    this.state = QuestionState.init;
+    this.updateVisualQuestionState();
+    this.questionDiv.style.color = "black";
+    this.checkAndRepeatBtn.innerHTML = iconPlay;
+    this.checkAndRepeatBtn.style.display = "block";
+    this.checkAndRepeatBtn.style.color = "black";
+    this.checkAndRepeatBtnState = "check";
+  }
+
+  updateVisualQuestionState() {
+    let color1 = "black";
+    let color2 = "transparent";
+    switch (this.state) {
+      case QuestionState.init:
+        color1 = "rgb(0,0,0)";
+        color2 = "transparent";
+        break;
+      case QuestionState.passed:
+        color1 = "rgb(0,150,0)";
+        color2 = "rgba(0,150,0, 0.025)";
+        break;
+      case QuestionState.errors:
+        color1 = "rgb(150,0,0)";
+        color2 = "rgba(150,0,0, 0.025)";
+        if (this.numChecked >= 5) {
+          this.feedbackSpan.innerHTML =
+            "" + this.numCorrect + " / " + this.numChecked;
+        }
+        break;
+    }
+    this.questionDiv.style.color =
+      this.feedbackSpan.style.color =
+      this.titleDiv.style.color =
+      this.checkAndRepeatBtn.style.backgroundColor =
+      this.questionDiv.style.borderColor =
+        color1;
+    this.questionDiv.style.backgroundColor = color2;
+  }
+
+  populateDom() {
+    this.parentDiv.innerHTML = "";
     // generate question div
-    this.qDiv = genDiv();
-    parent.appendChild(this.qDiv);
-    this.qDiv.classList.add("question");
+    this.questionDiv = genDiv();
+    this.parentDiv.appendChild(this.questionDiv);
+    this.questionDiv.classList.add("question");
+    // feedback overlay
+    this.feedbackDiv = genDiv();
+    this.feedbackDiv.classList.add("questionFeedback");
+    this.questionDiv.appendChild(this.feedbackDiv);
+    this.feedbackDiv.innerHTML = "awesome";
+    // debug text (source line)
+    if (this.debug && "src_line" in this.src) {
+      let title = genDiv();
+      title.classList.add("debugInfo");
+      title.innerHTML = "Source code: lines " + this.src["src_line"] + "..";
+      this.questionDiv.appendChild(title);
+    }
     // generate question title
     this.titleDiv = genDiv();
-    this.qDiv.appendChild(this.titleDiv);
+    this.questionDiv.appendChild(this.titleDiv);
     this.titleDiv.classList.add("questionTitle");
     this.titleDiv.innerHTML = this.src["title"];
     // error?
     if (this.src["error"].length > 0) {
       let errorSpan = genSpan(this.src["error"]);
-      this.qDiv.appendChild(errorSpan);
+      this.questionDiv.appendChild(errorSpan);
       errorSpan.style.color = "red";
       return;
     }
     // generate question text
     for (let c of this.src.text.children)
-      this.qDiv.appendChild(this.generateText(c));
+      this.questionDiv.appendChild(this.generateText(c));
     // generate button row
     let buttonDiv = genDiv();
-    this.qDiv.appendChild(buttonDiv);
+    this.questionDiv.appendChild(buttonDiv);
     buttonDiv.classList.add("buttonRow");
     // (a) check button
     let hasCheckButton = Object.keys(this.expected).length > 0;
     if (hasCheckButton) {
-      this.checkBtn = genButton();
-      buttonDiv.appendChild(this.checkBtn);
-      this.checkBtn.innerHTML = iconPlay;
+      this.checkAndRepeatBtn = genButton();
+      buttonDiv.appendChild(this.checkAndRepeatBtn);
+      this.checkAndRepeatBtn.innerHTML = iconPlay;
     }
-    // (b) spacing
+    // (c) spacing
     let space = genSpan("&nbsp;&nbsp;&nbsp;");
     buttonDiv.appendChild(space);
-    // (c) feedback text
-    let feedbackSpan = genSpan("");
-    buttonDiv.appendChild(feedbackSpan);
+    // (d) feedback text
+    this.feedbackSpan = genSpan("");
+    buttonDiv.appendChild(this.feedbackSpan);
     // debug text (variables, python src, text src)
     if (this.debug) {
       if (this.src.variables.length > 0) {
@@ -90,12 +192,12 @@ export class Question {
         let title = genDiv();
         title.classList.add("debugInfo");
         title.innerHTML = "Variables generated by Python Code";
-        this.qDiv.appendChild(title);
+        this.questionDiv.appendChild(title);
         // variables
         let varDiv = genDiv();
         varDiv.classList.add("debugCode");
-        this.qDiv.appendChild(varDiv);
-        let instance = this.src.instances[this.instanceIdx];
+        this.questionDiv.appendChild(varDiv);
+        let instance = this.getCurrentInstance();
         let html = "";
         let variables = [...this.src["variables"]];
         variables.sort();
@@ -114,6 +216,7 @@ export class Question {
         }
         varDiv.innerHTML = html;
       }
+      // syntax highlighted source code
       let sources = ["python_src_html", "text_src_html"];
       let titles = ["Python Source Code", "Text Source Code"];
       for (let i = 0; i < sources.length; i++) {
@@ -123,138 +226,26 @@ export class Question {
           let title = genDiv();
           title.classList.add("debugInfo");
           title.innerHTML = titles[i];
-          this.qDiv.appendChild(title);
+          this.questionDiv.appendChild(title);
           // source code
           let code = genDiv();
           code.classList.add("debugCode");
-          this.qDiv.append(code);
+          this.questionDiv.append(code);
           code.innerHTML = this.src[key];
         }
       }
     }
     // evaluation
     if (hasCheckButton) {
-      this.checkBtn.addEventListener("click", () => {
-        feedbackSpan.innerHTML = "";
-        let numChecked = 0;
-        let numCorrect = 0;
-        for (let id in this.expected) {
-          //console.log("comparing answer " + id);
-          let type = this.types[id];
-          //console.log("type = " + type);
-          let student = this.student[id];
-          //console.log("student = " + student);
-          let expected = this.expected[id];
-          //console.log("expected = " + expected);
-          switch (type) {
-            case "bool":
-              if (student === expected) numCorrect++;
-              break;
-            case "string": {
-              let inputField = this.inputs[id];
-              let s = student.trim().toUpperCase();
-              let e = expected.trim().toUpperCase();
-              let ok = s === e;
-              if (ok) numCorrect++;
-              inputField.style.color = ok ? "black" : "white";
-              inputField.style.backgroundColor = ok ? "transparent" : "red";
-              break;
-            }
-            case "int":
-            case "float":
-              if (Math.abs(parseFloat(student) - parseFloat(expected)) < 1e-9)
-                numCorrect++;
-              break;
-            case "term": {
-              try {
-                let u = new Term();
-                u.parse(expected);
-                let v = new Term();
-                v.parse(student);
-                if (u.compare(v)) numCorrect++;
-              } catch (e) {
-                if (this.debug) {
-                  console.log(e);
-                }
-              }
-              break;
-            }
-            case "vector":
-            case "complex":
-            case "set": {
-              expected = expected.split(",");
-              numChecked += expected.length - 1;
-              student = [];
-              for (let i = 0; i < expected.length; i++)
-                student.push(this.student[id + "-" + i]);
-              if (type === "set") {
-                for (let i = 0; i < expected.length; i++) {
-                  let ei = parseFloat(expected[i]);
-                  for (let j = 0; j < student.length; j++) {
-                    let sj = parseFloat(student[j]);
-                    if (Math.abs(sj - ei) < 1e-9) {
-                      numCorrect++;
-                      break;
-                    }
-                  }
-                }
-              } else {
-                // vector or complex
-                for (let i = 0; i < expected.length; i++) {
-                  let si = parseFloat(student[i]);
-                  let ei = parseFloat(expected[i]);
-                  if (Math.abs(si - ei) < 1e-9) numCorrect++;
-                }
-              }
-              break;
-            }
-            case "matrix": {
-              let mat = new Matrix(0, 0);
-              mat.fromString(expected);
-              numChecked += mat.m * mat.n - 1;
-              for (let i = 0; i < mat.m; i++) {
-                for (let j = 0; j < mat.n; j++) {
-                  let idx = i * mat.n + j;
-                  student = this.student[id + "-" + idx];
-                  let e = mat.v[idx];
-                  //console.log("comparing element " + student + " to " + e);
-                  try {
-                    let u = new Term();
-                    u.parse(e);
-                    let v = new Term();
-                    v.parse(student);
-                    if (u.compare(v)) numCorrect++;
-                  } catch (e) {
-                    if (this.debug) {
-                      console.log(e);
-                    }
-                  }
-                }
-              }
-              break;
-            }
-            default:
-              feedbackSpan.innerHTML = "UNIMPLEMENTED EVAL OF TYPE " + type;
-          }
-          numChecked++;
-        }
-        if (numCorrect == numChecked) {
-          feedbackSpan.style.color =
-            this.titleDiv.style.color =
-            this.checkBtn.style.backgroundColor =
-            this.qDiv.style.borderColor =
-              "rgb(0,150,0)";
-          this.qDiv.style.backgroundColor = "rgba(0,150,0, 0.025)";
+      this.checkAndRepeatBtn.addEventListener("click", () => {
+        if (this.state == QuestionState.passed) {
+          this.state = QuestionState.init;
+          //this.debug = false;
+          //this.showSolution = false;
+          this.reset();
+          this.populateDom();
         } else {
-          this.titleDiv.style.color =
-            feedbackSpan.style.color =
-            this.checkBtn.style.backgroundColor =
-            this.qDiv.style.borderColor =
-              "rgb(150,0,0)";
-          this.qDiv.style.backgroundColor = "rgba(150,0,0, 0.025)";
-          if (numChecked >= 5) {
-            feedbackSpan.innerHTML = "" + numCorrect + " / " + numChecked;
-          }
+          evalQuestion(this);
         }
       });
     }
@@ -274,13 +265,15 @@ export class Question {
       case "text":
         return node.data;
       case "var": {
-        let instance = this.src.instances[this.instanceIdx];
+        let instance = this.getCurrentInstance();
         let type = instance[node.data].type;
         let value = instance[node.data].value;
         switch (type) {
           case "vector":
+            // TODO: elements as terms -> toTexStrings
             return "\\left[" + value + "\\right]";
           case "set":
+            // TODO: elements as terms -> toTexStrings
             return "\\left\\{" + value + "\\right\\}";
           case "complex": {
             let tk = value.split(",");
@@ -295,22 +288,15 @@ export class Question {
             // e.g. "[[1,2,3],[4,5,6]]" -> "\begin{pmatrix}1&2&3\\4%5%6\end{pmatrix}"
             let mat = new Matrix(0, 0);
             mat.fromString(value);
-            s = mat.toTeX(node.data.includes("augmented"));
+            s = mat.toTeXString(node.data.includes("augmented"));
             return s;
           }
           case "term": {
-            // TODO: parse with parenthesis info
-            //     + output with \frac, ...
-            // TODO: sqrt, ...
-            s = value
-              .replaceAll("sin", "\\sin")
-              .replaceAll("cos", "\\cos")
-              .replaceAll("tan", "\\tan")
-              .replaceAll("exp", "\\exp")
-              .replaceAll("ln", "\\ln")
-              .replaceAll("*", "\\cdot ")
-              .replaceAll("(", "\\left(")
-              .replaceAll(")", "\\right)");
+            try {
+              s = Term.parse(value).toTexString();
+            } catch (e) {
+              // failed, so keep input...
+            }
             break;
           }
           default:
@@ -322,31 +308,15 @@ export class Question {
   }
 
   /**
-   * @param {boolean} left
-   * @param {number} rowSpan
-   * @returns {HTMLTableCellElement}
-   */
-  generateMatrixParenthesis(left, rowSpan) {
-    let cell = document.createElement("td");
-    cell.style.width = "3px";
-    for (let side of ["Top", left ? "Left" : "Right", "Bottom"]) {
-      cell.style["border" + side + "Width"] = "2px";
-      cell.style["border" + side + "Style"] = "solid";
-    }
-    cell.rowSpan = rowSpan;
-    return cell;
-  }
-
-  /**
+   * TODO: remove code after migration input input.js
    * @param {HTMLInputElement} input
    */
   validateTermInput(input) {
-    let t = new Term();
     let ok = true;
     let value = input.value;
     if (value.length > 0) {
       try {
-        t.parse(value);
+        Term.parse(value);
       } catch (e) {
         ok = false;
       }
@@ -393,13 +363,15 @@ export class Question {
       }
       case "gap": {
         let span = genSpan("");
-        let width = Math.max(node.data.length * 12, 24);
+        let width = Math.max(node.data.length * 14, 24);
         let input = genInputField(width);
         let id = "gap-" + this.gapIdx;
-        this.inputs[id] = input;
+        this.gapInputs[id] = input;
         this.expected[id] = node.data;
         this.types[id] = "string";
         input.addEventListener("keyup", () => {
+          this.editedQuestion();
+          input.value = input.value.toUpperCase();
           this.student[id] = input.value.trim();
         });
         if (this.showSolution)
@@ -414,7 +386,7 @@ export class Question {
         let span = genSpan("");
         span.style.verticalAlign = "text-bottom";
         let id = node.data;
-        let expected = this.src.instances[this.instanceIdx][id];
+        let expected = this.getCurrentInstance()[id];
         this.expected[id] = expected.value;
         this.types[id] = expected.type;
         if (!suppressParentheses)
@@ -427,145 +399,56 @@ export class Question {
               break;
           }
         if (expected.type === "vector" || expected.type === "set") {
-          // TODO: resizable
           // vector or set
           let elements = expected.value.split(",");
           let n = elements.length;
           for (let i = 0; i < n; i++) {
             if (i > 0) span.appendChild(genSpan(" , "));
-            let input = genInputField(Math.max(elements[i].length * 12, 24));
-            span.appendChild(input);
-            input.addEventListener("keyup", () => {
-              this.student[id + "-" + i] = input.value.trim();
-              this.validateTermInput(input);
-            });
-            if (this.showSolution)
-              this.student[id + "-" + i] = input.value = elements[i];
+            let elementId = id + "-" + i;
+            new TermInput(
+              span,
+              this,
+              elementId,
+              elements[i].length,
+              elements[i],
+              false
+            );
           }
         } else if (expected.type === "matrix") {
-          /**
-           * @param {HTMLDivElement} parent
-           * @param {Matrix} matExpected
-           * @param {Matrix} matStudent
-           */
-          let genMatrixDom = (parent, matExpected, matStudent) => {
-            // parent div
-            let div = genDiv();
-            parent.innerHTML = "";
-            parent.appendChild(div);
-            div.style.position = "relative";
-            div.style.display = "inline-block";
-            // core matrix
-            let table = document.createElement("table");
-            div.appendChild(table);
-            let cellWidth = matExpected.getMaxCellStrlen();
-            cellWidth = Math.max(cellWidth * 12, 24);
-            for (let i = 0; i < matStudent.m; i++) {
-              let row = document.createElement("tr");
-              table.appendChild(row);
-              if (i == 0)
-                row.appendChild(
-                  this.generateMatrixParenthesis(true, matStudent.m)
-                );
-              for (let j = 0; j < matStudent.n; j++) {
-                let idx = i * matStudent.n + j;
-                let cell = document.createElement("td");
-                row.appendChild(cell);
-                let input = genInputField(cellWidth);
-                input.style.textAlign = "end";
-                cell.appendChild(input);
-                input.addEventListener("keyup", () => {
-                  this.student[id + "-" + idx] = input.value.trim();
-                  this.validateTermInput(input);
-                });
-                if (this.showSolution)
-                  this.student[id + "-" + idx] = input.value =
-                    "" + matStudent.v[idx];
-              }
-              if (i == 0)
-                row.appendChild(
-                  this.generateMatrixParenthesis(false, matStudent.m)
-                );
-            }
-            // resize buttons [add col, remove col, add row, remove row]
-            let text = ["+", "-", "+", "-"];
-            let deltaM = [0, 0, 1, -1];
-            let deltaN = [1, -1, 0, 0];
-            let top = [0, 22, 888, 888];
-            let bottom = [888, 888, -22, -22];
-            let right = [-22, -22, 0, 22];
-            let available = [
-              matExpected.n != 1,
-              matExpected.n != 1,
-              matExpected.m != 1,
-              matExpected.m != 1,
-            ];
-            let hidden = [
-              matStudent.n >= 10,
-              matStudent.n <= 1,
-              matStudent.m >= 10,
-              matStudent.m <= 1,
-            ];
-            for (let i = 0; i < 4; i++) {
-              if (available[i] == false) continue;
-              let btn = genSpan(text[i]);
-              if (top[i] != 888) btn.style.top = "" + top[i] + "px";
-              if (bottom[i] != 888) btn.style.bottom = "" + bottom[i] + "px";
-              if (right[i] != 888) btn.style.right = "" + right[i] + "px";
-              btn.classList.add("matrixResizeButton");
-              div.appendChild(btn);
-              if (hidden[i]) {
-                btn.style.opacity = "0.5";
-              } else {
-                btn.addEventListener("click", () => {
-                  matStudent.resize(
-                    matStudent.m + deltaM[i],
-                    matStudent.n + deltaN[i],
-                    "0"
-                  );
-                  genMatrixDom(parent, matExpected, matStudent);
-                });
-              }
-            }
-          };
-          let matExpected = new Matrix(0, 0);
-          matExpected.fromString(expected.value);
-          let matStudent = new Matrix(
-            matExpected.m == 1 ? 1 : 3,
-            matExpected.n == 1 ? 1 : 3
-          );
-          if (this.showSolution) matStudent.fromMatrix(matExpected);
           let parentDiv = genDiv();
           span.appendChild(parentDiv);
-          genMatrixDom(parentDiv, matExpected, matStudent);
+          new MatrixInput(parentDiv, this, id, expected.value);
         } else if (expected.type === "complex") {
           // complex number in normal form
           let elements = expected.value.split(",");
-          for (let i = 0; i < 2; i++) {
-            let input = genInputField(
-              Math.max(Math.max(elements[i].length * 12, 24), 24)
-            );
-            span.appendChild(input);
-            if (this.showSolution)
-              this.student[id + "-" + i] = input.value = elements[i];
-            input.addEventListener("keyup", () => {
-              this.student[id + "-" + i] = input.value.trim();
-              this.validateTermInput(input);
-            });
-            if (i == 0)
-              span.append(genSpan(" "), genMathSpan("+"), genSpan(" "));
-            else span.append(genSpan(" "), genMathSpan("i"));
-          }
+          new TermInput(
+            span,
+            this,
+            id + "-0",
+            elements[0].length,
+            elements[0],
+            false
+          );
+          span.append(genSpan(" "), genMathSpan("+"), genSpan(" "));
+          new TermInput(
+            span,
+            this,
+            id + "-1",
+            elements[1].length,
+            elements[1],
+            false
+          );
+          span.append(genSpan(" "), genMathSpan("i"));
         } else {
-          // scalar
-          let input = genInputField(Math.max(expected.value.length * 12, 24));
-          span.appendChild(input);
-          input.addEventListener("keyup", () => {
-            this.student[id] = input.value.trim();
-            this.validateTermInput(input);
-          });
-          if (this.showSolution)
-            this.student[id] = input.value = expected.value;
+          let integersOnly = expected.type === "int";
+          new TermInput(
+            span,
+            this,
+            id,
+            expected.value.length,
+            expected.value,
+            integersOnly
+          );
         }
         if (!suppressParentheses)
           switch (expected.type) {
@@ -586,7 +469,8 @@ export class Question {
         let mc = node.type == "multi-choice";
         let table = document.createElement("table");
         let n = node.children.length;
-        let order = this.debug ? unShuffledIndices(n) : shuffledIndices(n);
+        let shuffled = this.debug == false;
+        let order = range(n, shuffled);
         let iconCorrect = mc ? iconSquareChecked : iconCircleChecked;
         let iconIncorrect = mc ? iconSquareUnchecked : iconCircleUnchecked;
         let checkboxes = [];
@@ -599,8 +483,7 @@ export class Question {
           let expectedValue =
             answer.children[0].type == "bool"
               ? answer.children[0].data
-              : this.src.instances[this.instanceIdx][answer.children[0].data]
-                  .value;
+              : this.getCurrentInstance()[answer.children[0].data].value;
           this.expected[answerId] = expectedValue;
           this.types[answerId] = "bool";
           this.student[answerId] = this.showSolution ? expectedValue : "false";
@@ -620,6 +503,7 @@ export class Question {
           if (mc) {
             // multi-choice
             tr.addEventListener("click", () => {
+              this.editedQuestion();
               this.student[answerId] =
                 this.student[answerId] === "true" ? "false" : "true";
               if (this.student[answerId] === "true")
@@ -629,6 +513,7 @@ export class Question {
           } else {
             // single-choice
             tr.addEventListener("click", () => {
+              this.editedQuestion();
               for (let id of answerIDs) this.student[id] = "false";
               this.student[answerId] = "true";
               for (let i = 0; i < answerIDs.length; i++) {

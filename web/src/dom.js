@@ -70,13 +70,13 @@ export function genSpan(innerHTML, children = []) {
 }
 
 /**
+ * @param {HTMLElement} element
  * @param {string} tex
- * @returns {HTMLSpanElement}
+ * @param {boolean} [displayStyle=false]
  */
-export function genMathSpan(tex, displayStyle = false) {
-  let span = document.createElement("span");
+export function updateMathElement(element, tex, displayStyle = false) {
   // @ts-ignore
-  katex.render(tex, span, {
+  katex.render(tex, element, {
     throwOnError: false,
     displayMode: displayStyle,
     macros: {
@@ -86,5 +86,15 @@ export function genMathSpan(tex, displayStyle = false) {
       "\\ZZ": "\\mathbb{Z}",
     },
   });
+}
+
+/**
+ * @param {string} tex
+ * @param {boolean} [displayStyle=false]
+ * @returns {HTMLSpanElement}
+ */
+export function genMathSpan(tex, displayStyle = false) {
+  let span = document.createElement("span");
+  updateMathElement(span, tex, displayStyle);
   return span;
 }

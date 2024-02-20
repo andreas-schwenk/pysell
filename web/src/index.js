@@ -4,6 +4,7 @@
  * LICENSE: GPLv3
  ******************************************************************************/
 
+import { genDiv } from "./dom.js";
 import { courseInfo1, courseInfo2, courseInfo3 } from "./lang.js";
 import { Question } from "./question.js";
 
@@ -36,11 +37,14 @@ export function init(quizSrc, debug) {
   let idx = 1;
   for (let questionSrc of quizSrc.questions) {
     questionSrc.title = "" + idx + ". " + questionSrc.title;
-    let question = new Question(questionSrc, debug);
+    let div = genDiv();
+    questionsDiv.appendChild(div);
+    let question = new Question(div, questionSrc, quizSrc.lang, debug);
     question.showSolution = debug;
     questions.push(question);
-    question.populateDom(questionsDiv);
-    if (debug && questionSrc.error.length == 0) question.checkBtn.click();
+    question.populateDom();
+    if (debug && questionSrc.error.length == 0)
+      question.checkAndRepeatBtn.click();
     idx++;
   }
 }
