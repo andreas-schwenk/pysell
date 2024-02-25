@@ -5,6 +5,12 @@
  ******************************************************************************/
 
 /**
+ * This file provides functions to generate HTML elements in a shorter notation.
+ * Also CSS classes are assigned in some cases.
+ */
+
+/**
+ * Generates a HTMLDivElement and optionally assigns child elements to it.
  * @param {HTMLElement[]} children
  * @returns {HTMLDivElement}
  */
@@ -15,6 +21,7 @@ export function genDiv(children = []) {
 }
 
 /**
+ * Generates a HTMLUListElement and optionally assigns child elements to it.
  * @param {HTMLElement[]} children
  * @returns {HTMLUListElement}
  */
@@ -25,6 +32,7 @@ export function genUl(children = []) {
 }
 
 /**
+ * Generates a HTMLLIElement and optionally assigns a child element to it.
  * @param {HTMLElement} child
  * @returns {HTMLLIElement}
  */
@@ -35,6 +43,7 @@ export function genLi(child) {
 }
 
 /**
+ * Generates a HTMLInputElement.
  * @param {number} width
  * @returns {HTMLInputElement}
  */
@@ -48,6 +57,7 @@ export function genInputField(width) {
 }
 
 /**
+ * Generates a HTMLButtonElement.
  * @returns {HTMLButtonElement}
  */
 export function genButton() {
@@ -58,6 +68,7 @@ export function genButton() {
 }
 
 /**
+ * Generates a HTMLSpanElement.
  * @param {string} innerHTML
  * @param {HTMLElement[]} [children=[]]
  * @returns {HTMLSpanElement}
@@ -70,6 +81,7 @@ export function genSpan(innerHTML, children = []) {
 }
 
 /**
+ * Renders a TeX-bases equation to an existing HTML element using "katex".
  * @param {HTMLElement} element
  * @param {string} tex
  * @param {boolean} [displayStyle=false]
@@ -84,11 +96,13 @@ export function updateMathElement(element, tex, displayStyle = false) {
       "\\NN": "\\mathbb{N}",
       "\\QQ": "\\mathbb{Q}",
       "\\ZZ": "\\mathbb{Z}",
+      "\\CC": "\\mathbb{C}",
     },
   });
 }
 
 /**
+ * Renders a TeX-bases equation to a new HTML element using "katex".
  * @param {string} tex
  * @param {boolean} [displayStyle=false]
  * @returns {HTMLSpanElement}

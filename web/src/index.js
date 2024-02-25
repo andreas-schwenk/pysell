@@ -9,16 +9,21 @@ import { courseInfo1, courseInfo2, courseInfo3 } from "./lang.js";
 import { Question } from "./question.js";
 
 /**
- * @param {Object.<Object,Object>} quizSrc
- * @param {boolean} debug
+ * This file is the entry point of the quiz website and populates the DOM.
+ */
+
+/**
+ * @param {Object.<Object,Object>} quizSrc -- JSON object as output from sell.py
+ * @param {boolean} debug -- true for enabling extensive debugging features
  */
 export function init(quizSrc, debug) {
+  // default to English, if the provided language abbreviation is unknown
   if (["en", "de", "es", "it", "fr"].includes(quizSrc.lang) == false)
     quizSrc.lang = "en";
+  // if debugging is enabled, show a DEBUG info at the start of the page
   if (debug) document.getElementById("debug").style.display = "block";
-  document.getElementById("date").innerHTML = new Date()
-    .toISOString()
-    .split("T")[0];
+  // show the quiz' meta data
+  document.getElementById("date").innerHTML = quizSrc.date;
   document.getElementById("title").innerHTML = quizSrc.title;
   document.getElementById("author").innerHTML = quizSrc.author;
   document.getElementById("courseInfo1").innerHTML = courseInfo1[quizSrc.lang];
@@ -30,11 +35,12 @@ export function init(quizSrc, debug) {
     quizSrc.lang
   ].replace("*", reload);
 
+  // generate questions
   /** @type {Question[]} */
   let questions = [];
   /** @type {HTMLElement} */
   let questionsDiv = document.getElementById("questions");
-  let idx = 1;
+  let idx = 1; // question index 1, 2, ...
   for (let questionSrc of quizSrc.questions) {
     questionSrc.title = "" + idx + ". " + questionSrc.title;
     let div = genDiv();
@@ -43,8 +49,10 @@ export function init(quizSrc, debug) {
     question.showSolution = debug;
     questions.push(question);
     question.populateDom();
-    if (debug && questionSrc.error.length == 0)
+    if (debug && questionSrc.error.length == 0) {
+      // if the debug version is active, evaluate the question immediately
       question.checkAndRepeatBtn.click();
+    }
     idx++;
   }
 }

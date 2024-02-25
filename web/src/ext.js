@@ -4,10 +4,17 @@
  * LICENSE: GPLv3
  ******************************************************************************/
 
-// code in this file is from external sources
+/**
+ * This file contains code that was derived from external sources.
+ */
 
 /**
- * code taken from: https://www.tutorialspoint.com/levenshtein-distance-in-javascript
+ * Calculates the Levenshtein Distance from two given strings.
+ * Examples:
+ *  - levenshteinDistance("abc","abc") returns 0
+ *  - levenshteinDistance("abc","abbc") returns 1
+ * Code taken from
+ *    https://www.tutorialspoint.com/levenshtein-distance-in-javascript
  * @param {string} u
  * @param {string} v
  * @returns {number}
@@ -30,8 +37,3 @@ export function levenshteinDistance(u, v) {
   }
   return track[v.length][u.length];
 }
-
-// tests
-// let xx1 = levenshteinDistance("abc", "bc"); // 1
-// let xx2 = levenshteinDistance("ab", "abc"); // 1
-// let xx3 = levenshteinDistance("abc", "abc"); // 0

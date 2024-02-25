@@ -10,6 +10,7 @@ This script is only intended for pySELL development.
 Users just use file 'sell.py' (python sell.py QUESTION_FILE.txt)
 """
 
+
 import subprocess
 
 print("pySELL builder - 2024 by Andreas Schwenk")
@@ -65,11 +66,25 @@ if __name__ == "__main__":
             skip = True
         elif "@end(html)" in line:
             skip = False
+            # begin HTML
             py += "# @begin(html)\n"
-            py += 'html = """' + html.strip() + '\n"""\n'
+            # insert HTML as byte-strings
+            py += "html = b''\n"
+            html_bytes = html.encode("utf-8")
+            while len(html_bytes) > 0:
+                py += "html += " + str(html_bytes[:60]) + "\n"
+                html_bytes = html_bytes[60:]
+            py += "html = html.decode('utf-8')\n"
+            # end HTML
             py += "# @end(html)\n"
         elif skip is False:
             py += line
     # write new version of sell.py
     f = open("sell.py", "w")
     f.write(py.strip() + "\n")
+
+# compile example
+res = subprocess.run(["python3", "sell.py", "-J", "examples/ex1.txt"], cwd=".")
+
+# update example in docs/
+res = subprocess.run(["cp", "examples/ex1.html", "docs/"], cwd=".")

@@ -4,9 +4,15 @@
  * LICENSE: GPLv3
  ******************************************************************************/
 
+/**
+ * This file implements tests for file "math.js" and indicates the
+ *     ART OF ROBUST MATH PARSING :-)
+ * Run tests e.g. via command "node math_TEST.js".
+ */
+
 import assert from "assert";
 
-import { Node, Term } from "./math.js";
+import { TermNode, Term } from "./math.js";
 
 // TODO: compare e.g. "1/x" -> need to adjust compare implementation!!
 
@@ -97,11 +103,11 @@ assert.equal(Term.parse("2^3").compare(Term.parse("8")), true);
 
 assert.ok(
   Term.parse("- x^2 + y^2 + xy + x(y+1) + sin(2) + sin 3*x + e^0 + e^3 + 2pi")
-    .eval({ x: Node.const(3), y: Node.const(5) })
+    .eval({ x: TermNode.const(3), y: TermNode.const(5) })
     .compare(77.69013814243468, 0)
 );
 assert.ok(
   Term.parse("(8*x + 5)*cos(4*x^2 + 5*x + 6)")
-    .eval({ x: Node.const(2) })
+    .eval({ x: TermNode.const(2) })
     .compare(17.51869057063671, 0)
 );

@@ -4,6 +4,10 @@
  * LICENSE: GPLv3
  ******************************************************************************/
 
+/**
+ * This file provided static strings for all supported languages.
+ */
+
 export let courseInfo1 = {
   en: "This page runs in your browser and does not store any data on servers.",
   de: "Diese Seite wird in Ihrem Browser ausgeführt und speichert keine Daten auf Servern.",
@@ -29,7 +33,7 @@ export let courseInfo3 = {
 };
 
 export let feedbackOK = {
-  en: ["awesome", "great", "correct", "well done"],
+  en: ["awesome", "great", "well done", "nice", "you got it", "good"],
   de: ["super", "gut gemacht", "weiter so", "richtig"],
   es: ["impresionante", "genial", "correcto", "bien hecho"],
   it: ["fantastico", "grande", "corretto", "ben fatto"],
@@ -37,7 +41,7 @@ export let feedbackOK = {
 };
 
 export let feedbackErr = {
-  en: ["try again", "still some mistakes", "wrong answer"],
+  en: ["try again", "still some mistakes", "wrong answer", "no"],
   de: ["leider falsch", "nicht richtig", "versuch's nochmal"],
   es: ["inténtalo de nuevo", "todavía algunos errores", "respuesta incorrecta"],
   it: ["riprova", "ancora qualche errore", "risposta sbagliata"],

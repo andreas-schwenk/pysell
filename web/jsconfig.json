@@ -6,6 +6,7 @@
     "checkJs": true,
     "target": "ES2021",
     "module": "NodeNext",
-    "moduleResolution": "nodenext"
+    "moduleResolution": "nodenext",
+    "strict": false // set "true" to check class members
   }
 }

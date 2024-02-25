@@ -1,3 +1,4 @@
+# TODO: comment all code (e.g. build.py, sell.py lines 186ff)
 
 # TODO: doc: if a variable in math mode is a matrix and contains "augmented" as subterm, then it is represented as augmented matrix
 # TODO: doc: note on packages -> which error occurs, if e.g. numpy is NOT installed??
@@ -5,6 +6,10 @@
 # TODO: readme notes on libraries: numpy, sympy, sage, ... (sympy and numpy loading times slow: exclude optionally?)
 # TODO: readme: add hints on fractions (sympy Fraction), ... + give more examples in general
 
+# TODO: mobile devices: horizontal scroll e.g. matrix inputs
+
+# TODO: gif-Video for editing, compiling, debugging, using
+# TODO: guide how to import to Moodle/Ilias
 
 # TODO: publish python package
 
@@ -16,12 +21,14 @@
 
 
 
-# TODO: sagemath docs:
+# TODO: sage math docs:
 
 sage -python sell.py INPUT_PATH
 
 from sage.all import *
-sage.all.factorial(3)
+f = sage.all.factorial(3)
+type(f)
+# <class 'int'>
 x = sage.all.power_mod(2,100,123)
 type(x)
 # <class 'int'>

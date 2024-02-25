@@ -99,7 +99,7 @@ A question consists of a textual part, and optionally of Python code, to generat
 - TeX-based display style math is embedded into a pair of `$$` (display mode in inline math can be activated by writing e.g. `$\displaystyle \sum_{i=1}^n i^2$`)
 - Multiple-Choice questions are preceded by `[x]` for correct answers, or `[ ]` for incorrect answers, respectively.
 - Single-Choice questions are preceded by `(x)` for the correct answer, and `( )` for incorrect answers, respectively.
-- A line break can be forces by `\\`.
+- A line break can be forced by `\\`.
 
 **Question code**
 
@@ -236,9 +236,8 @@ _Note that the result of `rangeZ` is of type `list`, while the built-in function
 
 ## Developer Guide
 
-To debug (or extend) the web code, first convert an input file into a json file with the `-J` option enables, e.g. `python3 sell.py -J src/ex1.txt`. Then `src/ex1.json` is generated.
+To debug (or extend) the web code, first convert an input file into a json file with the `-J` option enabled, e.g. `python3 sell.py -J src/ex1.txt`. Then `src/ex1.json` is generated.
 
 Then start a local web server (e.g. using `python3 -m http.server 8000`) and open `web/index.html` (e.g. `localhost:8000/web/`, if your port number is 8000). The uncompressed JavaScript code in directory `web/src/` is interpreted as module.
 
-To update `sell.py` after any change in the JavaScript code, first head to `cd web/`, and install the dependency `esbuild` via `npm install`.
-Then go back to the packages root dir, and run `python3 build.py` in order to update variable `html` in file `sell.py`.
+To update `sell.py` after any change in the JavaScript code, and run `python3 build.py` in order to update variable `html` in file `sell.py`.

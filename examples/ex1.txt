@@ -5,7 +5,6 @@ AUTHOR  Andreas Schwenk
 
 # this is a comment line
 
-
 QUESTION Multiple-Choice
 Mark the correct answer(s)
 [x] This answer is correct
@@ -23,8 +22,9 @@ Mark the correct answer
 QUESTION Programming
 Will the following loop terminate:
 `while (true || x) { ... }`?
-(x) no
 ( ) yes
+( ) no
+(x) depends on `...`
 
 
 QUESTION Gap

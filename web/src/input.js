@@ -8,14 +8,28 @@ import { genDiv, genInputField, genSpan, updateMathElement } from "./dom.js";
 import { Matrix, Term } from "./math.js";
 import { Question } from "./question.js";
 
+/**
+ * This file implements the textual input fields for terms and matrices.
+ * Each input field observes the students inputs and forbids not allowed keys
+ *   (e.g. special characters).
+ * In case of non-integer inputs, the entered term is rendered via TeX,
+ *   to let the student verify its input.
+ * Matrices are resizable, i.e. its row and/or column count can be adjusted
+ *   by students (this is NOT the case, if the sample solution is a row or
+ *   column vector. Then only one dimension is resizable).
+ */
+
+/**
+ * Input field for typing a term.
+ */
 export class TermInput {
   /**
-   * @param {HTMLElement} parent
-   * @param {Question} question
-   * @param {string} inputId
-   * @param {number} numChars
-   * @param {string} solutionString
-   * @param {boolean} integersOnly
+   * @param {HTMLElement} parent -- parent element where the input is appended to
+   * @param {Question} question -- the question
+   * @param {string} inputId -- the id for persisting the students input
+   * @param {number} numChars -- number of characters for the width-estimation
+   * @param {string} solutionString -- the sample solution
+   * @param {boolean} integersOnly -- if true, then only numbers can be entered
    */
   constructor(
     parent,
@@ -25,52 +39,67 @@ export class TermInput {
     solutionString,
     integersOnly
   ) {
+    // initialize the students answer to "unset"
     question.student[inputId] = "";
     /** @type {Question} */
     this.question = question;
     /** @type {string} */
     this.inputId = inputId;
-    /** @type {HTMLElement} */
+    /**
+     * @type {HTMLElement} -- additional span, where the HTMLInputElement,
+     * as well as the TeX preview are embedded into
+     */
     this.outerSpan = genSpan("");
     this.outerSpan.style.position = "relative";
     parent.appendChild(this.outerSpan);
-    /** @type {HTMLInputElement} */
-    this.inputElement = genInputField(Math.max(numChars * 10, 48));
+    /** @type {HTMLInputElement} -- the input field for entering the input */
+    this.inputElement = genInputField(Math.max(numChars * 12, 48));
     this.outerSpan.appendChild(this.inputElement);
-    /** @type {HTMLDivElement} */
+    /** @type {HTMLDivElement} -- the TeX preview */
     this.equationPreviewDiv = genDiv();
     this.equationPreviewDiv.classList.add("equationPreview");
-    this.equationPreviewDiv.style.display = "none";
+    this.equationPreviewDiv.style.display = "none"; // hidden per default
     this.outerSpan.appendChild(this.equationPreviewDiv);
     // events
     this.inputElement.addEventListener("click", () => {
+      // mark the question as altered
+      this.question.editedQuestion();
+      this.edited();
+    });
+    this.inputElement.addEventListener("keyup", () => {
+      // mark the question as altered
+      this.question.editedQuestion();
       this.edited();
     });
     this.inputElement.addEventListener("focusout", () => {
+      // hide the TeX preview in case that the focus to the input was lost
       this.equationPreviewDiv.innerHTML = "";
       this.equationPreviewDiv.style.display = "none";
     });
     this.inputElement.addEventListener("keydown", (e) => {
+      // forbid special characters
       let allowed = "abcdefghijklmnopqrstuvwxyz";
       allowed += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
       allowed += "0123456789";
       allowed += "+-*/^(). <>=|";
-      if (integersOnly) {
-        allowed = "-0123456789";
-      }
-      if (e.key.length < 3 && allowed.includes(e.key) == false) {
+      // only allow numbers in case of integral solutions
+      if (integersOnly) allowed = "-0123456789";
+      if (e.key.length < 3 && allowed.includes(e.key) == false)
         e.preventDefault();
-      }
+      // extend the width of the input field, in case the student enters a
+      // term that is longer than expected...
+      let requiredWidth = this.inputElement.value.length * 12;
+      if (this.inputElement.offsetWidth < requiredWidth)
+        this.inputElement.style.width = "" + requiredWidth + "px";
     });
-    this.inputElement.addEventListener("keyup", () => {
-      this.question.editedQuestion();
-      this.edited();
-    });
+    // for debugging purposes
     if (this.question.showSolution)
       question.student[inputId] = this.inputElement.value = solutionString;
   }
 
   edited() {
+    // the student updated the answer, so we must validate the syntax,
+    // as well as update the TeX preview
     let input = this.inputElement.value.trim();
     let tex = "";
     let isConstant = false; // e.g. input is "123"
@@ -78,39 +107,32 @@ export class TermInput {
       let t = Term.parse(input);
       isConstant = t.root.op === "const";
       tex = t.toTexString();
+      this.inputElement.style.color = "black";
       this.equationPreviewDiv.style.backgroundColor = "green";
     } catch (e) {
       // term is not valid, so use input, but with defused "^" and "_"
       tex = input.replaceAll("^", "\\hat{~}").replaceAll("_", "\\_");
+      this.inputElement.style.color = "maroon";
       this.equationPreviewDiv.style.backgroundColor = "maroon";
     }
+    // render the equation
     updateMathElement(this.equationPreviewDiv, tex, true);
     this.equationPreviewDiv.style.display =
       input.length > 0 && !isConstant ? "block" : "none";
+    // update the input
     this.question.student[this.inputId] = input;
-    this.validateTermInput();
-  }
-
-  validateTermInput() {
-    let ok = true;
-    let value = this.inputElement.value.trim();
-    if (value.length > 0) {
-      try {
-        Term.parse(value);
-      } catch (e) {
-        ok = false;
-      }
-    }
-    this.inputElement.style.color = ok ? "black" : "maroon";
   }
 }
 
+/**
+ * Resizable input table for entering a matrix.
+ */
 export class MatrixInput {
   /**
-   * @param {HTMLElement} parent
-   * @param {Question} question
-   * @param {string} inputId
-   * @param {string} expectedMatrixString
+   * @param {HTMLElement} parent -- parent element where the matrix input is appended to
+   * @param {Question} question -- the question
+   * @param {string} inputId -- the id for persisting the students input
+   * @param {string} expectedMatrixString -- the stringified sample solution
    */
   constructor(parent, question, inputId, expectedMatrixString) {
     /** @type {HTMLElement} */
@@ -122,35 +144,42 @@ export class MatrixInput {
     /** @type {Matrix} */
     this.matExpected = new Matrix(0, 0);
     this.matExpected.fromString(expectedMatrixString);
-    /** @type {Matrix} */
+    /** @type {Matrix} -- the student must determine the sizing (except for vectors) */
     this.matStudent = new Matrix(
       this.matExpected.m == 1 ? 1 : 3,
       this.matExpected.n == 1 ? 1 : 3
     );
-    if (question.showSolution) {
-      this.matStudent.fromMatrix(this.matExpected);
-    }
+    if (question.showSolution) this.matStudent.fromMatrix(this.matExpected);
+    // generate the DOM
     this.genMatrixDom();
   }
 
+  /**
+   * Generate the DOM (HTMLTable and children)
+   */
   genMatrixDom() {
-    // parent div
+    // we need an additional HTMLDivElement that contains both the table for the
+    // matrix, as well as the resizing buttons ("+" and "-")
     let div = genDiv();
     this.parent.innerHTML = "";
     this.parent.appendChild(div);
     div.style.position = "relative";
     div.style.display = "inline-block";
-    // core matrix
+    // implement the core matrix as table
     let table = document.createElement("table");
     div.appendChild(table);
+    // get the maximum string length of the elements (for estimating the width)
     let maxCellStrlen = this.matExpected.getMaxCellStrlen();
+    // populate the table by rows and cells
     for (let i = 0; i < this.matStudent.m; i++) {
       let row = document.createElement("tr");
       table.appendChild(row);
+      // insert a column for left parenthesis (rendered by a bordered HTMLDivElement)
       if (i == 0)
         row.appendChild(
           this.generateMatrixParenthesis(true, this.matStudent.m)
         );
+      // for each column within the current row
       for (let j = 0; j < this.matStudent.n; j++) {
         let idx = i * this.matStudent.n + j;
         let cell = document.createElement("td");
@@ -165,30 +194,34 @@ export class MatrixInput {
           false
         );
       }
+      // insert a column for the right (rendered by a bordered HTMLDivElement)
       if (i == 0)
         row.appendChild(
           this.generateMatrixParenthesis(false, this.matStudent.m)
         );
     }
-    // resize buttons [add col, remove col, add row, remove row]
-    let text = ["+", "-", "+", "-"];
-    let deltaM = [0, 0, 1, -1];
-    let deltaN = [1, -1, 0, 0];
-    let top = [0, 22, 888, 888];
+    // add resize buttons (add column, remove column, add row, remove row)
+    let text = ["+", "-", "+", "-"]; // button labels
+    let deltaM = [0, 0, 1, -1]; // row delta
+    let deltaN = [1, -1, 0, 0]; // column delta
+    let top = [0, 22, 888, 888]; // signed valued positions, or 888 if invalid
     let bottom = [888, 888, -22, -22];
     let right = [-22, -22, 0, 22];
     let available = [
+      // vectors are only resizable in one direction
       this.matExpected.n != 1,
       this.matExpected.n != 1,
       this.matExpected.m != 1,
       this.matExpected.m != 1,
     ];
     let hidden = [
+      // hide the buttons, if there are too many/less rows/cols
       this.matStudent.n >= 10,
       this.matStudent.n <= 1,
       this.matStudent.m >= 10,
       this.matStudent.m <= 1,
     ];
+    // render the (potentially) 4 buttons
     for (let i = 0; i < 4; i++) {
       if (available[i] == false) continue;
       let btn = genSpan(text[i]);
@@ -218,6 +251,7 @@ export class MatrixInput {
    * @returns {HTMLTableCellElement}
    */
   generateMatrixParenthesis(left, rowSpan) {
+    // TODO: rounded border, if the langauge is e.g. "de"
     let cell = document.createElement("td");
     cell.style.width = "3px";
     for (let side of ["Top", left ? "Left" : "Right", "Bottom"]) {

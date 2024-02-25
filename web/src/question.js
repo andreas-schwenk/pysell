@@ -4,6 +4,11 @@
  * LICENSE: GPLv3
  ******************************************************************************/
 
+/**
+ * This file implements the question and its behavior, i.e. it controls most
+ * of the magic.
+ */
+
 import {
   genButton,
   genDiv,
@@ -17,94 +22,110 @@ import { evalQuestion } from "./eval.js";
 import {
   iconSquareChecked,
   iconSquareUnchecked,
-  iconPlay,
+  iconCheck,
   iconCircleUnchecked,
   iconCircleChecked,
 } from "./icons.js";
 import { MatrixInput, TermInput } from "./input.js";
 import { Matrix, Term, range } from "./math.js";
 
+/**
+ * The state of a question.
+ */
 export let QuestionState = {
   init: 0, // not evaluated
   errors: 1, // evaluated with errors
   passed: 2, // evaluated with no errors
 };
 
+/**
+ * The quiz question.
+ * For better understanding, create a JSON file of a quiz, e.g. via
+ * "python3 sell.py -J examples/ex1.txt"
+ */
 export class Question {
   /**
-   * @param {HTMLElement} parentDiv
-   * @param {Object.<Object,Object>} src
-   * @param {string} language
-   * @param {boolean} debug
+   * @param {HTMLElement} parentDiv -- a parental div, where the question is put in
+   * @param {Object.<Object,Object>} src -- the JSON-based question description
+   * @param {string} language -- the natural langauge id (used for user info)
+   * @param {boolean} debug -- debugging mode enabled? (true for "*_DEBUG.html")
    */
   constructor(parentDiv, src, language, debug) {
-    /** @type {number} */
+    /** @type {number} -- the state of the question */
     this.state = QuestionState.init;
-    /** @type {string} */
+    /** @type {string} -- the natural langauge identifier */
     this.language = language;
-    /** @type {Object.<Object,Object>} */
+    /** @type {Object.<Object,Object>} -- the JSON-based description */
     this.src = src;
-    /** @type {boolean} */
+    /** @type {boolean} -- debugging enabled? */
     this.debug = debug;
-    /** @type {number[]} */
+    /** @type {number[]} -- the order of instances (each instance is a set of random variables) */
     this.instanceOrder = range(src.instances.length, true);
-    /** @type {number} */
+    /** @type {number} -- the current index in this.instanceOrder */
     this.instanceIdx = 0;
-    /** @type {number} */
-    this.choiceIdx = 0; // distinct index for every multi or single choice
-    /** @type {number} */
-    this.gapIdx = 0; // distinct index for every gap field
-    /** @type {Object.<string,string>} */
+    /** @type {number} -- distinct index for every multiple or single choice */
+    this.choiceIdx = 0;
+    /** @type {number} -- distinct index for every gap field */
+    this.gapIdx = 0;
+    /** @type {Object.<string,string>} -- the expected solution (variable -> stringified solution) */
     this.expected = {};
-    /** @type {Object.<string,string>} */
+    /** @type {Object.<string,string>} -- the type of each variable (e.g. "matrix", "int", ...) */
     this.types = {}; // variable types of this.expected
-    /** @type {Object.<string,string>} */
+    /** @type {Object.<string,string>} -- the current answer(s) set by the student */
     this.student = {};
-    /** @type {Object.<Object,HTMLInputElement>} */
-    this.gapInputs = {}; // html input elements (currently ONLY used for type gap)
-    /** @type {HTMLElement} */
+    /** @type {Object.<Object,HTMLInputElement>} - input elements for gaps for setting feedback colors */
+    this.gapInputs = {};
+    /** @type {HTMLElement} -- a parental div, where the question is put in  */
     this.parentDiv = parentDiv;
-    /** @type {HTMLDivElement} */
+    /** @type {HTMLDivElement} -- the root HTMLDivElement of the current question */
     this.questionDiv = null;
-    /** @type {HTMLDivElement} */
-    this.feedbackDiv = null;
-    /** @type {HTMLDivElement} */
+    /** @type {HTMLDivElement} -- HTMLDivElement for the feedback popup (e.g. "awesome") */
+    this.feedbackPopupDiv = null;
+    /** @type {HTMLDivElement} -- HTMLDivElement for the title */
     this.titleDiv = null;
-    /** @type {HTMLButtonElement} */
+    /** @type {HTMLButtonElement} -- HTMLButtonElement for the eval/repeat button */
     this.checkAndRepeatBtn = null;
-    /** @type {string} */
-    this.checkAndRepeatBtnState = "check";
-    /** @type {boolean} */
+    /** @type {boolean} -- show the solution? */
     this.showSolution = false;
-    /** @type {HTMLSpanElement} */
+    /** @type {HTMLSpanElement} -- HTMLSpanElement for the feedback text next to the button */
     this.feedbackSpan = null;
-    /** @type {number} */
+    /** @type {number} -- number of correct answers */
     this.numCorrect = 0;
-    /** @type {number} */
+    /** @type {number} -- number of checked answers */
     this.numChecked = 0;
   }
 
+  /**
+   * Gets the next instance.
+   */
   reset() {
     this.instanceIdx = (this.instanceIdx + 1) % this.src.instances.length;
   }
 
   /**
+   * Gets the current instance.
    * @returns {Object.<string,Object>}
    */
   getCurrentInstance() {
     return this.src.instances[this.instanceOrder[this.instanceIdx]];
   }
 
+  /**
+   * Sets the question to be edited recently. Visually, the font and border
+   * color is set to black.
+   */
   editedQuestion() {
     this.state = QuestionState.init;
     this.updateVisualQuestionState();
     this.questionDiv.style.color = "black";
-    this.checkAndRepeatBtn.innerHTML = iconPlay;
+    this.checkAndRepeatBtn.innerHTML = iconCheck;
     this.checkAndRepeatBtn.style.display = "block";
     this.checkAndRepeatBtn.style.color = "black";
-    this.checkAndRepeatBtnState = "check";
   }
 
+  /**
+   * Sets the color scheme of the question, based on passing or errors.
+   */
   updateVisualQuestionState() {
     let color1 = "black";
     let color2 = "transparent";
@@ -135,6 +156,10 @@ export class Question {
     this.questionDiv.style.backgroundColor = color2;
   }
 
+  /**
+   * Generate the DOM of the question.
+   * @returns {void}
+   */
   populateDom() {
     this.parentDiv.innerHTML = "";
     // generate question div
@@ -142,10 +167,10 @@ export class Question {
     this.parentDiv.appendChild(this.questionDiv);
     this.questionDiv.classList.add("question");
     // feedback overlay
-    this.feedbackDiv = genDiv();
-    this.feedbackDiv.classList.add("questionFeedback");
-    this.questionDiv.appendChild(this.feedbackDiv);
-    this.feedbackDiv.innerHTML = "awesome";
+    this.feedbackPopupDiv = genDiv();
+    this.feedbackPopupDiv.classList.add("questionFeedback");
+    this.questionDiv.appendChild(this.feedbackPopupDiv);
+    this.feedbackPopupDiv.innerHTML = "awesome";
     // debug text (source line)
     if (this.debug && "src_line" in this.src) {
       let title = genDiv();
@@ -166,7 +191,7 @@ export class Question {
       return;
     }
     // generate question text
-    for (let c of this.src.text.children)
+    for (let c of this.src.text.c)
       this.questionDiv.appendChild(this.generateText(c));
     // generate button row
     let buttonDiv = genDiv();
@@ -177,7 +202,8 @@ export class Question {
     if (hasCheckButton) {
       this.checkAndRepeatBtn = genButton();
       buttonDiv.appendChild(this.checkAndRepeatBtn);
-      this.checkAndRepeatBtn.innerHTML = iconPlay;
+      this.checkAndRepeatBtn.innerHTML = iconCheck;
+      this.checkAndRepeatBtn.style.backgroundColor = "black";
     }
     // (c) spacing
     let space = genSpan("&nbsp;&nbsp;&nbsp;");
@@ -202,8 +228,8 @@ export class Question {
         let variables = [...this.src["variables"]];
         variables.sort();
         for (let v of variables) {
-          let type = instance[v].type;
-          let value = instance[v].value;
+          let type = instance[v].t;
+          let value = instance[v].v;
           switch (type) {
             case "vector":
               value = "[" + value + "]";
@@ -240,8 +266,6 @@ export class Question {
       this.checkAndRepeatBtn.addEventListener("click", () => {
         if (this.state == QuestionState.passed) {
           this.state = QuestionState.init;
-          //this.debug = false;
-          //this.showSolution = false;
           this.reset();
           this.populateDom();
         } else {
@@ -252,22 +276,23 @@ export class Question {
   }
 
   /**
+   * Generates TeX source recursively.
    * @param {Object.<Object,Object>} node
    * @returns {string}
    */
   generateMathString(node) {
     let s = "";
-    switch (node.type) {
+    switch (node.t) {
       case "math":
       case "display-math":
-        for (let c of node.children) s += this.generateMathString(c);
+        for (let c of node.c) s += this.generateMathString(c);
         break;
       case "text":
-        return node.data;
+        return node.d; // d := data
       case "var": {
         let instance = this.getCurrentInstance();
-        let type = instance[node.data].type;
-        let value = instance[node.data].value;
+        let type = instance[node.d].t;
+        let value = instance[node.d].v;
         switch (type) {
           case "vector":
             // TODO: elements as terms -> toTexStrings
@@ -288,7 +313,7 @@ export class Question {
             // e.g. "[[1,2,3],[4,5,6]]" -> "\begin{pmatrix}1&2&3\\4%5%6\end{pmatrix}"
             let mat = new Matrix(0, 0);
             mat.fromString(value);
-            s = mat.toTeXString(node.data.includes("augmented"));
+            s = mat.toTeXString(node.d.includes("augmented"));
             return s;
           }
           case "term": {
@@ -304,76 +329,60 @@ export class Question {
         }
       }
     }
-    return s;
+    return "{" + s + "}";
   }
 
   /**
-   * TODO: remove code after migration input input.js
-   * @param {HTMLInputElement} input
-   */
-  validateTermInput(input) {
-    let ok = true;
-    let value = input.value;
-    if (value.length > 0) {
-      try {
-        Term.parse(value);
-      } catch (e) {
-        ok = false;
-      }
-    }
-    input.style.color = ok ? "black" : "maroon";
-    //input.style.fontStyle = ok ? "normal" : "italic";
-  }
-
-  /**
+   * Generates paragraphs, enumerations, ...
    * @param {Object.<Object,Object>} node
    * @param {boolean} spanInsteadParagraph
    * @returns {HTMLElement}
    */
   generateText(node, spanInsteadParagraph = false) {
-    switch (node.type) {
+    switch (node.t) {
       case "paragraph":
       case "span": {
         let e = document.createElement(
-          node.type == "span" || spanInsteadParagraph ? "span" : "p"
+          node.t == "span" || spanInsteadParagraph ? "span" : "p"
         );
-        for (let c of node.children) e.appendChild(this.generateText(c));
+        for (let c of node.c) e.appendChild(this.generateText(c));
         return e;
       }
       case "text": {
-        return genSpan(node.data);
+        return genSpan(node.d);
       }
       case "code": {
-        let span = genSpan(node.data);
+        let span = genSpan(node.d);
         span.classList.add("code");
         return span;
       }
       case "italic":
       case "bold": {
         let span = genSpan("");
-        span.append(...node.children.map((c) => this.generateText(c)));
-        if (node.type === "bold") span.style.fontWeight = "bold";
+        span.append(...node.c.map((c) => this.generateText(c)));
+        if (node.t === "bold") span.style.fontWeight = "bold";
         else span.style.fontStyle = "italic";
         return span;
       }
       case "math":
       case "display-math": {
         let tex = this.generateMathString(node);
-        return genMathSpan(tex, node.type === "display-math");
+        return genMathSpan(tex, node.t === "display-math");
       }
       case "gap": {
         let span = genSpan("");
-        let width = Math.max(node.data.length * 14, 24);
+        let width = Math.max(node.d.length * 14, 24);
         let input = genInputField(width);
         let id = "gap-" + this.gapIdx;
         this.gapInputs[id] = input;
-        this.expected[id] = node.data;
+        this.expected[id] = node.d;
         this.types[id] = "string";
         input.addEventListener("keyup", () => {
           this.editedQuestion();
           input.value = input.value.toUpperCase();
           this.student[id] = input.value.trim();
         });
+        this.student[id] = "";
         if (this.showSolution)
           this.student[id] = input.value = this.expected[id];
         this.gapIdx++;
@@ -382,15 +391,22 @@ export class Question {
       }
       case "input":
       case "input2": {
-        let suppressParentheses = node.type === "input2";
+        // "input2" is an alternative mode, that simple turns off rendering
+        // of parenthesis around sets / vectors
+        let suppressParentheses = node.t === "input2";
+        // outer span, where everything is put in
         let span = genSpan("");
         span.style.verticalAlign = "text-bottom";
-        let id = node.data;
+        // identifier of the input variable
+        let id = node.d;
+        // expected value (stringified)
         let expected = this.getCurrentInstance()[id];
-        this.expected[id] = expected.value;
-        this.types[id] = expected.type;
+        // set expected value and type locally
+        this.expected[id] = expected.v;
+        this.types[id] = expected.t;
+        // render parentheses around set / vector input (NOT for "input2")
         if (!suppressParentheses)
-          switch (expected.type) {
+          switch (expected.t) {
             case "set":
               span.append(genMathSpan("\\{"), genSpan(" "));
               break;
@@ -398,9 +414,9 @@ export class Question {
               span.append(genMathSpan("["), genSpan(" "));
               break;
           }
-        if (expected.type === "vector" || expected.type === "set") {
+        if (expected.t === "vector" || expected.t === "set") {
           // vector or set
-          let elements = expected.value.split(",");
+          let elements = expected.v.split(",");
           let n = elements.length;
           for (let i = 0; i < n; i++) {
             if (i > 0) span.appendChild(genSpan(" , "));
@@ -414,13 +430,13 @@ export class Question {
               false
             );
           }
-        } else if (expected.type === "matrix") {
+        } else if (expected.t === "matrix") {
           let parentDiv = genDiv();
           span.appendChild(parentDiv);
-          new MatrixInput(parentDiv, this, id, expected.value);
-        } else if (expected.type === "complex") {
+          new MatrixInput(parentDiv, this, id, expected.v);
+        } else if (expected.t === "complex") {
           // complex number in normal form
-          let elements = expected.value.split(",");
+          let elements = expected.v.split(",");
           new TermInput(
             span,
             this,
@@ -440,18 +456,19 @@ export class Question {
           );
           span.append(genSpan(" "), genMathSpan("i"));
         } else {
-          let integersOnly = expected.type === "int";
+          let integersOnly = expected.t === "int";
           new TermInput(
             span,
             this,
             id,
-            expected.value.length,
-            expected.value,
+            expected.v.length,
+            expected.v,
             integersOnly
           );
         }
+        // render parentheses around set / vector input (NOT for "input2")
         if (!suppressParentheses)
-          switch (expected.type) {
+          switch (expected.t) {
             case "set":
               span.append(genSpan(" "), genMathSpan("\\}"));
               break;
@@ -462,13 +479,13 @@ export class Question {
         return span;
       }
       case "itemize": {
-        return genUl(node.children.map((c) => genLi(this.generateText(c))));
+        return genUl(node.c.map((c) => genLi(this.generateText(c))));
       }
       case "single-choice":
       case "multi-choice": {
-        let mc = node.type == "multi-choice";
+        let mc = node.t == "multi-choice";
         let table = document.createElement("table");
-        let n = node.children.length;
+        let n = node.c.length;
         let shuffled = this.debug == false;
         let order = range(n, shuffled);
         let iconCorrect = mc ? iconSquareChecked : iconCircleChecked;
@@ -477,17 +494,17 @@ export class Question {
         let answerIDs = [];
         for (let i = 0; i < n; i++) {
           let idx = order[i];
-          let answer = node.children[idx];
+          let answer = node.c[idx];
           let answerId = "mc-" + this.choiceIdx + "-" + idx;
           answerIDs.push(answerId);
           let expectedValue =
-            answer.children[0].type == "bool"
-              ? answer.children[0].data
-              : this.getCurrentInstance()[answer.children[0].data].value;
+            answer.c[0].t == "bool"
+              ? answer.c[0].d
+              : this.getCurrentInstance()[answer.c[0].d].v;
           this.expected[answerId] = expectedValue;
           this.types[answerId] = "bool";
           this.student[answerId] = this.showSolution ? expectedValue : "false";
-          let text = this.generateText(answer.children[1], true);
+          let text = this.generateText(answer.c[1], true);
           // dom
           let tr = document.createElement("tr");
           table.appendChild(tr);
@@ -530,7 +547,9 @@ export class Question {
         return table;
       }
       default: {
-        let span = genSpan("UNIMPLEMENTED(" + node.type + ")");
+        // put error, in case the implementation in "sell.py" is more advances
+        // than the web version :-)
+        let span = genSpan("UNIMPLEMENTED(" + node.t + ")");
         span.style.color = "red";
         return span;
       }
