@@ -1,10 +1,14 @@
 # TODO: comment all code (e.g. build.py, sell.py lines 186ff)
 
+# TODO: feedback (e.g. "awesome") is not clearly rendered, i.e. blended into the background
+
 # TODO: doc: if a variable in math mode is a matrix and contains "augmented" as subterm, then it is represented as augmented matrix
 # TODO: doc: note on packages -> which error occurs, if e.g. numpy is NOT installed??
 # TODO: documentation for Conditional Multiple Choice (NOT available for single choice!)
 # TODO: readme notes on libraries: numpy, sympy, sage, ... (sympy and numpy loading times slow: exclude optionally?)
 # TODO: readme: add hints on fractions (sympy Fraction), ... + give more examples in general
+# TODO: readme: clarify the use of ":"
+# TODO: readme: explicitly describe all data types (int, float, rational, ...)
 
 # TODO: mobile devices: horizontal scroll e.g. matrix inputs
 
@@ -18,6 +22,10 @@
 # TODO: automatically switch between round parentheses and brackets for vectors/matrices; based on LANG (de: round parentheses, otherwise: brackets)
 
 # TODO: plots: e.g. https://pythonforundergradengineers.com/plotting-sin-cos-with-matplotlib.html
+
+# TODO: VSCode syntax highlighting plugin (or even complete lang workbench plugin??)
+# TODO: Moodle plugin
+# TODO: exercise download "shop"
 
 
 

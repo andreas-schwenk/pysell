@@ -4,21 +4,31 @@ Python based Simple E-Learning Language for the simple creation of interactive c
 
 ## Dependencies
 
-**Users:** Only vanilla Python 3 is required to create basic questions. If you like to use symbolic calculations in your questions, then also `sympy` should be installed (`pip install sympy`).
+**Users:** Only vanilla Python 3 is required to create basic questions. If you like to use symbolic calculations in your questions, then also `sympy` should be installed (`pip install sympy`). If you require linear algebra, for example `numpy` can be used (`pip install numpy`). Also `SageMath` can be used.
 
 **Developers:** Node.js + a local web server for debugging the web code (or alternatively install the recommended VS-code extension in this repository).
 
 ## User Guide
 
-Download file `sell.py` from this repository. Only this file es required. All other files are used for the development of `pySELL`.
+Download file [`sell.py`](https://raw.githubusercontent.com/andreas-schwenk/pysell/main/sell.py) from this repository. Only this file es required. All other files are used for the development of `pySELL`.
 
 Run `python sell.py FILENAME.txt` to generate a self-contained quiz-website `FILENAME.html` from sources in `FILENAME.txt`. You will find an example below, and more examples in directory `examples/`.
+
+Also a file `FILENAME_debug.html` is created, which can be used for debugging purposes. The debug output differs to the release files in the following aspects:
+
+- The sample solution is rendered in the input files
+- All questions are evaluated directly, for testing the evaluation
+- Single and multiple choice answers are displayed in static order
+- Python and text sources are displayed with syntax highlighting
+- The line numbers of the source file are shown for each exercise
+
+If you like to use `SageMath` in your code, then run `sage -python sell.py FILENAME.txt`.
 
 _A short developer guide can be found at the end of this document._
 
 ## Example
 
-The following example code generates some questions, as seen in the figure and available for testing [here](https://andreas-schwenk.github.io/pysell/ex1.html).
+The following example code generates some questions, as can be seen in the figure. You may run the examples [here](https://andreas-schwenk.github.io/pysell/ex1.html).
 
 ![](docs/example.jpg)
 
@@ -141,6 +151,8 @@ a = random.randint(-2,5)
 # equivalent:
 a = random.choice(range(-2,5+1))
 ```
+
+_The examples explicitly write `+1` to clarify that the upper bound is not included._
 
 #### Choose a random number `a` from a given set `{2,3,5,7}`:
 

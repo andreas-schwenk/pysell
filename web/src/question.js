@@ -27,7 +27,7 @@ import {
   iconCircleChecked,
 } from "./icons.js";
 import { MatrixInput, TermInput } from "./input.js";
-import { Matrix, Term, range } from "./math.js";
+import { Matrix, Term, TermNode, range } from "./math.js";
 
 /**
  * The state of a question.
@@ -304,10 +304,7 @@ export class Question {
             let tk = value.split(",");
             let real = parseFloat(tk[0]);
             let imag = parseFloat(tk[1]);
-            let s = "";
-            if (Math.abs(real) > 1e-9) s += real;
-            if (Math.abs(imag) > 1e-9) s += (imag < 0 ? "-" : "+") + imag + "i";
-            return s;
+            return TermNode.const(real, imag).toTexString();
           }
           case "matrix": {
             // e.g. "[[1,2,3],[4,5,6]]" -> "\begin{pmatrix}1&2&3\\4%5%6\end{pmatrix}"

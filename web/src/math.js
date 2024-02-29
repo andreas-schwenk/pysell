@@ -505,6 +505,7 @@ export class Term {
       let id = "";
       if (this.token.startsWith("pi")) id = "pi";
       else id = this.token[0];
+      if (id === "I") id = "i";
       this.next(id.length); // only consume next char(s)
       return new TermNode("var:" + id, []);
     } else throw new Error("expected unary");
@@ -553,7 +554,9 @@ export class Term {
       "ln",
       "sqrt",
     ];
-    for (let f of fun1) if (this.token.startsWith(f)) return f;
+    for (let f of fun1) {
+      if (this.token.toLowerCase().startsWith(f)) return f;
+    }
     return "";
   }
 
@@ -744,9 +747,11 @@ export class TermNode {
         let im = hasIm ? "" + this.im + "i" : "";
         if (im === "1i") im = "i";
         else if (im === "-1i") im = "-i";
-        if (hasIm && this.im >= 0 && hasRe) im = "+" + im;
         if (!hasRe && !hasIm) s = "0";
-        else s = re + im;
+        else {
+          if (hasIm && this.im >= 0 && hasRe) im = "+" + im;
+          s = re + im;
+        }
         break;
       }
       case ".-":
