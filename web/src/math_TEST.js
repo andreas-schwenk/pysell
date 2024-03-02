@@ -32,6 +32,17 @@ for (let tt of texTests) {
 }
 
 let tests = `
+
+# ODE: y'(x) = -2*x^2 / y(x)
+# wolframalpha.com                   sympy
+sqrt(2/3)*sqrt(C-2*x^3)      ==ODE  sqrt(C-12*x^3)/3
+
+sin(2*C) * 2 + 4 * x         ==ODE  C + 4 * x
+sqrt(- 4/3 x^3 + C)          ==ODE  sqrt(- 12 * x^3 + C)/3
+sin(C1)*sin(3x) + C2*cos(3x) ==ODE  C1*sin(3x) + C2*cos(3x)
+sin(C1)*sin(3x) + C2*cos(3x) ==ODE  C2*sin(3x) + C1*cos(3x)
+C1 exp 2x + C2 exp(-4x)      ==ODE  C2 exp 2x + C1 exp(-4x)
+
 xyz t          == x*y*z*t
 2+4*5          == 2+(4*5)
 (2+4)*5        == 30
@@ -86,20 +97,38 @@ sinc2x+1       == sin(2x)/(2x)+1
 for (let test of tests.split("\n")) {
   test = test.split("#")[0].trim();
   if (test.length == 0) continue;
-  let equal = test.includes("==");
-  let tk = equal ? test.split("==") : test.split("!=");
-  console.log("comparing " + tk[0] + " == " + tk[1]);
+
+  let compareType = "==";
+  if (test.includes("!=")) compareType = "!=";
+  if (test.includes("==ODE")) compareType = "==ODE";
+  if (test.includes("!=ODE")) compareType = "!=ODE";
+  let tk = test.split(compareType);
+  console.log("comparing " + tk[0] + compareType + tk[1]);
   console.log(
     " ----> " +
       Term.parse(tk[0]).toString() +
-      " == " +
+      " " +
+      compareType +
+      " " +
       Term.parse(tk[1]).toString()
   );
-  let res = Term.parse(tk[0]).compare(Term.parse(tk[1]));
-  assert.equal(res, equal);
+  switch (compareType) {
+    case "==":
+    case "!=": {
+      let eq = compareType === "==";
+      assert.equal(Term.compare(Term.parse(tk[0]), Term.parse(tk[1])), eq);
+      break;
+    }
+    case "==ODE":
+    case "!=ODE": {
+      let eq = compareType === "==ODE";
+      assert.equal(Term.compareODE(Term.parse(tk[0]), Term.parse(tk[1])), eq);
+      break;
+    }
+  }
 }
 
-assert.equal(Term.parse("2^3").compare(Term.parse("8")), true);
+assert.equal(Term.compare(Term.parse("2^3"), Term.parse("8")), true);
 
 assert.ok(
   Term.parse("- x^2 + y^2 + xy + x(y+1) + sin(2) + sin 3*x + e^0 + e^3 + 2pi")

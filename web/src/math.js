@@ -166,14 +166,53 @@ export class Term {
   }
 
   /**
-   * Gets set set of variables (e.g. {x,y} for x^2+y^2 ).
+   * Clone the current term, but excludes scanner/parser attributes.
+   * @returns {Term}
+   */
+  clone() {
+    let c = new Term();
+    c.root = this.root.clone();
+    return c;
+  }
+
+  /**
+   * Gets the set of variables (e.g. {x,y} for x^2+y^2).
    * @param {Set<string>} s
+   * @param {string} [prefix=""] -- if set, then only variables starting with prefix are filled
    * @param {TermNode} node
    */
-  getVars(s, node = null) {
+  getVars(s, prefix = "", node = null) {
     if (node == null) node = this.root;
-    if (node.op.startsWith("var:")) s.add(node.op.substring(4));
-    for (let c of node.c) this.getVars(s, c);
+    if (node.op.startsWith("var:")) {
+      let id = node.op.substring(4);
+      if (prefix.length == 0 || (prefix.length > 0 && id.startsWith(prefix)))
+        s.add(id);
+    }
+    for (let c of node.c) {
+      this.getVars(s, prefix, c);
+    }
+  }
+
+  /**
+   * Replaces variables driven by a given dict
+   * @param {Object.<string,TermNode>} dict
+   * @param {TermNode} [node=null]
+   */
+  setVars(dict, node = null) {
+    if (node == null) node = this.root;
+    for (let c of node.c) {
+      this.setVars(dict, c);
+    }
+    if (node.op.startsWith("var:")) {
+      let id = node.op.substring(4);
+      if (id in dict) {
+        let x = dict[id].clone();
+        node.op = x.op;
+        node.c = x.c;
+        node.re = x.re;
+        node.im = x.im;
+      }
+    }
   }
 
   /**
@@ -201,8 +240,7 @@ export class Term {
       case "-":
       case "*":
       case "/":
-      case "^":
-      case "==": {
+      case "^": {
         // binary operation
         let u = this.eval(dict, node.c[0]);
         let v = this.eval(dict, node.c[1]);
@@ -231,12 +269,6 @@ export class Term {
               new TermNode("*", [v, new TermNode("ln", [u])]),
             ]);
             res = this.eval(dict, tn);
-            break;
-          case "==":
-            t1 = u.re - v.re;
-            t2 = u.im - v.im;
-            res.re = Math.sqrt(t1 * t1 + t2 * t2) < EPS ? 1 : 0;
-            res.im = 0;
             break;
         }
         break;
@@ -504,6 +536,8 @@ export class Term {
     } else if (this.isAlpha(this.token[0])) {
       let id = "";
       if (this.token.startsWith("pi")) id = "pi";
+      else if (this.token.startsWith("C1")) id = "C1";
+      else if (this.token.startsWith("C2")) id = "C2";
       else id = this.token[0];
       if (id === "I") id = "i";
       this.next(id.length); // only consume next char(s)
@@ -512,29 +546,160 @@ export class Term {
   }
 
   /**
-   * Compares the current term to a given one, numerically.
-   * E.g. "x+x" and "2x" are equal.
+   * Compares two terms numerically. E.g. "x+x" and "2x" are equal.
    * This method randomly sets all occurring variables to a (complex) number
    * and then evaluates both terms.
-   * @param {Term} term
+   * @param {Term} tu
+   * @param {Term} tv
    * @return {boolean}
    */
-  compare(term) {
+  static compare(tu, tv) {
     const EPS = 1e-9;
     const NUM_TESTS = 10; // TODO
     let vars = new Set();
-    this.getVars(vars);
-    term.getVars(vars);
+    tu.getVars(vars);
+    tv.getVars(vars);
     for (let i = 0; i < NUM_TESTS; i++) {
       /** @type {Object.<string,TermNode>} */
       let context = {};
       for (let v of vars)
         context[v] = TermNode.const(Math.random(), Math.random());
-      let t = new TermNode("==", [this.root, term.root]);
-      let res = this.eval(context, t); // TODO: catch DIV/0, ... -> test again
-      if (Math.abs(res.re) < EPS) return false;
+      let r1 = tu.eval(context); // TODO: catch DIV/0, ... -> test again
+      let r2 = tv.eval(context); // TODO: catch DIV/0, ... -> test again
+      let dre = r1.re - r2.re;
+      let dim = r1.im - r2.im;
+      let abs = Math.sqrt(dre * dre + dim * dim);
+      if (abs > EPS) return false;
     }
     return true;
+  }
+
+  /**
+   * Compares two ODE strings. For example, valid solutions for
+   *     y'(x) = -2*x^2 / y(x)    are
+   *     sqrt(2/3)*sqrt(C-2*x^3)  [output from wolframalpha.com]   and
+   *     sqrt(C-12*x^3)/3         [output from sympy]
+   * Challenge: C_k can be replaced by any valid term that involves one or more
+   *     occurrences of C_k, as well as constants. For example, we may write
+   *     "sqrt(3*C+5)" instead of just "C". If we would compare both solutions
+   *     terms from the examples above numerically, i.e. by replacing C_k and x
+   *     with random numbers (equally numbers for both terms), then the test
+   *     would fail; even it should success.
+   * Too keep the math engine in this file simple, we use the following "trick"
+   * that is sufficient for math questions (but NOT for the real world...)
+   * (a) Compare both terms numerically, with all C_k := 0.
+   *     If this test fails, then both terms are unequal and we return FAILED.
+   * (b) To verify that C_k is used in an appropriate context, we reduce each
+   *     term to its "fundamental structure" and compare these new terms.
+   *     For example "sqrt(2/3)*sqrt(C-2*x^3)" becomes "sqrt(C-x)", and
+   *     "sqrt(C-12*x^3)/3" becomes "sqrt(C-x)" again. If the reduced terms
+   *     are equal, then the ODE term comparison SUCCEEDS.
+   *     Refer to method prepareODEconstantComparison(..) for more detail.
+   * @param {Term} tu
+   * @param {Term} tv
+   * @return {boolean}
+   */
+  static compareODE(tu, tv) {
+    // implementation of (a)
+    let tuClone = tu.clone();
+    let tvClone = tv.clone();
+    let constantVars = new Set();
+    tuClone.getVars(constantVars, "C");
+    tvClone.getVars(constantVars, "C");
+    /** @type {Object.<string,TermNode>} */
+    let context = {};
+    for (let v of constantVars.keys()) {
+      context[v] = TermNode.const(0, 0);
+    }
+    tuClone.setVars(context);
+    tvClone.setVars(context);
+    if (Term.compare(tuClone, tvClone) == false) {
+      return false;
+    }
+    // implementation of (b)
+    // TODO: special visual feedback for students, if only (b) fails
+    tuClone = tu.clone();
+    tvClone = tv.clone();
+    tuClone.prepareODEconstantComparison();
+    tvClone.prepareODEconstantComparison();
+    return Term.compare(tuClone, tvClone);
+  }
+
+  /**
+   * TODO: allow swapping of constants!!
+   * TODO: update comments to new implementation
+   *
+   * Numerical term comparison provides a testing-scope, that involves
+   * replacing all occurring variables with random numbers (same values for
+   * same variables in both terms; also refer to method "compare").
+   * "Proving" the equality for solutions of ODEs of order "n" is more
+   * challenging, since constants C_k \in \CC, with 0 < k < n, may be
+   * given ambiguously.
+   * For example, terms "sqrt(sin(2*C)+x^3)" and "sqrt(C+x^3)" must be
+   * considered equal.
+   * This method optimizes the occurrences of constants, i.e. removes any
+   * operations that involves constants and C.
+   * The Term Rewriting System (TRS) is specified as follows:
+   *   unary_op(C)           -> C      (e.g. unary minus)
+   *   binary_op(C,constant) -> C      (e.g. addition)
+   *   binary_op(constant,C) -> C      (e.g. addition)
+   *   function(C)           -> C      (e.g. the sine-function)
+   * @param {TermNode} node
+   * @return {void}
+   */
+  prepareODEconstantComparison(node = null) {
+    if (node == null) node = this.root;
+    for (let c of node.c) {
+      this.prepareODEconstantComparison(c);
+    }
+    switch (node.op) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+      case "^": {
+        let op = [node.c[0].op, node.c[1].op];
+        let isConst = [op[0] === "const", op[1] === "const"];
+        let isVar = [op[0].startsWith("var:"), op[1].startsWith("var:")];
+        if (isVar[0] && isConst[1]) {
+          node.op = node.c[0].op;
+          node.c = [];
+        } else if (isVar[1] && isConst[0]) {
+          node.op = node.c[1].op;
+          node.c = [];
+        } else if (isVar[0] && isVar[1] && op[0] == op[1]) {
+          node.op = node.c[0].op;
+          node.c = [];
+        } else if (isConst[0]) {
+          node.op = node.c[1].op;
+          node.c = node.c[1].c;
+        } else if (isConst[1]) {
+          node.op = node.c[0].op;
+          node.c = node.c[0].c;
+        }
+        break;
+      }
+      case ".-":
+      case "abs":
+      case "sin":
+      case "sinc":
+      case "cos":
+      case "tan":
+      case "cot":
+      case "exp":
+      case "ln":
+      case "log":
+      case "sqrt":
+        if (node.c[0].op.startsWith("var:")) {
+          node.op = node.c[0].op;
+          node.c = [];
+        } else if (node.c[0].op === "const") {
+          node.op = "const";
+          node.re = node.im = 0;
+          node.c = [];
+        }
+        break;
+    }
   }
 
   /**
@@ -595,7 +760,8 @@ export class Term {
         ((this.isNum(this.token[0]) && this.isAlpha(ch)) ||
           (this.isAlpha(this.token[0]) && this.isNum(ch)))
       ) {
-        return;
+        // ... but keep ODE-constants (e.g. "C1", "C2", ...)
+        if (this.token != "C") return;
       }
       // delimiter?
       if ("^%#*$()[]{},.:;+-*/_!<>=?|\t\n ".includes(ch)) {
@@ -681,6 +847,20 @@ export class TermNode {
   }
 
   /**
+   * @returns {TermNode}
+   */
+  clone() {
+    let c = new TermNode(
+      this.op,
+      this.c.map((ci) => ci.clone()),
+      this.re,
+      this.im
+    );
+    c.explicitParentheses = this.explicitParentheses;
+    return c;
+  }
+
+  /**
    * Creates a constant (i.e. a leaf)
    * @param {number} re
    * @param {number} im
@@ -716,8 +896,10 @@ export class TermNode {
         s = "(" + this.re + "+" + this.im + "i)";
       else if (hasReal && hasImag && this.im < 0)
         s = "(" + this.re + "-" + -this.im + "i)";
-      else if (hasReal) s = "" + this.re;
+      else if (hasReal && this.re > 0) s = "" + this.re;
+      else if (hasReal && this.re < 0) s = "(" + this.re + ")";
       else if (hasImag) s = "(" + this.im + "i)";
+      else s = "0";
     } else if (this.op.startsWith("var")) {
       s = this.op.split(":")[1];
     } else if (this.c.length == 1) {

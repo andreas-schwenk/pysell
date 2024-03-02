@@ -20,6 +20,62 @@ import { Question } from "./question.js";
  */
 
 /**
+ * Input field for a textual gap.
+ */
+export class GapInput {
+  /**
+   * @param {HTMLElement} parent -- parent element where the input is appended to
+   * @param {Question} question -- the question
+   * @param {string} inputId -- the id for persisting the students input
+   * @param {string} solutionString -- the sample solution
+   */
+  constructor(parent, question, inputId, solutionString) {
+    // initialize the students answer to "unset"
+    question.student[inputId] = "";
+    /** @type {Question} */
+    this.question = question;
+    /** @type {string} */
+    this.inputId = inputId;
+    if (inputId.length == 0) {
+      // generate a new id, if the input does not correspond to a variable,
+      // but the solution was given directly as string in the text.
+      this.inputId = "gap-" + question.gapIdx;
+      question.types[this.inputId] = "string";
+      question.expected[this.inputId] = solutionString;
+      question.gapIdx++;
+    }
+    // split the solution string into single answers
+    let expectedList = solutionString.split("|");
+    // get the maximum number of characters (to estimate the width of the input)
+    let maxAnswerLen = 0;
+    for (let i = 0; i < expectedList.length; i++) {
+      let e = expectedList[i];
+      if (e.length > maxAnswerLen) maxAnswerLen = e.length;
+    }
+    let span = genSpan("");
+    parent.appendChild(span);
+    let width = Math.max(maxAnswerLen * 15, 24);
+    let input = genInputField(width);
+    question.gapInputs[this.inputId] = input;
+    input.addEventListener("keyup", () => {
+      this.question.editedQuestion();
+      input.value = input.value.toUpperCase();
+      this.question.student[this.inputId] = input.value.trim();
+    });
+    span.appendChild(input);
+    if (this.question.showSolution) {
+      this.question.student[this.inputId] = input.value = expectedList[0];
+      if (expectedList.length > 1) {
+        let allOptions = genSpan("[" + expectedList.join("|") + "]");
+        allOptions.style.fontSize = "small";
+        allOptions.style.textDecoration = "underline";
+        span.appendChild(allOptions);
+      }
+    }
+  }
+}
+
+/**
  * Input field for typing a term.
  */
 export class TermInput {

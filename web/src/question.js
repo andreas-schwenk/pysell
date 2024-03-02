@@ -26,7 +26,7 @@ import {
   iconCircleUnchecked,
   iconCircleChecked,
 } from "./icons.js";
-import { MatrixInput, TermInput } from "./input.js";
+import { GapInput, MatrixInput, TermInput } from "./input.js";
 import { Matrix, Term, TermNode, range } from "./math.js";
 
 /**
@@ -107,7 +107,10 @@ export class Question {
    * @returns {Object.<string,Object>}
    */
   getCurrentInstance() {
-    return this.src.instances[this.instanceOrder[this.instanceIdx]];
+    // TODO: check where this method is used. If this method returns undefined,
+    // then consider this!!!
+    let idx = this.instanceOrder[this.instanceIdx];
+    return this.src.instances[idx];
   }
 
   /**
@@ -190,6 +193,19 @@ export class Question {
       errorSpan.style.color = "red";
       return;
     }
+    // generate image, if applicable
+    // TODO: reuse code of generating node type "image"
+    let instance = this.getCurrentInstance();
+    if (instance != undefined && "__svg_image" in instance) {
+      let base64data = instance["__svg_image"].v;
+      let imageDiv = genDiv();
+      this.questionDiv.appendChild(imageDiv);
+      let img = document.createElement("img");
+      imageDiv.appendChild(img);
+      img.classList.add("img");
+      img.src = "data:image/svg+xml;base64," + base64data;
+    }
+
     // generate question text
     for (let c of this.src.text.c)
       this.questionDiv.appendChild(this.generateText(c));
@@ -285,10 +301,27 @@ export class Question {
     switch (node.t) {
       case "math":
       case "display-math":
-        for (let c of node.c) s += this.generateMathString(c);
+        for (let c of node.c) {
+          let sc = this.generateMathString(c);
+          if (c.t === "var" && s.includes("!PM")) {
+            // replace the last occurred "!PM" (plus-minus sign)
+            // with the sign of the variable. The sign of the variable itself
+            // is vanished.
+            // TODO: test for non-integers
+            if (sc.startsWith("{-")) {
+              sc = "{" + sc.substring(2);
+              s = s.replaceAll("!PM", "-");
+            } else s = s.replaceAll("!PM", "+");
+          }
+          s += sc;
+        }
         break;
       case "text":
-        return node.d; // d := data
+        return node.d;
+      case "plus_minus": {
+        s += " !PM ";
+        break;
+      }
       case "var": {
         let instance = this.getCurrentInstance();
         let type = instance[node.d].t;
@@ -326,7 +359,7 @@ export class Question {
         }
       }
     }
-    return "{" + s + "}";
+    return node.t === "plus_minus" ? s : "{" + s + "}";
   }
 
   /**
@@ -366,24 +399,21 @@ export class Question {
         let tex = this.generateMathString(node);
         return genMathSpan(tex, node.t === "display-math");
       }
+      case "string_var": {
+        let span = genSpan("");
+        let instance = this.getCurrentInstance();
+        let type = instance[node.d].t;
+        let value = instance[node.d].v;
+        if (type === "string") span.innerHTML = value;
+        else {
+          span.innerHTML = "EXPECTED VARIABLE OF TYPE STRING";
+          span.style.color = "red";
+        }
+        return span;
+      }
       case "gap": {
         let span = genSpan("");
-        let width = Math.max(node.d.length * 14, 24);
-        let input = genInputField(width);
-        let id = "gap-" + this.gapIdx;
-        this.gapInputs[id] = input;
-        this.expected[id] = node.d;
-        this.types[id] = "string";
-        input.addEventListener("keyup", () => {
-          this.editedQuestion();
-          input.value = input.value.toUpperCase();
-          this.student[id] = input.value.trim();
-        });
-        this.student[id] = "";
-        if (this.showSolution)
-          this.student[id] = input.value = this.expected[id];
-        this.gapIdx++;
-        span.appendChild(input);
+        new GapInput(span, this, "", node.d);
         return span;
       }
       case "input":
@@ -411,7 +441,10 @@ export class Question {
               span.append(genMathSpan("["), genSpan(" "));
               break;
           }
-        if (expected.t === "vector" || expected.t === "set") {
+        if (expected.t === "string") {
+          // gap question
+          new GapInput(span, this, id, this.expected[id]);
+        } else if (expected.t === "vector" || expected.t === "set") {
           // vector or set
           let elements = expected.v.split(",");
           let n = elements.length;
@@ -542,6 +575,25 @@ export class Question {
         }
         this.choiceIdx++;
         return table;
+      }
+      case "image": {
+        let imageDiv = genDiv();
+        let path = node.d;
+        let pathTokens = path.split(".");
+        let fileExtension = pathTokens[pathTokens.length - 1];
+        let width = node.c[0].d;
+        let b64 = node.c[1].d;
+        let img = document.createElement("img");
+        imageDiv.appendChild(img);
+        img.classList.add("img");
+        img.style.width = width + "%";
+        let dataTypes = {
+          svg: "svg+xml",
+          png: "png",
+          jpg: "jpeg",
+        };
+        img.src = "data:image/" + dataTypes[fileExtension] + ";base64," + b64;
+        return imageDiv;
       }
       default: {
         // put error, in case the implementation in "sell.py" is more advances

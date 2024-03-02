@@ -1,1 +1,6 @@
+LANG    en
+TITLE   pySELL Demo
+AUTHOR  Andreas Schwenk
+
+
 # TODO: sage examples + info "sage -python INPUT", ...

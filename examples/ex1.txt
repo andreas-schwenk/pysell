@@ -1,15 +1,9 @@
 LANG    en
-TITLE   Demo
+TITLE   pySELL Demo
 AUTHOR  Andreas Schwenk
 
 
 # this is a comment line
-
-QUESTION Multiple-Choice
-Mark the correct answer(s)
-[x] This answer is correct
-[x] This answer is correct
-[ ] This answer is incorrect
 
 
 QUESTION Single-Choice
@@ -19,43 +13,53 @@ Mark the correct answer
 ( ) This answer is *incorrect*
 
 
-QUESTION Programming
-Will the following loop terminate:
-`while (true || x) { ... }`?
-( ) yes
-( ) no
-(x) depends on `...`
+QUESTION Multiple-Choice
+Mark the correct answer(s)
+[x] This answer is correct
+[x] This answer is correct
+[ ] This answer is incorrect
 
 
-QUESTION Gap
-- Write 3 as a word %"three".
-- Write 7 as a word %"seven".
+QUESTION Gaps
+- Write 3 as a word: %"three"
+- Write 7 as a word: %"seven"
+- Write the name of one of the first letters in the Greek alphabet: %"alpha|beta"
 
 
-QUESTION Addition
+QUESTION Integers
 """
 import random
-#x = random.randint(10, 20)
-#y = random.randint(10, 20)
-x = random.randint(1, 5)
-y = 2
+x = random.randint(-10, 10)
+y = random.randint(1, 10)
 z = x + y
 """
 Calculate $x + y =$ %z
 
 
-QUESTION Fibonacci
+QUESTION Automatically Chosen Sign
+"""
+import random
+# draw two random numbers x and y in {-10, -9, ..., 10} excluding zero,
+# and with x unequal y
+[x,y] = random.sample(rangeZ(-10,10+1),k=2)
+z = x + y
+"""
+# "+-" writes  x+y  if y is positive, or  x-abs(y)  otherwise.
+Calculate $x +- y =$ %z
+
+
+QUESTION Lists/Vectors
 """
 fib = [1] * 7
 for i in range(2,len(fib)):
     fib[i] = fib[i-2] + fib[i-1]
 fib3 = fib[3:]
 """
-Complete the Fibonacci sequence
+Continue the Fibonacci sequence
 - $ 1, 1, 2, $ %!fib3, ...
 
 
-QUESTION Set
+QUESTION Sets
 """
 import random
 x = {2,4,5}
@@ -65,7 +69,7 @@ z = x.union(y)
 $x \cup y = $ %z
 
 
-QUESTION Complex
+QUESTION Complex Numbers
 """
 import random
 [a,b,c,d] = random.choices(range(2,10+1),k=4)
@@ -84,13 +88,13 @@ import numpy
 A = numpy.random.randint(20, size=(4, 3))
 B = A.transpose()
 """
-- $A^T =$ %B
+- $A^T=$ %B
 
 
 QUESTION Matrices with Sympy
 """
 from sympy import *
-A = randMatrix(2,3, min=-2, max=2, symmetric=False)
+A = randMatrix(3,3, min=-1, max=1, symmetric=True)
 B = randMatrix(2,3, min=-2, max=2, symmetric=False)
 x = symbols('x')
 B[0,0] = cos(x) + sin(5)
@@ -99,15 +103,32 @@ C = A * B.transpose()
 - $A \cdot B^T=$ %C
 
 
-QUESTION Term
+QUESTION Terms: Differentiation
 """
 from sympy import *
 x = symbols('x')
 f = 3 * cos(x)
-fd = diff(f,x)
+d = diff(f,x)
 """
-- $"f"(x)=f$
-- $"f"'(x)=$ %fd
+$"f"(x)=f$ \\
+$"f"'(x)=$ %d
+
+
+QUESTION Terms 2: Integration
+"""
+from sympy import *
+x = symbols('x')
+f = parse_expr("(x+1) / exp(x)", evaluate=False)
+#     We could also have written 
+#          f = (x+1) / exp(x)
+#     . But sympy would have simplified it to
+#          (x+1) * exp(-x)
+#     , which may not have been the teacher's intention
+i = integrate(f,x)
+"""
+Determine by **partial integration:** \\
+- $ \displaystyle \int f ~ dx =$ %i $+ C$ \\
+with $C \in \CC$
 
 
 QUESTION Conditional Multiple Choice
@@ -122,3 +143,71 @@ Mark the correct answer(s)
 [!ab] $a>b$
 [!bc] $b>c$
 [!cd] $c>d$
+
+
+QUESTION Strings and Dynamic Gaps
+"""
+import random
+x = random.randint(1,5)
+txt = ["one|uno", "two|dos", "three|tres", "four|cuatro", "five|cinco"][x-1]
+en = txt.split("|")[0]
+"""
+- Write &en as Arabic numeral: %x
+- Write $x$ as English or Spanish text: %txt.
+
+
+QUESTION First-order differential equation with separable variables
+"""
+# y'(x) = -a * x^2 / y(x)
+import random
+from sympy import *
+a = random.randint(2,5)
+y = Function('y')
+x = symbols('x')
+f = Derivative(y(x), x) + a * x**2 / y(x)
+result = dsolve(f, y(x))
+if not checkodesol(f, result)[0]:
+    raise Exception("sympy failed to solve the ODE")
+# skip first solution with preceding minus
+result = result[1].rhs
+"""
+Solve the ODE $$ y'(x) = -a \frac{x^2}{y(x)} $$
+- $ y(x) = \pm $ %result \\
+Do not forget to include $C$ in your answer.
+
+
+QUESTION Embedded Code Fragments
+Will `while (true || x) { ... }` terminate?
+( ) yes
+( ) no
+(x) depends on `...`
+
+
+QUESTION Images
+!../docs/logo.svg:25         # 25 percent width; default is 100
+What is shown in the image?
+(x) the pySELL logo
+( ) the PostScript logo
+
+
+QUESTION Plots
+"""
+# warning: matplotlib is slow...
+import matplotlib.pyplot as plt
+import numpy as np
+x = np.linspace(-5,5,100)
+s = np.sin(x)
+c = np.cos(x)
+plt.plot(x,s,x,c)
+plt.legend(['function 1', 'function 2'])
+plt.xlabel('x')
+plt.ylabel('f(x)')
+plt.title('trigonometric functions')
+# remove variable(s) that are also used in math mode
+del x, s, c
+"""
+Mark all functions that are displayed in the plot
+[x] $f(x)=\sin(x)$
+[x] $f(x)=\cos(x)$
+[ ] $f(x)=\tan(x)$
+[ ] $f(x)=\cot(x)$

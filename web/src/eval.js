@@ -46,16 +46,20 @@ export function evalQuestion(question) {
         question.numChecked++;
         let inputField = question.gapInputs[id];
         let s = student.trim().toUpperCase();
-        let e = expected.trim().toUpperCase();
-        let d = levenshteinDistance(s, e);
-        // treat answer as OK, if the Levenshtein distance is zero or one.
-        let ok = d <= 1;
-        if (ok) {
-          question.numCorrect++;
-          // in case that the answer is accepted, we need to update the
-          // input text to be in correspondence with the sample solution
-          question.gapInputs[id].value = e;
-          question.student[id] = e;
+        let e = expected.trim().toUpperCase().split("|");
+        let ok = false;
+        for (let ei of e) {
+          let d = levenshteinDistance(s, ei);
+          // treat answer as OK, if the Levenshtein distance is zero or one.
+          if (d <= 1) {
+            ok = true;
+            question.numCorrect++;
+            // in case that the answer is accepted, we need to update the
+            // input text to be in correspondence with the sample solution
+            question.gapInputs[id].value = ei;
+            question.student[id] = ei;
+            break;
+          }
         }
         // give a visual feedback within the input field
         inputField.style.color = ok ? "black" : "white";
@@ -78,7 +82,10 @@ export function evalQuestion(question) {
           // parse the expected and student solution, as both are given by strings
           let u = Term.parse(expected);
           let v = Term.parse(student);
-          if (u.compare(v)) question.numCorrect++;
+          let ok = false;
+          if (question.src["is_ode"]) ok = Term.compareODE(u, v);
+          else ok = Term.compare(u, v);
+          if (ok) question.numCorrect++;
         } catch (e) {
           // if term parsing fails, we just don't count the answer
           if (question.debug) {
@@ -109,7 +116,7 @@ export function evalQuestion(question) {
               let u = Term.parse(expectedList[i]);
               for (let j = 0; j < studentList.length; j++) {
                 let v = Term.parse(studentList[j]);
-                if (u.compare(v)) {
+                if (Term.compare(u, v)) {
                   question.numCorrect++;
                   break;
                 }
@@ -127,7 +134,7 @@ export function evalQuestion(question) {
             try {
               let u = Term.parse(studentList[i]);
               let v = Term.parse(expectedList[i]);
-              if (u.compare(v)) question.numCorrect++;
+              if (Term.compare(u, v)) question.numCorrect++;
             } catch (e) {
               // if term parsing fails, we just don't count the answer
               if (question.debug) {
@@ -153,7 +160,7 @@ export function evalQuestion(question) {
             try {
               let u = Term.parse(e);
               let v = Term.parse(student);
-              if (u.compare(v)) question.numCorrect++;
+              if (Term.compare(u, v)) question.numCorrect++;
             } catch (e) {
               // if term parsing fails, we just don't count the answer
               if (question.debug) {
