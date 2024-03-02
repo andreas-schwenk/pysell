@@ -288,7 +288,7 @@ _Note that the result of `rangeZ` is of type `list`, while the built-in function
 
 ## Developer Guide
 
-To debug (or extend) the web code, first convert an input file into a json file with the `-J` option enabled, e.g. `python3 sell.py -J src/ex1.txt`. Then `src/ex1.json` is generated.
+To debug (or extend) the web code, first convert an input file into a json file with the `-J` option enabled, e.g. `python3 sell.py -J examples/ex1.txt`. Then `examples/ex1.json` is generated.
 
 Then start a local web server (e.g. using `python3 -m http.server 8000`) and open `web/index.html` (e.g. `localhost:8000/web/`, if your port number is 8000). The uncompressed JavaScript code in directory `web/src/` is interpreted as module.
 
