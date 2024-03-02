@@ -1,10 +1,16 @@
 # pySELL
 
-`pySELL` is a Python-based Simple E-Learning Language for the rapid creation of interactive STEM courses.
+`pySELL` is a Python-based Simple E-Learning Language for the rapid creation of interactive STEM quizzes, with a focus on randomized math questions.
 
-As a member of the Free Software Foundation (FSF), I decided to publish `pySELL` as free and open-source software under the license of `GPLv3`.
+Compared to other solutions (e.g. `STACK` questions), `pySELL` has NO technological dependencies. Generated quizzes consist of one self-contained HTML file. Theses files can be hosted on a web-server or imported to existing _Moodle_ (as file upload) or _Ilias_ (as HTML course) courses.
+
+Student answers are not stored on servers, so `pySELL` quizzes provide an 100 % anonymous training. This is very well received by students on their first contact with new topics.
+
+Teachers benefit from a simple to learn syntax. After some practice, even sophisticated questions can be generated with very little time investment.
 
 If you are using `pySELL` in one of your (university) classes, I would love to hear about that! Write a mail with feedback / bug reports / feature requests to `contact@compiler-construction.com`
+
+As a member of the Free Software Foundation (FSF), I decided to publish `pySELL` as free and open-source software under the license of `GPLv3`.
 
 ![](docs/example.jpg)
 
