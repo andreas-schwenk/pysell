@@ -271,9 +271,12 @@ class TextNode:
             self.children.append(self.parse_span(lex))
 
         elif self.type == "command":
-            # TODO: .png .jpg
-            # TODO: warning, if file size is (too) large
-            if ".svg" in self.data:
+            if (
+                ".svg" in self.data
+                or ".png" in self.data
+                or ".jpg" in self.data
+                or ".jpeg" in self.data
+            ):
                 self.parse_image()
             else:
                 # TODO: report error
@@ -494,9 +497,10 @@ class Question:
                 node.type = "code"
                 node.data = node.data[1:-1]
         elif node.type == "image":
+            # TODO: warning, if file size is (too) large
             path = os.path.join(self.input_dirname, node.data)
             img_type = os.path.splitext(path)[1][1:]
-            supported_img_types = ["svg", "png", "jpg"]
+            supported_img_types = ["svg", "png", "jpg", "jpeg"]
             if img_type not in supported_img_types:
                 self.error += f"ERROR: image type '{img_type}' is not supported. "
                 self.error += f"Use one of {', '.join(supported_img_types)}"

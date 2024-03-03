@@ -23,7 +23,7 @@ Mark the correct answer(s)
 QUESTION Gaps
 - Write 3 as a word: %"three"
 - Write 7 as a word: %"seven"
-- Write the name of one of the first letters in the Greek alphabet: %"alpha|beta"
+- Write the name of one of the first two letters in the Greek alphabet: %"alpha|beta"
 
 
 QUESTION Integers
@@ -96,8 +96,8 @@ QUESTION Matrices with Sympy
 from sympy import *
 A = randMatrix(3,3, min=-1, max=1, symmetric=True)
 B = randMatrix(2,3, min=-2, max=2, symmetric=False)
-x = symbols('x')
-B[0,0] = cos(x) + sin(5)
+x,y = symbols('x,y')
+B[0,0] = cos(x) + sin(y)
 C = A * B.transpose()
 """
 - $A \cdot B^T=$ %C
@@ -128,7 +128,7 @@ i = integrate(f,x)
 """
 Determine by **partial integration:** \\
 - $ \displaystyle \int f ~ dx =$ %i $+ C$ \\
-with $C \in \CC$
+with $C \in \RR$
 
 
 QUESTION Conditional Multiple Choice

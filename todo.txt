@@ -1,4 +1,4 @@
-# TODO: comment all code (e.g. build.py, sell.py lines 186ff)
+# TODO: comment all code (e.g. build.py, sell.py lines 186ff); explain why sell.py is only ONE large file; insert "ToC" into large files and explain classes roughly
 
 # TODO: split examples into files and add example questions for common math topics (ODE, diff, int, ...)
 
@@ -26,6 +26,8 @@
 # TODO: guide how to import questions to Moodle/Ilias
 
 # TODO: publish pysell as python package
+
+# TODO: use Babel in esbuild to support older browsers
 
 # TODO: test everything in Windows
 

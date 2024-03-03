@@ -1,14 +1,16 @@
 # pySELL
 
+![](docs/logo.svg)
+
 `pySELL` is a Python-based Simple E-Learning Language for the rapid creation of interactive STEM quizzes, with a focus on randomized math questions.
 
-Compared to other solutions (e.g. `STACK` questions), `pySELL` has NO technological dependencies. Generated quizzes consist of one self-contained HTML file. Theses files can be hosted on a web-server or imported to existing _Moodle_ (as file upload) or _Ilias_ (as HTML course) courses.
+Compared to other solutions (e.g. `STACK` questions), `pySELL` has NO technological runtime dependencies, except `katex` for math rendering. Generated quizzes consist each of one self-contained HTML file. Theses files can be hosted on a web-server or imported to an existing LMS courses (e.g. _Moodle_ via "file upload", or _Ilias_ via "HTML course").
 
 Student answers are not stored on servers, so `pySELL` quizzes provide an 100 % anonymous training. This is very well received by students on their first contact with new topics.
 
 Teachers benefit from a simple to learn syntax. After some practice, even sophisticated questions can be generated with very little time investment.
 
-If you are using `pySELL` in one of your (university) classes, I would love to hear about that! Write a mail with feedback / bug reports / feature requests to `contact@compiler-construction.com`
+If you are using `pySELL` in one of your (university) classes, I would love to hear about it! Write a mail with feedback / bug reports / feature requests to `contact@compiler-construction.com`
 
 As a member of the Free Software Foundation (FSF), I decided to publish `pySELL` as free and open-source software under the license of `GPLv3`.
 
@@ -16,13 +18,13 @@ As a member of the Free Software Foundation (FSF), I decided to publish `pySELL`
 
 ## User Guide
 
-Download file [`sell.py`](https://raw.githubusercontent.com/andreas-schwenk/pysell/main/sell.py) from this repository. Only this file is required. All other files are used for the development of `pySELL`.
+Download file [`sell.py`](https://raw.githubusercontent.com/andreas-schwenk/pysell/main/sell.py) from this repository. Only this single file is required. All other files are used for the development of `pySELL`.
 
 Run `python3 sell.py FILENAME.txt` to generate a self-contained quiz-website `FILENAME.html` from sources in `FILENAME.txt`. You will find an example below, and more examples in directory `examples/`.
 
 Also a file `FILENAME_debug.html` is created, which can be used for debugging purposes. The debug output differs to the release files in the following aspects:
 
-- The sample solution is rendered in the input files
+- The sample solution is rendered in the input fields
 - All questions are evaluated directly, for testing the evaluation
 - Single and multiple choice answers are displayed in static order
 - Python and text sources are displayed with syntax highlighting
@@ -75,6 +77,12 @@ z = x + y
 Calculate $x + y =$ %z
 
 
+QUESTION Gaps
+- Write 3 as a word: %"three"
+- Write 7 as a word: %"seven"
+- Write the name of one of the first two letters in the Greek alphabet: %"alpha|beta"
+
+
 QUESTION Fibonacci
 """
 fib = [1] * 7
@@ -86,16 +94,35 @@ Complete the Fibonacci sequence
 - $ 1, 1, 2, $ %fib3, ...
 
 
+QUESTION Terms 2: Integration
+"""
+from sympy import *
+x = symbols('x')
+f = parse_expr("(x+1) / exp(x)", evaluate=False)
+i = integrate(f,x)
+"""
+Determine by **partial integration:** \\
+- $ \displaystyle \int f ~ dx =$ %i $+ C$ \\
+with $C \in \RR$
+
+
 QUESTION Matrices with Sympy
 """
 from sympy import *
 A = randMatrix(3,3, min=-1, max=1, symmetric=True)
 B = randMatrix(2,3, min=-2, max=2, symmetric=False)
-x = symbols('x')
-B[0,0] = cos(x) + sin(5)
+x,y = symbols('x,y')
+B[0,0] = cos(x) + sin(y)
 C = A * B.transpose()
 """
 - $A \cdot B^T=$ %C
+
+
+QUESTION Images
+!../docs/logo.svg:25
+What is shown in the image?
+(x) the pySELL logo
+( ) the PostScript logo
 ```
 
 ## Syntax
@@ -293,3 +320,13 @@ To debug (or extend) the web code, first convert an input file into a json file 
 Then start a local web server (e.g. using `python3 -m http.server 8000`) and open `web/index.html` (e.g. `localhost:8000/web/`, if your port number is 8000). The uncompressed JavaScript code in directory `web/src/` is interpreted as module.
 
 To update `sell.py` after any change in the JavaScript code, and run `python3 build.py` in order to update variable `html` in file `sell.py`.
+
+Structure of the repository:
+
+- `sell.py` mainly compiles an input file to a JSON file. The generation of HTML output files can be found at the end. HTML/CSS/JavaScript template code is inserted by `build.py`.
+- `build.py` builds and minifies the JavaScript code in path `web/src/`, inserts it into `web/index.html` and finally writes the self-contained HTML file into `sell.py`.
+- `docs/` contains the logo, as well as the [showcase](`https://andreas-schwenk.github.io/pysell/ex1.html`)
+- `examples/` contains example quizzes.
+- `web/` contains the front end, i.e. HTML/CSS/JavaScript code.
+- `web/index.html` is (a) used for testing; in this case, JavaScript code in path `web/src/` is loaded as module (b) used as template code for the final HTML insertion into `sell.py`
+- `web/build.js` is called by `build.py`. It uses `esbuild` to build and minify JavaScript code in path `web/src/`. Alternative build tools should also work without issues.
