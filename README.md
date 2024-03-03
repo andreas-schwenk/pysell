@@ -83,15 +83,15 @@ QUESTION Gaps
 - Write the name of one of the first two letters in the Greek alphabet: %"alpha|beta"
 
 
-QUESTION Fibonacci
+QUESTION Lists/Vectors
 """
 fib = [1] * 7
 for i in range(2,len(fib)):
     fib[i] = fib[i-2] + fib[i-1]
 fib3 = fib[3:]
 """
-Complete the Fibonacci sequence
-- $ 1, 1, 2, $ %fib3, ...
+Continue the Fibonacci sequence
+- $ 1, 1, 2, $ %!fib3, ...
 
 
 QUESTION Terms 2: Integration
