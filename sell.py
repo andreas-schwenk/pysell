@@ -19,15 +19,26 @@ USAGE   Only file 'sell.py' is required to compile question files
         ARGUMENTS  -J is optional and generates a JSON output file for debugging        
         EXAMPLE    python3 sell.py examples/ex1.txt
         OUTPUT     examples/ex1.html, examples/ex1_DEBUG.html
+
+FAQ
+    
+    Q:  Why is this file so long?
+    A:  The intention is to provide pySelL as ONE file, that can easily be
+        shared and modified.
+
+    Q:  You could also package and publish pySELL as a package!
+    A:  Sure. Maybe this will happen in the future..
 """
 
 
-# TODO: embed variables into string via "{v}"
-
-
-import json, sys, os, re, io, base64
+import base64
+import datetime
+import io
+import json
+import os
+import re
+import sys
 from typing import Self
-from datetime import datetime
 
 
 class Lexer:
@@ -56,7 +67,7 @@ class Lexer:
             ch = self.src[self.pos]
             # in case that we get a special character (a.k.a delimiter),
             # we stop
-            if ch in "`^'\"%#*$()[]\{\}\\,.:;+-*/_!<>\t\n =?|&":
+            if ch in "`^'\"%#*$()[]{}\\,.:;+-*/_!<>\t\n =?|&":
                 # if the current token is not empty, return it for now and
                 # keep the delimiter to the next call of next()
                 if len(self.token) > 0:
@@ -170,13 +181,13 @@ skipVariables = [
     "transpose",
 ]
 
-# The following (stringified) function rangeZ is provided as pseudo-intrinsic
+
+# The following function rangeZ is provided as pseudo-intrinsic
 # function in Python scripts, embedded into the question descriptions.
 # It is an alternative version for "range", that excludes the zero.
 # This is beneficial for drawing random numbers of questions for math classes.
-
-# TODO: define directly?? should also be available in executed programs!?!
-rangeZ_src = """def rangeZ(*a):
+def rangeZ(*a):
+    """implements 'range', but excludes the zero"""
     r = []
     if len(a) == 1:
         r = list(range(a[0]))
@@ -187,7 +198,7 @@ rangeZ_src = """def rangeZ(*a):
     if 0 in r:
         r.remove(0)
     return r
-"""
+
 
 # TODO: add comments starting from here
 
@@ -195,12 +206,13 @@ rangeZ_src = """def rangeZ(*a):
 class TextNode:
     """Tree structure for the question text"""
 
-    def __init__(self, type: str, data: str = "") -> None:
-        self.type: str = type
+    def __init__(self, type_: str, data: str = "") -> None:
+        self.type: str = type_
         self.data: str = data
         self.children: list[TextNode] = []
 
     def parse(self) -> None:
+        """parses text recursively"""
         if self.type == "root":
             self.children = [TextNode(" ", "")]
             lines = self.data.split("\n")
@@ -209,12 +221,12 @@ class TextNode:
                 line = line.strip()
                 if len(line) == 0:
                     continue
-                type = line[0]  # refer to "types" below
-                if type not in "[(-!":
-                    type = " "
-                if type != self.children[-1].type:
-                    self.children.append(TextNode(type, ""))
-                self.children[-1].type = type
+                type_ = line[0]  # refer to "types" below
+                if type_ not in "[(-!":
+                    type_ = " "
+                if type_ != self.children[-1].type:
+                    self.children.append(TextNode(type_, ""))
+                self.children[-1].type = type_
                 self.children[-1].data += line + "\n"
                 if line.endswith("\\\\"):
                     # line break
@@ -232,7 +244,7 @@ class TextNode:
                 child.type = types[child.type]
                 child.parse()
 
-        elif self.type == "multi-choice" or self.type == "single-choice":
+        elif self.type in ("multi-choice", "single-choice"):
             options = self.data.strip().split("\n")
             self.data = ""
             for option in options:
@@ -286,6 +298,7 @@ class TextNode:
             raise Exception("unimplemented")
 
     def parse_image(self) -> Self:
+        """parses an image inclusion"""
         img_path = self.data[1:].strip()
         img_width = 100  # percentage
         if ":" in img_path:
@@ -297,6 +310,7 @@ class TextNode:
         self.children.append(TextNode("width", img_width))
 
     def parse_span(self, lex: Lexer) -> Self:
+        """parses a span element"""
         # grammar: span = { item };
         #          item = bold | math | input | string_var | plus_minus | text;
         #          bold = "*" { item } "*";
@@ -311,15 +325,16 @@ class TextNode:
         return span
 
     def parse_item(self, lex: Lexer, math_mode=False) -> Self:
+        """parses a single item of a span/paragraph"""
         if not math_mode and lex.token == "*":
             return self.parse_bold_italic(lex)
-        elif lex.token == "$":
+        if lex.token == "$":
             return self.parse_math(lex)
-        elif not math_mode and lex.token == "%":
+        if not math_mode and lex.token == "%":
             return self.parse_input(lex)
-        elif not math_mode and lex.token == "&":
+        if not math_mode and lex.token == "&":
             return self.parse_string_var(lex)
-        elif math_mode and lex.token == "+":
+        if math_mode and lex.token == "+":
             n = TextNode("text", lex.token)
             lex.next()
             if lex.token == "-":
@@ -330,24 +345,24 @@ class TextNode:
                 n.type = "plus_minus"
                 lex.next()
             return n
-        elif not math_mode and lex.token == "\\":
+        if not math_mode and lex.token == "\\":
             lex.next()
             if lex.token == "\\":
                 lex.next()
             return TextNode("text", "<br/>")
-        else:
-            n = TextNode("text", lex.token)
-            lex.next()
-            return n
+        n = TextNode("text", lex.token)
+        lex.next()
+        return n
 
     def parse_bold_italic(self, lex: Lexer) -> Self:
+        """parses bold or italic text"""
         node = TextNode("italic")
         if lex.token == "*":
             lex.next()
         if lex.token == "*":
             node.type = "bold"
             lex.next()
-        while lex.token != "" and lex.token != "*":
+        while lex.token not in ("", "*"):
             node.children.append(self.parse_item(lex))
         if lex.token == "*":
             lex.next()
@@ -356,6 +371,7 @@ class TextNode:
         return node
 
     def parse_math(self, lex: Lexer) -> Self:
+        """parses inline math or display style math"""
         math = TextNode("math")
         if lex.token == "$":
             lex.next()
@@ -371,17 +387,19 @@ class TextNode:
         return math
 
     def parse_input(self, lex: Lexer) -> Self:
-        input = TextNode("input")
+        """parses an input element field"""
+        input_ = TextNode("input")
         if lex.token == "%":
             lex.next()
         if lex.token == "!":
-            input.type = "input2"
+            input_.type = "input2"
             lex.next()
-        input.data = lex.token.strip()
+        input_.data = lex.token.strip()
         lex.next()
-        return input
+        return input_
 
     def parse_string_var(self, lex: Lexer) -> Self:
+        """parses a string variable"""
         sv = TextNode("string_var")
         if lex.token == "&":
             lex.next()
@@ -390,6 +408,8 @@ class TextNode:
         return sv
 
     def optimize(self) -> Self:
+        """optimizes the current text node recursively. E.g. multiple pure
+        text items are concatenated into a single text node."""
         children_opt = []
         for c in self.children:
             opt = c.optimize()
@@ -409,6 +429,7 @@ class TextNode:
         return self
 
     def to_dict(self) -> dict:
+        """recursively exports the text node instance to a dictionary"""
         # t := type, d := data, c := children
         return {
             "t": self.type,
@@ -433,6 +454,7 @@ class Question:
         self.python_src_tokens: set[str] = set()
 
     def build(self) -> None:
+        """builds a question from text and Python sources"""
         if len(self.python_src) > 0:
             self.analyze_python_code()
             instances_str = []
@@ -461,6 +483,9 @@ class Question:
         self.text.optimize()
 
     def post_process_text(self, node: TextNode, math=False) -> None:
+        """post processes the textual part. For example, a semantical check
+        for the existing of referenced variables is applied. Also images
+        are loaded and stringified."""
         for c in node.children:
             self.post_process_text(
                 c, math or node.type == "math" or node.type == "display-math"
@@ -544,25 +569,23 @@ class Question:
             self.error += "since this would result in MANY open windows :-)"
 
     def run_python_code(self) -> dict:
+        """Runs the questions python code and gathers all local variables."""
         locals = {}
         res = {}
         src = self.python_src
-        if "rangeZ" in self.python_src:
-            src = rangeZ_src + src
         try:
             exec(src, globals(), locals)
         except Exception as e:
             # print(e)
             self.error += str(e) + ". "
             return res
-        for id in locals:
-            if id in skipVariables or (id not in self.python_src_tokens):
+        for local_id, value in locals.items():
+            if local_id in skipVariables or (local_id not in self.python_src_tokens):
                 continue
-            value = locals[id]
             type_str = str(type(value))
-            if type_str == "<class 'module'>" or type_str == "<class 'function'>":
+            if type_str in ("<class 'module'>", "<class 'function'>"):
                 continue
-            self.variables.add(id)
+            self.variables.add(local_id)
             t = ""  # type
             v = ""  # value
             if type_str in boolean_types:
@@ -620,7 +643,7 @@ class Question:
                         v = v.replace("C1", "C")
             # t := type, v := value
             v = v.replace("I", "i")  # reformat sympy imaginary part
-            res[id] = {"t": t, "v": v}
+            res[local_id] = {"t": t, "v": v}
         if len(self.variables) > 50:
             self.error += "ERROR: Wrong usage of Python imports. Refer to pySELL docs!"
             # TODO: write the docs...
@@ -638,6 +661,7 @@ class Question:
         return res
 
     def to_dict(self) -> dict:
+        """recursively exports the question to a dictionary"""
         return {
             "title": self.title,
             "error": self.error,
@@ -655,6 +679,8 @@ class Question:
         }
 
     def syntax_highlight_text_line(self, src: str) -> str:
+        """syntax highlights a single questions text line and returns the
+        formatted code in HTML format"""
         html = ""
         math = False
         code = False
@@ -727,10 +753,13 @@ class Question:
             html += "</bold>"
         return html
 
-    def red_colored_span(self, innerHTML: str) -> str:
-        return '<span style="color:#FF5733; font-weight:bold">' + innerHTML + "</span>"
+    def red_colored_span(self, inner_html: str) -> str:
+        """embeds HTML code into a red colored span"""
+        return '<span style="color:#FF5733; font-weight:bold">' + inner_html + "</span>"
 
     def syntax_highlight_text(self, src: str) -> str:
+        """syntax highlights a questions text and returns the formatted code in
+        HTML format"""
         html = ""
         lines = src.split("\n")
         for line in lines:
@@ -752,6 +781,8 @@ class Question:
         return html
 
     def syntax_highlight_python(self, src: str) -> str:
+        """syntax highlights a questions python code and returns the formatted
+        code in HTML format"""
         lines = src.split("\n")
         html = ""
         for line in lines:
@@ -772,7 +803,7 @@ class Question:
         return html
 
 
-def compile(input_dirname: str, src: str) -> dict:
+def compile_input_file(input_dirname: str, src: str) -> dict:
     """compiles a SELL input file to JSON"""
     lang = "en"
     title = ""
@@ -784,7 +815,7 @@ def compile(input_dirname: str, src: str) -> dict:
     lines = src.split("\n")
     for line_no, line in enumerate(lines):
         line = line.split("#")[0]  # remove comments
-        lineUnStripped = line
+        line_not_stripped = line
         line = line.strip()
         if len(line) == 0:
             continue
@@ -801,12 +832,14 @@ def compile(input_dirname: str, src: str) -> dict:
             questions.append(question)
             question.title = line[8:].strip()
             parsing_python = False
-        elif question != None:
+        elif question is not None:
             if line.startswith('"""'):
                 parsing_python = not parsing_python
             else:
                 if parsing_python:
-                    question.python_src += lineUnStripped.replace("\t", "    ") + "\n"
+                    question.python_src += (
+                        line_not_stripped.replace("\t", "    ") + "\n"
+                    )
                 else:
                     question.text_src += line + "\n"
     for question in questions:
@@ -815,7 +848,7 @@ def compile(input_dirname: str, src: str) -> dict:
         "lang": lang,
         "title": title,
         "author": author,
-        "date": datetime.today().strftime("%Y-%m-%d"),
+        "date": datetime.datetime.today().strftime("%Y-%m-%d"),
         "info": info,
         "questions": list(map(lambda o: o.to_dict(), questions)),
     }
@@ -823,636 +856,663 @@ def compile(input_dirname: str, src: str) -> dict:
 
 # the following code is automatically generated and updated by file "build.py"
 # @begin(html)
-html = b''
-html += b'<!DOCTYPE html> <html> <head> <meta charset="UTF-8" /> <titl'
-html += b'e>pySELL Quiz</title> <meta name="viewport" content="width=d'
-html += b'evice-width, initial-scale=1.0" /> <link rel="icon" type="im'
-html += b'age/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAI'
-html += b'ABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAA'
-html += b'AAAAACqqqr/PDw8/0VFRf/V1dX////////////09Pb/trbO/3t7q/9wcLH/c'
-html += b'XG0/3NzqP+iosH/5OTr////////////j4+P/wAAAP8KCgr/x8fH///////k5'
-html += b'Or/bGym/y4ukP8kJJD/IiKR/yIikv8jI5H/KCiP/1BQnP/Jydz//////5CQk'
-html += b'P8BAQH/DAwM/8jIyP/7+/v/cHCo/yIij/8lJZP/KSmR/z4+lf9AQJH/Li6Q/'
-html += b'yUlkv8jI5H/TEya/9/f6P+QkJD/AQEB/wwMDP/Ly8r/ycna/y4ujv8lJZP/N'
-html += b'DSU/5+fw//j4+v/5+fs/76+0v9LS5f/JSWS/yYmkP+Skrr/kJCQ/wAAAP8MD'
-html += b'Az/zc3L/5aWvP8iIo//ISGQ/39/sf////7/////////////////n5+7/yMjj'
-html += b'P8kJJH/bm6p/5CQkP8BAQH/CgoK/6SkpP+Skp//XV2N/1dXi//Hx9X//////'
-html += b'///////////9fX1/39/rP8kJI7/JCSR/25upP+QkJD/AQEB/wEBAf8ODg7/F'
-html += b'BQT/xUVE/8hIR//XV1c/8vL0P/IyNv/lZW7/1panP8rK5D/JiaT/ycnjv+bm'
-html += b'7v/kJCQ/wEBAf8AAAD/AAAA/wAAAP8AAAD/AAAH/wAAK/8aGmv/LCyO/yQkj'
-html += b'/8jI5L/JSWT/yIikP9dXZ//6enu/5CQkP8BAQH/BQUF/0xMTP9lZWT/Pz9N/'
-html += b'wUFVP8AAGz/AABu/xYWhf8jI5L/JCSP/zY2k/92dq7/4ODo//////+QkJD/A'
-html += b'QEB/wwMDP/IyMj//Pz9/2lppf8ZGYf/AgJw/wAAZ/8cHHL/Zmak/5ubv//X1'
-html += b'+T//v7+////////////kJCQ/wEBAf8MDAz/ycnJ/9/f6f85OZT/IyOR/wcHZ'
-html += b'P8AAB7/UVFZ//n5+P//////0dHd/7i4yf++vs7/7e3z/5CQkP8AAAD/DAwM/'
-html += b'87Ozf/Y2OP/MjKQ/x8fjv8EBEr/AAAA/1xcWv//////6ent/0tLlf8kJIn/M'
-html += b'jKL/8fH2v+QkJD/AQEB/wcHB/98fHv/jo6T/yUlc/8JCXj/AABi/wAAK/9eX'
-html += b'nj/trbS/2xspv8nJ5H/IyOT/0pKm//m5uz/kJCQ/wEBAf8AAAD/AAAA/wAAA'
-html += b'P8AACH/AABk/wAAbf8EBHD/IyOM/ykpkv8jI5H/IyOS/ysrjP+kpMP//////'
-html += b'5GRkf8CAgL/AQEB/wEBAf8BAQH/AgIE/woKK/8ZGWj/IyOG/ycnj/8nJ4//M'
-html += b'DCS/0xMmf+lpcP/+vr6///////Pz8//kZGR/5CQkP+QkJD/kJCQ/5OTk/+ws'
-html += b'K//zs7V/8LC2f+goL3/oaG+/8PD2P/n5+z/////////////////AAAAAAAAA'
-html += b'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
-html += b'AAAAAAAAAAAAAAAAA==" sizes="16x16" /> <link rel="stylesheet"'
-html += b' href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.'
-html += b'min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEa'
-html += b'qSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous" /> '
-html += b'<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/'
-html += b'katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1Y'
-html += b'QqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous'
-html += b'" ></script> <style> html { font-family: Arial, Helvetica, s'
-html += b'ans-serif; } body { max-width: 1024px; margin-left: auto; ma'
-html += b'rgin-right: auto; padding-left: 5px; padding-right: 5px; } h'
-html += b'1 { text-align: center; font-size: 28pt; } img { width: 100%'
-html += b'; display: block; margin-left: auto; margin-right: auto; } .'
-html += b'author { text-align: center; font-size: 18pt; } .courseInfo '
-html += b'{ font-size: 14pt; font-style: italic; /*margin-bottom: 24px'
-html += b';*/ text-align: center; } .question { position: relative; /*'
-html += b' required for feedback overlays */ color: black; background-'
-html += b'color: white; border-style: solid; border-radius: 5px; borde'
-html += b'r-width: 3px; border-color: black; padding: 8px; margin-top:'
-html += b' 20px; margin-bottom: 20px; -webkit-box-shadow: 4px 6px 8px '
-html += b'-1px rgba(0, 0, 0, 0.93); box-shadow: 4px 6px 8px -1px rgba('
-html += b'0, 0, 0, 0.1); overflow-x: auto; } .questionFeedback { z-ind'
-html += b'ex: 10; display: none; position: absolute; pointer-events: n'
-html += b'one; left: 10%; top: 33%; width: 80%; /*height: 100%;*/ text'
-html += b'-align: center; font-size: 24pt; text-shadow: 0px 0px 18px r'
-html += b'gba(0, 0, 0, 0.33); background-color: rgba(255, 255, 255, 1)'
-html += b'; padding-top: 20px; padding-bottom: 20px; /*border-style: s'
-html += b'olid; border-width: 4px; border-color: rgb(200, 200, 200);*/'
-html += b' border-radius: 16px; -webkit-box-shadow: 0px 0px 18px 5px r'
-html += b'gba(0, 0, 0, 0.66); box-shadow: 0px 0px 18px 5px rgba(0, 0, '
-html += b'0, 0.66); } .questionTitle { font-size: 24pt; } .code { font'
-html += b'-family: "Courier New", Courier, monospace; color: black; ba'
-html += b'ckground-color: rgb(235, 235, 235); padding: 2px 5px; border'
-html += b'-radius: 5px; margin: 1px 2px; } .debugCode { font-family: "'
-html += b'Courier New", Courier, monospace; padding: 4px; margin-botto'
-html += b'm: 5px; background-color: black; color: white; border-radius'
-html += b': 5px; opacity: 0.85; overflow-x: scroll; } .debugInfo { tex'
-html += b't-align: end; font-size: 10pt; margin-top: 2px; color: rgb(6'
-html += b'4, 64, 64); } ul { margin-top: 0; margin-left: 0px; padding-'
-html += b'left: 20px; } .inputField { position: relative; width: 32px;'
-html += b' height: 24px; font-size: 14pt; border-style: solid; border-'
-html += b'color: black; border-radius: 5px; border-width: 0.2; padding'
-html += b'-left: 5px; padding-right: 5px; outline-color: black; backgr'
-html += b'ound-color: transparent; margin: 1px; } .inputField:focus { '
-html += b'outline-color: maroon; } .equationPreview { position: absolu'
-html += b'te; top: 120%; left: 0%; padding-left: 8px; padding-right: 8'
-html += b'px; padding-top: 4px; padding-bottom: 4px; background-color:'
-html += b' rgb(128, 0, 0); border-radius: 5px; font-size: 12pt; color:'
-html += b' white; text-align: start; z-index: 20; opacity: 0.95; } .bu'
-html += b'tton { padding-left: 8px; padding-right: 8px; padding-top: 5'
-html += b'px; padding-bottom: 5px; font-size: 12pt; background-color: '
-html += b'rgb(0, 150, 0); color: white; border-style: none; border-rad'
-html += b'ius: 4px; height: 36px; cursor: pointer; } .buttonRow { disp'
-html += b'lay: flex; align-items: baseline; margin-top: 12px; } .matri'
-html += b'xResizeButton { width: 20px; background-color: black; color:'
-html += b' #fff; text-align: center; border-radius: 3px; position: abs'
-html += b'olute; z-index: 1; height: 20px; cursor: pointer; margin-bot'
-html += b'tom: 3px; } a { color: black; text-decoration: underline; } '
-html += b'</style> </head> <body> <h1 id="title"></h1> <div class="aut'
-html += b'hor" id="author"></div> <p id="courseInfo1" class="courseInf'
-html += b'o"></p> <p id="courseInfo2" class="courseInfo"></p> <h1 id="'
-html += b'debug" class="debugCode" style="display: none">DEBUG VERSION'
-html += b'</h1> <div id="questions"></div> <p style="font-size: 8pt; f'
-html += b'ont-style: italic; text-align: center"> This quiz was create'
-html += b'd using <a href="https://github.com/andreas-schwenk/pysell">'
-html += b'pySELL</a>, the <i>Python-based Simple E-Learning Language</'
-html += b'i>, written by Andreas Schwenk, GPLv3<br /> last update on <'
-html += b'span id="date"></span> </p> <script>let debug = false; let q'
-html += b'uizSrc = {};var sell=(()=>{var H=Object.defineProperty;var e'
-html += b'e=Object.getOwnPropertyDescriptor;var te=Object.getOwnProper'
-html += b'tyNames;var se=Object.prototype.hasOwnProperty;var ie=(n,e)='
-html += b'>{for(var t in e)H(n,t,{get:e[t],enumerable:!0})},re=(n,e,t,'
-html += b's)=>{if(e&&typeof e=="object"||typeof e=="function")for(let '
-html += b'i of te(e))!se.call(n,i)&&i!==t&&H(n,i,{get:()=>e[i],enumera'
-html += b'ble:!(s=ee(e,i))||s.enumerable});return n};var ne=n=>re(H({}'
-html += b',"__esModule",{value:!0}),n);var le={};ie(le,{init:()=>ae});'
-html += b'function v(n=[]){let e=document.createElement("div");return '
-html += b'e.append(...n),e}function Q(n=[]){let e=document.createEleme'
-html += b'nt("ul");return e.append(...n),e}function z(n){let e=documen'
-html += b't.createElement("li");return e.appendChild(n),e}function B(n'
-html += b'){let e=document.createElement("input");return e.spellcheck='
-html += b'!1,e.type="text",e.classList.add("inputField"),e.style.width'
-html += b'=n+"px",e}function U(){let n=document.createElement("button"'
-html += b');return n.type="button",n.classList.add("button"),n}functio'
-html += b'n m(n,e=[]){let t=document.createElement("span");return e.le'
-html += b'ngth>0?t.append(...e):t.innerHTML=n,t}function V(n,e,t=!1){k'
-html += b'atex.render(e,n,{throwOnError:!1,displayMode:t,macros:{"\\\\RR'
-html += b'":"\\\\mathbb{R}","\\\\NN":"\\\\mathbb{N}","\\\\QQ":"\\\\mathbb{Q}","\\'
-html += b'\\ZZ":"\\\\mathbb{Z}","\\\\CC":"\\\\mathbb{C}"}})}function C(n,e=!1'
-html += b'){let t=document.createElement("span");return V(t,n,e),t}var'
-html += b' O={en:"This page runs in your browser and does not store an'
-html += b'y data on servers.",de:"Diese Seite wird in Ihrem Browser au'
-html += b'sgef\\xFChrt und speichert keine Daten auf Servern.",es:"Esta'
-html += b' p\\xE1gina se ejecuta en su navegador y no almacena ning\\xFA'
-html += b'n dato en los servidores.",it:"Questa pagina viene eseguita '
-html += b'nel browser e non memorizza alcun dato sui server.",fr:"Cett'
-html += b'e page fonctionne dans votre navigateur et ne stocke aucune '
-html += b'donn\\xE9e sur des serveurs."},_={en:"You can * this page in '
-html += b'order to get new randomized tasks.",de:"Sie k\\xF6nnen diese '
-html += b'Seite *, um neue randomisierte Aufgaben zu erhalten.",es:"Pu'
-html += b'edes * esta p\\xE1gina para obtener nuevas tareas aleatorias.'
-html += b'",it:"\\xC8 possibile * questa pagina per ottenere nuovi comp'
-html += b'iti randomizzati",fr:"Vous pouvez * cette page pour obtenir '
-html += b'de nouvelles t\\xE2ches al\\xE9atoires"},F={en:"reload",de:"ak'
-html += b'tualisieren",es:"recargar",it:"ricaricare",fr:"recharger"},j'
-html += b'={en:["awesome","great","well done","nice","you got it","goo'
-html += b'd"],de:["super","gut gemacht","weiter so","richtig"],es:["im'
-html += b'presionante","genial","correcto","bien hecho"],it:["fantasti'
-html += b'co","grande","corretto","ben fatto"],fr:["g\\xE9nial","super"'
-html += b',"correct","bien fait"]},Z={en:["try again","still some mist'
-html += b'akes","wrong answer","no"],de:["leider falsch","nicht richti'
-html += b'g","versuch\'s nochmal"],es:["int\\xE9ntalo de nuevo","todav\\x'
-html += b'EDa algunos errores","respuesta incorrecta"],it:["riprova","'
-html += b'ancora qualche errore","risposta sbagliata"],fr:["r\\xE9essay'
-html += b'er","encore des erreurs","mauvaise r\\xE9ponse"]};function X('
-html += b'n,e){let t=Array(e.length+1).fill(null).map(()=>Array(n.leng'
-html += b'th+1).fill(null));for(let s=0;s<=n.length;s+=1)t[0][s]=s;for'
-html += b'(let s=0;s<=e.length;s+=1)t[s][0]=s;for(let s=1;s<=e.length;'
-html += b's+=1)for(let i=1;i<=n.length;i+=1){let a=n[i-1]===e[s-1]?0:1'
-html += b';t[s][i]=Math.min(t[s][i-1]+1,t[s-1][i]+1,t[s-1][i-1]+a)}ret'
-html += b'urn t[e.length][n.length]}var Y=\'<svg xmlns="http://www.w3.o'
-html += b'rg/2000/svg" height="28" viewBox="0 0 448 512"><path d="M384'
-html += b' 80c8.8 0 16 7.2 16 16V416c0 8.8-7.2 16-16 16H64c-8.8 0-16-7'
-html += b'.2-16-16V96c0-8.8 7.2-16 16-16H384zM64 32C28.7 32 0 60.7 0 9'
-html += b'6V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.'
-html += b'3-28.7-64-64-64H64z"/></svg>\',q=\'<svg xmlns="http://www.w3.o'
-html += b'rg/2000/svg" height="28" viewBox="0 0 448 512"><path d="M64 '
-html += b'80c-8.8 0-16 7.2-16 16V416c0 8.8 7.2 16 16 16H384c8.8 0 16-7'
-html += b'.2 16-16V96c0-8.8-7.2-16-16-16H64zM0 96C0 60.7 28.7 32 64 32'
-html += b'H384c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 '
-html += b'0-64-28.7-64-64V96zM337 209L209 337c-9.4 9.4-24.6 9.4-33.9 0'
-html += b'l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L303 1'
-html += b'75c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/>\',K=\'<svg xmln'
-html += b's="http://www.w3.org/2000/svg" height="28" viewBox="0 0 512 '
-html += b'512"><path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 41'
-html += b'6 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z"/></svg>'
-html += b'\',G=\'<svg xmlns="http://www.w3.org/2000/svg" height="28" vie'
-html += b'wBox="0 0 512 512"><path d="M256 48a208 208 0 1 1 0 416 208 '
-html += b'208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 5'
-html += b'12zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 11'
-html += b'1-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 '
-html += b'9.4 24.6 9.4 33.9 0L369 209z"/></svg>\',T=\'<svg xmlns="http:/'
-html += b'/www.w3.org/2000/svg" height="25" viewBox="0 0 384 512" fill'
-html += b'="white"><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0'
-html += b' 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c1'
-html += b'4.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg>\',J=\'<s'
-html += b'vg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0'
-html += b' 0 512 512" fill="white"><path d="M0 224c0 17.7 14.3 32 32 3'
-html += b'2s32-14.3 32-32c0-53 43-96 96-96H320v32c0 12.9 7.8 24.6 19.8'
-html += b' 29.6s25.7 2.2 34.9-6.9l64-64c12.5-12.5 12.5-32.8 0-45.3l-64'
-html += b'-64c-9.2-9.2-22.9-11.9-34.9-6.9S320 19.1 320 32V64H160C71.6 '
-html += b'64 0 135.6 0 224zm512 64c0-17.7-14.3-32-32-32s-32 14.3-32 32'
-html += b'c0 53-43 96-96 96H192V352c0-12.9-7.8-24.6-19.8-29.6s-25.7-2.'
-html += b'2-34.9 6.9l-64 64c-12.5 12.5-12.5 32.8 0 45.3l64 64c9.2 9.2 '
-html += b'22.9 11.9 34.9 6.9s19.8-16.6 19.8-29.6V448H352c88.4 0 160-71'
-html += b'.6 160-160z"/></svg>\';function R(n,e=!1){let t=new Array(n);'
-html += b'for(let s=0;s<n;s++)t[s]=s;if(e)for(let s=0;s<n;s++){let i=M'
-html += b'ath.floor(Math.random()*n),a=Math.floor(Math.random()*n),o=t'
-html += b'[i];t[i]=t[a],t[a]=o}return t}var w=class n{constructor(e,t)'
-html += b'{this.m=e,this.n=t,this.v=new Array(e*t).fill("0")}getElemen'
-html += b't(e,t){return e<0||e>=this.m||t<0||t>=this.n?"0":this.v[e*th'
-html += b'is.n+t]}resize(e,t,s){if(e<1||e>50||t<1||t>50)return!1;let i'
-html += b'=new n(e,t);i.v.fill(s);for(let a=0;a<i.m;a++)for(let o=0;o<'
-html += b'i.n;o++)i.v[a*i.n+o]=this.getElement(a,o);return this.fromMa'
-html += b'trix(i),!0}fromMatrix(e){this.m=e.m,this.n=e.n,this.v=[...e.'
-html += b'v]}fromString(e){this.m=e.split("],").length,this.v=e.replac'
-html += b'eAll("[","").replaceAll("]","").split(",").map(t=>t.trim()),'
-html += b'this.n=this.v.length/this.m}getMaxCellStrlen(){let e=0;for(l'
-html += b'et t of this.v)t.length>e&&(e=t.length);return e}toTeXString'
-html += b'(e=!1){let t=e?"\\\\left[\\\\begin{array}":"\\\\begin{bmatrix}";e&'
-html += b'&(t+="{"+"c".repeat(this.n-1)+"|c}");for(let s=0;s<this.m;s+'
-html += b'+){for(let i=0;i<this.n;i++){i>0&&(t+="&");let a=this.getEle'
-html += b'ment(s,i);try{a=g.parse(a).toTexString()}catch{}t+=a}t+="\\\\\\'
-html += b'\\"}return t+=e?"\\\\end{array}\\\\right]":"\\\\end{bmatrix}",t}},g'
-html += b'=class n{constructor(){this.root=null,this.src="",this.token'
-html += b'="",this.skippedWhiteSpace=!1,this.pos=0}clone(){let e=new n'
-html += b';return e.root=this.root.clone(),e}getVars(e,t="",s=null){if'
-html += b'(s==null&&(s=this.root),s.op.startsWith("var:")){let i=s.op.'
-html += b'substring(4);(t.length==0||t.length>0&&i.startsWith(t))&&e.a'
-html += b'dd(i)}for(let i of s.c)this.getVars(e,t,i)}setVars(e,t=null)'
-html += b'{t==null&&(t=this.root);for(let s of t.c)this.setVars(e,s);i'
-html += b'f(t.op.startsWith("var:")){let s=t.op.substring(4);if(s in e'
-html += b'){let i=e[s].clone();t.op=i.op,t.c=i.c,t.re=i.re,t.im=i.im}}'
-html += b'}eval(e,t=null){let i=u.const(),a=0,o=0,l=null;switch(t==nul'
-html += b'l&&(t=this.root),t.op){case"const":i=t;break;case"+":case"-"'
-html += b':case"*":case"/":case"^":{let r=this.eval(e,t.c[0]),h=this.e'
-html += b'val(e,t.c[1]);switch(t.op){case"+":i.re=r.re+h.re,i.im=r.im+'
-html += b'h.im;break;case"-":i.re=r.re-h.re,i.im=r.im-h.im;break;case"'
-html += b'*":i.re=r.re*h.re-r.im*h.im,i.im=r.re*h.im+r.im*h.re;break;c'
-html += b'ase"/":a=h.re*h.re+h.im*h.im,i.re=(r.re*h.re+r.im*h.im)/a,i.'
-html += b'im=(r.im*h.re-r.re*h.im)/a;break;case"^":l=new u("exp",[new '
-html += b'u("*",[h,new u("ln",[r])])]),i=this.eval(e,l);break}break}ca'
-html += b'se".-":case"abs":case"sin":case"sinc":case"cos":case"tan":ca'
-html += b'se"cot":case"exp":case"ln":case"log":case"sqrt":{let r=this.'
-html += b'eval(e,t.c[0]);switch(t.op){case".-":i.re=-r.re,i.im=-r.im;b'
-html += b'reak;case"abs":i.re=Math.sqrt(r.re*r.re+r.im*r.im),i.im=0;br'
-html += b'eak;case"sin":i.re=Math.sin(r.re)*Math.cosh(r.im),i.im=Math.'
-html += b'cos(r.re)*Math.sinh(r.im);break;case"sinc":l=new u("/",[new '
-html += b'u("sin",[r]),r]),i=this.eval(e,l);break;case"cos":i.re=Math.'
-html += b'cos(r.re)*Math.cosh(r.im),i.im=-Math.sin(r.re)*Math.sinh(r.i'
-html += b'm);break;case"tan":a=Math.cos(r.re)*Math.cos(r.re)+Math.sinh'
-html += b'(r.im)*Math.sinh(r.im),i.re=Math.sin(r.re)*Math.cos(r.re)/a,'
-html += b'i.im=Math.sinh(r.im)*Math.cosh(r.im)/a;break;case"cot":a=Mat'
-html += b'h.sin(r.re)*Math.sin(r.re)+Math.sinh(r.im)*Math.sinh(r.im),i'
-html += b'.re=Math.sin(r.re)*Math.cos(r.re)/a,i.im=-(Math.sinh(r.im)*M'
-html += b'ath.cosh(r.im))/a;break;case"exp":i.re=Math.exp(r.re)*Math.c'
-html += b'os(r.im),i.im=Math.exp(r.re)*Math.sin(r.im);break;case"ln":c'
-html += b'ase"log":i.re=Math.log(Math.sqrt(r.re*r.re+r.im*r.im)),a=Mat'
-html += b'h.abs(r.im)<1e-9?0:r.im,i.im=Math.atan2(a,r.re);break;case"s'
-html += b'qrt":l=new u("^",[r,u.const(.5)]),i=this.eval(e,l);break}bre'
-html += b'ak}default:if(t.op.startsWith("var:")){let r=t.op.substring('
-html += b'4);if(r==="pi")return u.const(Math.PI);if(r==="e")return u.c'
-html += b'onst(Math.E);if(r==="i")return u.const(0,1);if(r in e)return'
-html += b' e[r];throw new Error("eval-error: unknown variable \'"+r+"\'"'
-html += b')}else throw new Error("UNIMPLEMENTED eval \'"+t.op+"\'")}retu'
-html += b'rn i}static parse(e){let t=new n;if(t.src=e,t.token="",t.ski'
-html += b'ppedWhiteSpace=!1,t.pos=0,t.next(),t.root=t.parseExpr(!1),t.'
-html += b'token!=="")throw new Error("remaining tokens: "+t.token+"...'
-html += b'");return t}parseExpr(e){return this.parseAdd(e)}parseAdd(e)'
-html += b'{let t=this.parseMul(e);for(;["+","-"].includes(this.token)&'
-html += b'&!(e&&this.skippedWhiteSpace);){let s=this.token;this.next()'
-html += b',t=new u(s,[t,this.parseMul(e)])}return t}parseMul(e){let t='
-html += b'this.parsePow(e);for(;!(e&&this.skippedWhiteSpace);){let s="'
-html += b'*";if(["*","/"].includes(this.token))s=this.token,this.next('
-html += b');else if(!e&&this.token==="(")s="*";else if(this.token.leng'
-html += b'th>0&&(this.isAlpha(this.token[0])||this.isNum(this.token[0]'
-html += b')))s="*";else break;t=new u(s,[t,this.parsePow(e)])}return t'
-html += b'}parsePow(e){let t=this.parseUnary(e);for(;["^"].includes(th'
-html += b'is.token)&&!(e&&this.skippedWhiteSpace);){let s=this.token;t'
-html += b'his.next(),t=new u(s,[t,this.parseUnary(e)])}return t}parseU'
-html += b'nary(e){return this.token==="-"?(this.next(),new u(".-",[thi'
-html += b's.parseMul(e)])):this.parseInfix(e)}parseInfix(e){if(this.to'
-html += b'ken.length==0)throw new Error("expected unary");if(this.isNu'
-html += b'm(this.token[0])){let t=this.token;return this.next(),this.t'
-html += b'oken==="."&&(t+=".",this.next(),this.token.length>0&&(t+=thi'
-html += b's.token,this.next())),new u("const",[],parseFloat(t))}else i'
-html += b'f(this.fun1().length>0){let t=this.fun1();this.next(t.length'
-html += b');let s=null;if(this.token==="(")if(this.next(),s=this.parse'
-html += b'Expr(e),this.token+="",this.token===")")this.next();else thr'
-html += b'ow Error("expected \')\'");else s=this.parseMul(!0);return new'
-html += b' u(t,[s])}else if(this.token==="("){this.next();let t=this.p'
-html += b'arseExpr(e);if(this.token+="",this.token===")")this.next();e'
-html += b'lse throw Error("expected \')\'");return t.explicitParentheses'
-html += b'=!0,t}else if(this.token==="|"){this.next();let t=this.parse'
-html += b'Expr(e);if(this.token+="",this.token==="|")this.next();else '
-html += b'throw Error("expected \'|\'");return new u("abs",[t])}else if('
-html += b'this.isAlpha(this.token[0])){let t="";return this.token.star'
-html += b'tsWith("pi")?t="pi":this.token.startsWith("C1")?t="C1":this.'
-html += b'token.startsWith("C2")?t="C2":t=this.token[0],t==="I"&&(t="i'
-html += b'"),this.next(t.length),new u("var:"+t,[])}else throw new Err'
-html += b'or("expected unary")}static compare(e,t){let a=new Set;e.get'
-html += b'Vars(a),t.getVars(a);for(let o=0;o<10;o++){let l={};for(let '
-html += b'f of a)l[f]=u.const(Math.random(),Math.random());let r=e.eva'
-html += b'l(l),h=t.eval(l),c=r.re-h.re,d=r.im-h.im;if(Math.sqrt(c*c+d*'
-html += b'd)>1e-9)return!1}return!0}static compareODE(e,t){let s=e.clo'
-html += b'ne(),i=t.clone(),a=new Set;s.getVars(a,"C"),i.getVars(a,"C")'
-html += b';let o={};for(let l of a.keys())o[l]=u.const(0,0);return s.s'
-html += b'etVars(o),i.setVars(o),n.compare(s,i)==!1?!1:(s=e.clone(),i='
-html += b't.clone(),s.prepareODEconstantComparison(),i.prepareODEconst'
-html += b'antComparison(),n.compare(s,i))}prepareODEconstantComparison'
-html += b'(e=null){e==null&&(e=this.root);for(let t of e.c)this.prepar'
-html += b'eODEconstantComparison(t);switch(e.op){case"+":case"-":case"'
-html += b'*":case"/":case"^":{let t=[e.c[0].op,e.c[1].op],s=[t[0]==="c'
-html += b'onst",t[1]==="const"],i=[t[0].startsWith("var:"),t[1].starts'
-html += b'With("var:")];i[0]&&s[1]?(e.op=e.c[0].op,e.c=[]):i[1]&&s[0]?'
-html += b'(e.op=e.c[1].op,e.c=[]):i[0]&&i[1]&&t[0]==t[1]?(e.op=e.c[0].'
-html += b'op,e.c=[]):s[0]?(e.op=e.c[1].op,e.c=e.c[1].c):s[1]&&(e.op=e.'
-html += b'c[0].op,e.c=e.c[0].c);break}case".-":case"abs":case"sin":cas'
-html += b'e"sinc":case"cos":case"tan":case"cot":case"exp":case"ln":cas'
-html += b'e"log":case"sqrt":e.c[0].op.startsWith("var:")?(e.op=e.c[0].'
-html += b'op,e.c=[]):e.c[0].op==="const"&&(e.op="const",e.re=e.im=0,e.'
-html += b'c=[]);break}}fun1(){let e=["abs","sinc","sin","cos","tan","c'
-html += b'ot","exp","ln","sqrt"];for(let t of e)if(this.token.toLowerC'
-html += b'ase().startsWith(t))return t;return""}next(e=-1){if(e>0&&thi'
-html += b's.token.length>e){this.token=this.token.substring(e),this.sk'
-html += b'ippedWhiteSpace=!1;return}this.token="";let t=!1,s=this.src.'
-html += b'length;for(this.skippedWhiteSpace=!1;this.pos<s&&`\t\n `.inclu'
-html += b'des(this.src[this.pos]);)this.skippedWhiteSpace=!0,this.pos+'
-html += b'+;for(;!t&&this.pos<s;){let i=this.src[this.pos];if(this.tok'
-html += b'en.length>0&&(this.isNum(this.token[0])&&this.isAlpha(i)||th'
-html += b'is.isAlpha(this.token[0])&&this.isNum(i))&&this.token!="C")r'
-html += b'eturn;if(`^%#*$()[]{},.:;+-*/_!<>=?|\t\n `.includes(i)){if(thi'
-html += b's.token.length>0)return;t=!0}`\t\n `.includes(i)==!1&&(this.to'
-html += b'ken+=i),this.pos++}}isNum(e){return e.charCodeAt(0)>=48&&e.c'
-html += b'harCodeAt(0)<=57}isAlpha(e){return e.charCodeAt(0)>=65&&e.ch'
-html += b'arCodeAt(0)<=90||e.charCodeAt(0)>=97&&e.charCodeAt(0)<=122||'
-html += b'e==="_"}toString(){return this.root==null?"":this.root.toStr'
-html += b'ing()}toTexString(){return this.root==null?"":this.root.toTe'
-html += b'xString()}},u=class n{constructor(e,t,s=0,i=0){this.op=e,thi'
-html += b's.c=t,this.re=s,this.im=i,this.explicitParentheses=!1}clone('
-html += b'){let e=new n(this.op,this.c.map(t=>t.clone()),this.re,this.'
-html += b'im);return e.explicitParentheses=this.explicitParentheses,e}'
-html += b'static const(e=0,t=0){return new n("const",[],e,t)}compare(e'
-html += b',t=0,s=1e-9){let i=this.re-e,a=this.im-t;return Math.sqrt(i*'
-html += b'i+a*a)<s}toString(){let e="";if(this.op==="const"){let t=Mat'
-html += b'h.abs(this.re)>1e-14,s=Math.abs(this.im)>1e-14;t&&s&&this.im'
-html += b'>=0?e="("+this.re+"+"+this.im+"i)":t&&s&&this.im<0?e="("+thi'
-html += b's.re+"-"+-this.im+"i)":t&&this.re>0?e=""+this.re:t&&this.re<'
-html += b'0?e="("+this.re+")":s?e="("+this.im+"i)":e="0"}else this.op.'
-html += b'startsWith("var")?e=this.op.split(":")[1]:this.c.length==1?e'
-html += b'=(this.op===".-"?"-":this.op)+"("+this.c.toString()+")":e="('
-html += b'"+this.c.map(t=>t.toString()).join(this.op)+")";return e}toT'
-html += b'exString(e=!1){let s="";switch(this.op){case"const":{let i=M'
-html += b'ath.abs(this.re)>1e-9,a=Math.abs(this.im)>1e-9,o=i?""+this.r'
-html += b'e:"",l=a?""+this.im+"i":"";l==="1i"?l="i":l==="-1i"&&(l="-i"'
-html += b'),!i&&!a?s="0":(a&&this.im>=0&&i&&(l="+"+l),s=o+l);break}cas'
-html += b'e".-":s="-"+this.c[0].toTexString();break;case"+":case"-":ca'
-html += b'se"*":case"^":{let i=this.c[0].toTexString(),a=this.c[1].toT'
-html += b'exString(),o=this.op==="*"?"\\\\cdot ":this.op;s="{"+i+"}"+o+"'
-html += b'{"+a+"}";break}case"/":{let i=this.c[0].toTexString(!0),a=th'
-html += b'is.c[1].toTexString(!0);s="\\\\frac{"+i+"}{"+a+"}";break}case"'
-html += b'sin":case"sinc":case"cos":case"tan":case"cot":case"exp":case'
-html += b'"ln":{let i=this.c[0].toTexString(!0);s+="\\\\"+this.op+"\\\\lef'
-html += b't("+i+"\\\\right)";break}case"sqrt":{let i=this.c[0].toTexStri'
-html += b'ng(!0);s+="\\\\"+this.op+"{"+i+"}";break}case"abs":{let i=this'
-html += b'.c[0].toTexString(!0);s+="\\\\left|"+i+"\\\\right|";break}defaul'
-html += b't:if(this.op.startsWith("var:")){let i=this.op.substring(4);'
-html += b'switch(i){case"pi":i="\\\\pi";break}s=" "+i+" "}else{let i="wa'
-html += b'rning: Node.toString(..):";i+=" unimplemented operator \'"+th'
-html += b'is.op+"\'",console.log(i),s=this.op,this.c.length>0&&(s+="\\\\l'
-html += b'eft({"+this.c.map(a=>a.toTexString(!0)).join(",")+"}\\\\right)'
-html += b'")}}return!e&&this.explicitParentheses&&(s="\\\\left({"+s+"}\\\\'
-html += b'right)"),s}};function $(n){n.feedbackSpan.innerHTML="",n.num'
-html += b'Checked=0,n.numCorrect=0;for(let s in n.expected){let i=n.ty'
-html += b'pes[s],a=n.student[s],o=n.expected[s];switch(i){case"bool":n'
-html += b'.numChecked++,a===o&&n.numCorrect++;break;case"string":{n.nu'
-html += b'mChecked++;let l=n.gapInputs[s],r=a.trim().toUpperCase(),h=o'
-html += b'.trim().toUpperCase().split("|"),c=!1;for(let d of h)if(X(r,'
-html += b'd)<=1){c=!0,n.numCorrect++,n.gapInputs[s].value=d,n.student['
-html += b's]=d;break}l.style.color=c?"black":"white",l.style.backgroun'
-html += b'dColor=c?"transparent":"maroon";break}case"int":n.numChecked'
-html += b'++,Math.abs(parseFloat(a)-parseFloat(o))<1e-9&&n.numCorrect+'
-html += b'+;break;case"float":case"term":{n.numChecked++;try{let l=g.p'
-html += b'arse(o),r=g.parse(a),h=!1;n.src.is_ode?h=g.compareODE(l,r):h'
-html += b'=g.compare(l,r),h&&n.numCorrect++}catch(l){n.debug&&(console'
-html += b'.log("term invalid"),console.log(l))}break}case"vector":case'
-html += b'"complex":case"set":{let l=o.split(",");n.numChecked+=l.leng'
-html += b'th;let r=[];for(let h=0;h<l.length;h++)r.push(n.student[s+"-'
-html += b'"+h]);if(i==="set")for(let h=0;h<l.length;h++)try{let c=g.pa'
-html += b'rse(l[h]);for(let d=0;d<r.length;d++){let p=g.parse(r[d]);if'
-html += b'(g.compare(c,p)){n.numCorrect++;break}}}catch(c){n.debug&&co'
-html += b'nsole.log(c)}else for(let h=0;h<l.length;h++)try{let c=g.par'
-html += b'se(r[h]),d=g.parse(l[h]);g.compare(c,d)&&n.numCorrect++}catc'
-html += b'h(c){n.debug&&console.log(c)}break}case"matrix":{let l=new w'
-html += b'(0,0);l.fromString(o),n.numChecked+=l.m*l.n;for(let r=0;r<l.'
-html += b'm;r++)for(let h=0;h<l.n;h++){let c=r*l.n+h;a=n.student[s+"-"'
-html += b'+c];let d=l.v[c];try{let p=g.parse(d),f=g.parse(a);g.compare'
-html += b'(p,f)&&n.numCorrect++}catch(p){n.debug&&console.log(p)}}brea'
-html += b'k}default:n.feedbackSpan.innerHTML="UNIMPLEMENTED EVAL OF TY'
-html += b'PE "+i}}n.state=n.numCorrect==n.numChecked?x.passed:x.errors'
-html += b',n.updateVisualQuestionState();let e=n.state===x.passed?j[n.'
-html += b'language]:Z[n.language],t=e[Math.floor(Math.random()*e.lengt'
-html += b'h)];n.feedbackPopupDiv.innerHTML=t,n.feedbackPopupDiv.style.'
-html += b'color=n.state===x.passed?"green":"maroon",n.feedbackPopupDiv'
-html += b'.style.display="block",setTimeout(()=>{n.feedbackPopupDiv.st'
-html += b'yle.display="none"},500),n.state===x.passed?n.src.instances.'
-html += b'length>0?n.checkAndRepeatBtn.innerHTML=J:n.checkAndRepeatBtn'
-html += b'.style.display="none":n.checkAndRepeatBtn.innerHTML=T}var L='
-html += b'class{constructor(e,t,s,i){t.student[s]="",this.question=t,t'
-html += b'his.inputId=s,s.length==0&&(this.inputId="gap-"+t.gapIdx,t.t'
-html += b'ypes[this.inputId]="string",t.expected[this.inputId]=i,t.gap'
-html += b'Idx++);let a=i.split("|"),o=0;for(let c=0;c<a.length;c++){le'
-html += b't d=a[c];d.length>o&&(o=d.length)}let l=m("");e.appendChild('
-html += b'l);let r=Math.max(o*15,24),h=B(r);if(t.gapInputs[this.inputI'
-html += b'd]=h,h.addEventListener("keyup",()=>{this.question.editedQue'
-html += b'stion(),h.value=h.value.toUpperCase(),this.question.student['
-html += b'this.inputId]=h.value.trim()}),l.appendChild(h),this.questio'
-html += b'n.showSolution&&(this.question.student[this.inputId]=h.value'
-html += b'=a[0],a.length>1)){let c=m("["+a.join("|")+"]");c.style.font'
-html += b'Size="small",c.style.textDecoration="underline",l.appendChil'
-html += b'd(c)}}},M=class{constructor(e,t,s,i,a,o){t.student[s]="",thi'
-html += b's.question=t,this.inputId=s,this.outerSpan=m(""),this.outerS'
-html += b'pan.style.position="relative",e.appendChild(this.outerSpan),'
-html += b'this.inputElement=B(Math.max(i*12,48)),this.outerSpan.append'
-html += b'Child(this.inputElement),this.equationPreviewDiv=v(),this.eq'
-html += b'uationPreviewDiv.classList.add("equationPreview"),this.equat'
-html += b'ionPreviewDiv.style.display="none",this.outerSpan.appendChil'
-html += b'd(this.equationPreviewDiv),this.inputElement.addEventListene'
-html += b'r("click",()=>{this.question.editedQuestion(),this.edited()}'
-html += b'),this.inputElement.addEventListener("keyup",()=>{this.quest'
-html += b'ion.editedQuestion(),this.edited()}),this.inputElement.addEv'
-html += b'entListener("focusout",()=>{this.equationPreviewDiv.innerHTM'
-html += b'L="",this.equationPreviewDiv.style.display="none"}),this.inp'
-html += b'utElement.addEventListener("keydown",l=>{let r="abcdefghijkl'
-html += b'mnopqrstuvwxyz";r+="ABCDEFGHIJKLMNOPQRSTUVWXYZ",r+="01234567'
-html += b'89",r+="+-*/^(). <>=|",o&&(r="-0123456789"),l.key.length<3&&'
-html += b'r.includes(l.key)==!1&&l.preventDefault();let h=this.inputEl'
-html += b'ement.value.length*12;this.inputElement.offsetWidth<h&&(this'
-html += b'.inputElement.style.width=""+h+"px")}),this.question.showSol'
-html += b'ution&&(t.student[s]=this.inputElement.value=a)}edited(){let'
-html += b' e=this.inputElement.value.trim(),t="",s=!1;try{let i=g.pars'
-html += b'e(e);s=i.root.op==="const",t=i.toTexString(),this.inputEleme'
-html += b'nt.style.color="black",this.equationPreviewDiv.style.backgro'
-html += b'undColor="green"}catch{t=e.replaceAll("^","\\\\hat{~}").replac'
-html += b'eAll("_","\\\\_"),this.inputElement.style.color="maroon",this.'
-html += b'equationPreviewDiv.style.backgroundColor="maroon"}V(this.equ'
-html += b'ationPreviewDiv,t,!0),this.equationPreviewDiv.style.display='
-html += b'e.length>0&&!s?"block":"none",this.question.student[this.inp'
-html += b'utId]=e}},I=class{constructor(e,t,s,i){this.parent=e,this.qu'
-html += b'estion=t,this.inputId=s,this.matExpected=new w(0,0),this.mat'
-html += b'Expected.fromString(i),this.matStudent=new w(this.matExpecte'
-html += b'd.m==1?1:3,this.matExpected.n==1?1:3),t.showSolution&&this.m'
-html += b'atStudent.fromMatrix(this.matExpected),this.genMatrixDom()}g'
-html += b'enMatrixDom(){let e=v();this.parent.innerHTML="",this.parent'
-html += b'.appendChild(e),e.style.position="relative",e.style.display='
-html += b'"inline-block";let t=document.createElement("table");e.appen'
-html += b'dChild(t);let s=this.matExpected.getMaxCellStrlen();for(let '
-html += b'p=0;p<this.matStudent.m;p++){let f=document.createElement("t'
-html += b'r");t.appendChild(f),p==0&&f.appendChild(this.generateMatrix'
-html += b'Parenthesis(!0,this.matStudent.m));for(let k=0;k<this.matStu'
-html += b'dent.n;k++){let b=p*this.matStudent.n+k,E=document.createEle'
-html += b'ment("td");f.appendChild(E);let A=this.inputId+"-"+b;new M(E'
-html += b',this.question,A,s,this.matStudent.v[b],!1)}p==0&&f.appendCh'
-html += b'ild(this.generateMatrixParenthesis(!1,this.matStudent.m))}le'
-html += b't i=["+","-","+","-"],a=[0,0,1,-1],o=[1,-1,0,0],l=[0,22,888,'
-html += b'888],r=[888,888,-22,-22],h=[-22,-22,0,22],c=[this.matExpecte'
-html += b'd.n!=1,this.matExpected.n!=1,this.matExpected.m!=1,this.matE'
-html += b'xpected.m!=1],d=[this.matStudent.n>=10,this.matStudent.n<=1,'
-html += b'this.matStudent.m>=10,this.matStudent.m<=1];for(let p=0;p<4;'
-html += b'p++){if(c[p]==!1)continue;let f=m(i[p]);l[p]!=888&&(f.style.'
-html += b'top=""+l[p]+"px"),r[p]!=888&&(f.style.bottom=""+r[p]+"px"),h'
-html += b'[p]!=888&&(f.style.right=""+h[p]+"px"),f.classList.add("matr'
-html += b'ixResizeButton"),e.appendChild(f),d[p]?f.style.opacity="0.5"'
-html += b':f.addEventListener("click",()=>{this.matStudent.resize(this'
-html += b'.matStudent.m+a[p],this.matStudent.n+o[p],"0"),this.genMatri'
-html += b'xDom()})}}generateMatrixParenthesis(e,t){let s=document.crea'
-html += b'teElement("td");s.style.width="3px";for(let i of["Top",e?"Le'
-html += b'ft":"Right","Bottom"])s.style["border"+i+"Width"]="2px",s.st'
-html += b'yle["border"+i+"Style"]="solid";return s.rowSpan=t,s}};var x'
-html += b'={init:0,errors:1,passed:2},P=class{constructor(e,t,s,i){thi'
-html += b's.state=x.init,this.language=s,this.src=t,this.debug=i,this.'
-html += b'instanceOrder=R(t.instances.length,!0),this.instanceIdx=0,th'
-html += b'is.choiceIdx=0,this.gapIdx=0,this.expected={},this.types={},'
-html += b'this.student={},this.gapInputs={},this.parentDiv=e,this.ques'
-html += b'tionDiv=null,this.feedbackPopupDiv=null,this.titleDiv=null,t'
-html += b'his.checkAndRepeatBtn=null,this.showSolution=!1,this.feedbac'
-html += b'kSpan=null,this.numCorrect=0,this.numChecked=0}reset(){this.'
-html += b'instanceIdx=(this.instanceIdx+1)%this.src.instances.length}g'
-html += b'etCurrentInstance(){let e=this.instanceOrder[this.instanceId'
-html += b'x];return this.src.instances[e]}editedQuestion(){this.state='
-html += b'x.init,this.updateVisualQuestionState(),this.questionDiv.sty'
-html += b'le.color="black",this.checkAndRepeatBtn.innerHTML=T,this.che'
-html += b'ckAndRepeatBtn.style.display="block",this.checkAndRepeatBtn.'
-html += b'style.color="black"}updateVisualQuestionState(){let e="black'
-html += b'",t="transparent";switch(this.state){case x.init:e="rgb(0,0,'
-html += b'0)",t="transparent";break;case x.passed:e="rgb(0,150,0)",t="'
-html += b'rgba(0,150,0, 0.025)";break;case x.errors:e="rgb(150,0,0)",t'
-html += b'="rgba(150,0,0, 0.025)",this.numChecked>=5&&(this.feedbackSp'
-html += b'an.innerHTML=""+this.numCorrect+" / "+this.numChecked);break'
-html += b'}this.questionDiv.style.color=this.feedbackSpan.style.color='
-html += b'this.titleDiv.style.color=this.checkAndRepeatBtn.style.backg'
-html += b'roundColor=this.questionDiv.style.borderColor=e,this.questio'
-html += b'nDiv.style.backgroundColor=t}populateDom(){if(this.parentDiv'
-html += b'.innerHTML="",this.questionDiv=v(),this.parentDiv.appendChil'
-html += b'd(this.questionDiv),this.questionDiv.classList.add("question'
-html += b'"),this.feedbackPopupDiv=v(),this.feedbackPopupDiv.classList'
-html += b'.add("questionFeedback"),this.questionDiv.appendChild(this.f'
-html += b'eedbackPopupDiv),this.feedbackPopupDiv.innerHTML="awesome",t'
-html += b'his.debug&&"src_line"in this.src){let a=v();a.classList.add('
-html += b'"debugInfo"),a.innerHTML="Source code: lines "+this.src.src_'
-html += b'line+"..",this.questionDiv.appendChild(a)}if(this.titleDiv=v'
-html += b'(),this.questionDiv.appendChild(this.titleDiv),this.titleDiv'
-html += b'.classList.add("questionTitle"),this.titleDiv.innerHTML=this'
-html += b'.src.title,this.src.error.length>0){let a=m(this.src.error);'
-html += b'this.questionDiv.appendChild(a),a.style.color="red";return}l'
-html += b'et e=this.getCurrentInstance();if(e!=null&&"__svg_image"in e'
-html += b'){let a=e.__svg_image.v,o=v();this.questionDiv.appendChild(o'
-html += b');let l=document.createElement("img");o.appendChild(l),l.cla'
-html += b'ssList.add("img"),l.src="data:image/svg+xml;base64,"+a}for(l'
-html += b'et a of this.src.text.c)this.questionDiv.appendChild(this.ge'
-html += b'nerateText(a));let t=v();this.questionDiv.appendChild(t),t.c'
-html += b'lassList.add("buttonRow");let s=Object.keys(this.expected).l'
-html += b'ength>0;s&&(this.checkAndRepeatBtn=U(),t.appendChild(this.ch'
-html += b'eckAndRepeatBtn),this.checkAndRepeatBtn.innerHTML=T,this.che'
-html += b'ckAndRepeatBtn.style.backgroundColor="black");let i=m("&nbsp'
-html += b';&nbsp;&nbsp;");if(t.appendChild(i),this.feedbackSpan=m(""),'
-html += b't.appendChild(this.feedbackSpan),this.debug){if(this.src.var'
-html += b'iables.length>0){let l=v();l.classList.add("debugInfo"),l.in'
-html += b'nerHTML="Variables generated by Python Code",this.questionDi'
-html += b'v.appendChild(l);let r=v();r.classList.add("debugCode"),this'
-html += b'.questionDiv.appendChild(r);let h=this.getCurrentInstance(),'
-html += b'c="",d=[...this.src.variables];d.sort();for(let p of d){let '
-html += b'f=h[p].t,k=h[p].v;switch(f){case"vector":k="["+k+"]";break;c'
-html += b'ase"set":k="{"+k+"}";break}c+=f+" "+p+" = "+k+"<br/>"}r.inne'
-html += b'rHTML=c}let a=["python_src_html","text_src_html"],o=["Python'
-html += b' Source Code","Text Source Code"];for(let l=0;l<a.length;l++'
-html += b'){let r=a[l];if(r in this.src&&this.src[r].length>0){let h=v'
-html += b'();h.classList.add("debugInfo"),h.innerHTML=o[l],this.questi'
-html += b'onDiv.appendChild(h);let c=v();c.classList.add("debugCode"),'
-html += b'this.questionDiv.append(c),c.innerHTML=this.src[r]}}}s&&this'
-html += b'.checkAndRepeatBtn.addEventListener("click",()=>{this.state='
-html += b'=x.passed?(this.state=x.init,this.reset(),this.populateDom()'
-html += b'):$(this)})}generateMathString(e){let t="";switch(e.t){case"'
-html += b'math":case"display-math":for(let s of e.c){let i=this.genera'
-html += b'teMathString(s);s.t==="var"&&t.includes("!PM")&&(i.startsWit'
-html += b'h("{-")?(i="{"+i.substring(2),t=t.replaceAll("!PM","-")):t=t'
-html += b'.replaceAll("!PM","+")),t+=i}break;case"text":return e.d;cas'
-html += b'e"plus_minus":{t+=" !PM ";break}case"var":{let s=this.getCur'
-html += b'rentInstance(),i=s[e.d].t,a=s[e.d].v;switch(i){case"vector":'
-html += b'return"\\\\left["+a+"\\\\right]";case"set":return"\\\\left\\\\{"+a+"'
-html += b'\\\\right\\\\}";case"complex":{let o=a.split(","),l=parseFloat(o'
-html += b'[0]),r=parseFloat(o[1]);return u.const(l,r).toTexString()}ca'
-html += b'se"matrix":{let o=new w(0,0);return o.fromString(a),t=o.toTe'
-html += b'XString(e.d.includes("augmented")),t}case"term":{try{t=g.par'
-html += b'se(a).toTexString()}catch{}break}default:t=a}}}return e.t==='
-html += b'"plus_minus"?t:"{"+t+"}"}generateText(e,t=!1){switch(e.t){ca'
-html += b'se"paragraph":case"span":{let s=document.createElement(e.t=='
-html += b'"span"||t?"span":"p");for(let i of e.c)s.appendChild(this.ge'
-html += b'nerateText(i));return s}case"text":return m(e.d);case"code":'
-html += b'{let s=m(e.d);return s.classList.add("code"),s}case"italic":'
-html += b'case"bold":{let s=m("");return s.append(...e.c.map(i=>this.g'
-html += b'enerateText(i))),e.t==="bold"?s.style.fontWeight="bold":s.st'
-html += b'yle.fontStyle="italic",s}case"math":case"display-math":{let '
-html += b's=this.generateMathString(e);return C(s,e.t==="display-math"'
-html += b')}case"string_var":{let s=m(""),i=this.getCurrentInstance(),'
-html += b'a=i[e.d].t,o=i[e.d].v;return a==="string"?s.innerHTML=o:(s.i'
-html += b'nnerHTML="EXPECTED VARIABLE OF TYPE STRING",s.style.color="r'
-html += b'ed"),s}case"gap":{let s=m("");return new L(s,this,"",e.d),s}'
-html += b'case"input":case"input2":{let s=e.t==="input2",i=m("");i.sty'
-html += b'le.verticalAlign="text-bottom";let a=e.d,o=this.getCurrentIn'
-html += b'stance()[a];if(this.expected[a]=o.v,this.types[a]=o.t,!s)swi'
-html += b'tch(o.t){case"set":i.append(C("\\\\{"),m(" "));break;case"vect'
-html += b'or":i.append(C("["),m(" "));break}if(o.t==="string")new L(i,'
-html += b'this,a,this.expected[a]);else if(o.t==="vector"||o.t==="set"'
-html += b'){let l=o.v.split(","),r=l.length;for(let h=0;h<r;h++){h>0&&'
-html += b'i.appendChild(m(" , "));let c=a+"-"+h;new M(i,this,c,l[h].le'
-html += b'ngth,l[h],!1)}}else if(o.t==="matrix"){let l=v();i.appendChi'
-html += b'ld(l),new I(l,this,a,o.v)}else if(o.t==="complex"){let l=o.v'
-html += b'.split(",");new M(i,this,a+"-0",l[0].length,l[0],!1),i.appen'
-html += b'd(m(" "),C("+"),m(" ")),new M(i,this,a+"-1",l[1].length,l[1]'
-html += b',!1),i.append(m(" "),C("i"))}else{let l=o.t==="int";new M(i,'
-html += b'this,a,o.v.length,o.v,l)}if(!s)switch(o.t){case"set":i.appen'
-html += b'd(m(" "),C("\\\\}"));break;case"vector":i.append(m(" "),C("]")'
-html += b');break}return i}case"itemize":return Q(e.c.map(s=>z(this.ge'
-html += b'nerateText(s))));case"single-choice":case"multi-choice":{let'
-html += b' s=e.t=="multi-choice",i=document.createElement("table"),a=e'
-html += b'.c.length,o=this.debug==!1,l=R(a,o),r=s?q:G,h=s?Y:K,c=[],d=['
-html += b'];for(let p=0;p<a;p++){let f=l[p],k=e.c[f],b="mc-"+this.choi'
-html += b'ceIdx+"-"+f;d.push(b);let E=k.c[0].t=="bool"?k.c[0].d:this.g'
-html += b'etCurrentInstance()[k.c[0].d].v;this.expected[b]=E,this.type'
-html += b's[b]="bool",this.student[b]=this.showSolution?E:"false";let '
-html += b'A=this.generateText(k.c[1],!0),y=document.createElement("tr"'
-html += b');i.appendChild(y),y.style.cursor="pointer";let S=document.c'
-html += b'reateElement("td");c.push(S),y.appendChild(S),S.innerHTML=th'
-html += b'is.student[b]=="true"?r:h;let W=document.createElement("td")'
-html += b';y.appendChild(W),W.appendChild(A),s?y.addEventListener("cli'
-html += b'ck",()=>{this.editedQuestion(),this.student[b]=this.student['
-html += b'b]==="true"?"false":"true",this.student[b]==="true"?S.innerH'
-html += b'TML=r:S.innerHTML=h}):y.addEventListener("click",()=>{this.e'
-html += b'ditedQuestion();for(let D of d)this.student[D]="false";this.'
-html += b'student[b]="true";for(let D=0;D<d.length;D++){let N=l[D];c[N'
-html += b'].innerHTML=this.student[d[N]]=="true"?r:h}})}return this.ch'
-html += b'oiceIdx++,i}case"image":{let s=v(),a=e.d.split("."),o=a[a.le'
-html += b'ngth-1],l=e.c[0].d,r=e.c[1].d,h=document.createElement("img"'
-html += b');s.appendChild(h),h.classList.add("img"),h.style.width=l+"%'
-html += b'";let c={svg:"svg+xml",png:"png",jpg:"jpeg"};return h.src="d'
-html += b'ata:image/"+c[o]+";base64,"+r,s}default:{let s=m("UNIMPLEMEN'
-html += b'TED("+e.t+")");return s.style.color="red",s}}}};function ae('
-html += b'n,e){["en","de","es","it","fr"].includes(n.lang)==!1&&(n.lan'
-html += b'g="en"),e&&(document.getElementById("debug").style.display="'
-html += b'block"),document.getElementById("date").innerHTML=n.date,doc'
-html += b'ument.getElementById("title").innerHTML=n.title,document.get'
-html += b'ElementById("author").innerHTML=n.author,document.getElement'
-html += b'ById("courseInfo1").innerHTML=O[n.lang];let t=\'<span onclick'
-html += b'="location.reload()" style="text-decoration: underline; font'
-html += b'-weight: bold; cursor: pointer">\'+F[n.lang]+"</span>";docume'
-html += b'nt.getElementById("courseInfo2").innerHTML=_[n.lang].replace'
-html += b'("*",t);let s=[],i=document.getElementById("questions"),a=1;'
-html += b'for(let o of n.questions){o.title=""+a+". "+o.title;let l=v('
-html += b');i.appendChild(l);let r=new P(l,o,n.lang,e);r.showSolution='
-html += b'e,s.push(r),r.populateDom(),e&&o.error.length==0&&r.checkAnd'
-html += b'RepeatBtn.click(),a++}}return ne(le);})();sell.init(quizSrc,'
-html += b'debug);</script></body> </html> '
-html = html.decode('utf-8')
+HTML: str = b''
+HTML += b'<!DOCTYPE html> <html> <head> <meta charset="UTF-8" /> <titl'
+HTML += b'e>pySELL Quiz</title> <meta name="viewport" content="width=d'
+HTML += b'evice-width, initial-scale=1.0" /> <link rel="icon" type="im'
+HTML += b'age/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAI'
+HTML += b'ABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAA'
+HTML += b'AAAAACqqqr/PDw8/0VFRf/V1dX////////////09Pb/trbO/3t7q/9wcLH/c'
+HTML += b'XG0/3NzqP+iosH/5OTr////////////j4+P/wAAAP8KCgr/x8fH///////k5'
+HTML += b'Or/bGym/y4ukP8kJJD/IiKR/yIikv8jI5H/KCiP/1BQnP/Jydz//////5CQk'
+HTML += b'P8BAQH/DAwM/8jIyP/7+/v/cHCo/yIij/8lJZP/KSmR/z4+lf9AQJH/Li6Q/'
+HTML += b'yUlkv8jI5H/TEya/9/f6P+QkJD/AQEB/wwMDP/Ly8r/ycna/y4ujv8lJZP/N'
+HTML += b'DSU/5+fw//j4+v/5+fs/76+0v9LS5f/JSWS/yYmkP+Skrr/kJCQ/wAAAP8MD'
+HTML += b'Az/zc3L/5aWvP8iIo//ISGQ/39/sf////7/////////////////n5+7/yMjj'
+HTML += b'P8kJJH/bm6p/5CQkP8BAQH/CgoK/6SkpP+Skp//XV2N/1dXi//Hx9X//////'
+HTML += b'///////////9fX1/39/rP8kJI7/JCSR/25upP+QkJD/AQEB/wEBAf8ODg7/F'
+HTML += b'BQT/xUVE/8hIR//XV1c/8vL0P/IyNv/lZW7/1panP8rK5D/JiaT/ycnjv+bm'
+HTML += b'7v/kJCQ/wEBAf8AAAD/AAAA/wAAAP8AAAD/AAAH/wAAK/8aGmv/LCyO/yQkj'
+HTML += b'/8jI5L/JSWT/yIikP9dXZ//6enu/5CQkP8BAQH/BQUF/0xMTP9lZWT/Pz9N/'
+HTML += b'wUFVP8AAGz/AABu/xYWhf8jI5L/JCSP/zY2k/92dq7/4ODo//////+QkJD/A'
+HTML += b'QEB/wwMDP/IyMj//Pz9/2lppf8ZGYf/AgJw/wAAZ/8cHHL/Zmak/5ubv//X1'
+HTML += b'+T//v7+////////////kJCQ/wEBAf8MDAz/ycnJ/9/f6f85OZT/IyOR/wcHZ'
+HTML += b'P8AAB7/UVFZ//n5+P//////0dHd/7i4yf++vs7/7e3z/5CQkP8AAAD/DAwM/'
+HTML += b'87Ozf/Y2OP/MjKQ/x8fjv8EBEr/AAAA/1xcWv//////6ent/0tLlf8kJIn/M'
+HTML += b'jKL/8fH2v+QkJD/AQEB/wcHB/98fHv/jo6T/yUlc/8JCXj/AABi/wAAK/9eX'
+HTML += b'nj/trbS/2xspv8nJ5H/IyOT/0pKm//m5uz/kJCQ/wEBAf8AAAD/AAAA/wAAA'
+HTML += b'P8AACH/AABk/wAAbf8EBHD/IyOM/ykpkv8jI5H/IyOS/ysrjP+kpMP//////'
+HTML += b'5GRkf8CAgL/AQEB/wEBAf8BAQH/AgIE/woKK/8ZGWj/IyOG/ycnj/8nJ4//M'
+HTML += b'DCS/0xMmf+lpcP/+vr6///////Pz8//kZGR/5CQkP+QkJD/kJCQ/5OTk/+ws'
+HTML += b'K//zs7V/8LC2f+goL3/oaG+/8PD2P/n5+z/////////////////AAAAAAAAA'
+HTML += b'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+HTML += b'AAAAAAAAAAAAAAAAA==" sizes="16x16" /> <link rel="stylesheet"'
+HTML += b' href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.'
+HTML += b'min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEa'
+HTML += b'qSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous" /> '
+HTML += b'<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/'
+HTML += b'katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1Y'
+HTML += b'QqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous'
+HTML += b'" ></script> <style> html { font-family: Arial, Helvetica, s'
+HTML += b'ans-serif; } body { max-width: 1024px; margin-left: auto; ma'
+HTML += b'rgin-right: auto; padding-left: 5px; padding-right: 5px; } h'
+HTML += b'1 { text-align: center; font-size: 28pt; } img { width: 100%'
+HTML += b'; display: block; margin-left: auto; margin-right: auto; } .'
+HTML += b'author { text-align: center; font-size: 18pt; } .courseInfo '
+HTML += b'{ font-size: 14pt; font-style: italic; /*margin-bottom: 24px'
+HTML += b';*/ text-align: center; } .question { position: relative; /*'
+HTML += b' required for feedback overlays */ color: black; background-'
+HTML += b'color: white; border-style: solid; border-radius: 5px; borde'
+HTML += b'r-width: 3px; border-color: black; padding: 8px; margin-top:'
+HTML += b' 20px; margin-bottom: 20px; -webkit-box-shadow: 4px 6px 8px '
+HTML += b'-1px rgba(0, 0, 0, 0.93); box-shadow: 4px 6px 8px -1px rgba('
+HTML += b'0, 0, 0, 0.1); overflow-x: auto; } .questionFeedback { z-ind'
+HTML += b'ex: 10; display: none; position: absolute; pointer-events: n'
+HTML += b'one; left: 10%; top: 33%; width: 80%; /*height: 100%;*/ text'
+HTML += b'-align: center; font-size: 24pt; text-shadow: 0px 0px 18px r'
+HTML += b'gba(0, 0, 0, 0.33); background-color: rgba(255, 255, 255, 1)'
+HTML += b'; padding-top: 20px; padding-bottom: 20px; /*border-style: s'
+HTML += b'olid; border-width: 4px; border-color: rgb(200, 200, 200);*/'
+HTML += b' border-radius: 16px; -webkit-box-shadow: 0px 0px 18px 5px r'
+HTML += b'gba(0, 0, 0, 0.66); box-shadow: 0px 0px 18px 5px rgba(0, 0, '
+HTML += b'0, 0.66); } .questionTitle { font-size: 24pt; } .code { font'
+HTML += b'-family: "Courier New", Courier, monospace; color: black; ba'
+HTML += b'ckground-color: rgb(235, 235, 235); padding: 2px 5px; border'
+HTML += b'-radius: 5px; margin: 1px 2px; } .debugCode { font-family: "'
+HTML += b'Courier New", Courier, monospace; padding: 4px; margin-botto'
+HTML += b'm: 5px; background-color: black; color: white; border-radius'
+HTML += b': 5px; opacity: 0.85; overflow-x: scroll; } .debugInfo { tex'
+HTML += b't-align: end; font-size: 10pt; margin-top: 2px; color: rgb(6'
+HTML += b'4, 64, 64); } ul { margin-top: 0; margin-left: 0px; padding-'
+HTML += b'left: 20px; } .inputField { position: relative; width: 32px;'
+HTML += b' height: 24px; font-size: 14pt; border-style: solid; border-'
+HTML += b'color: black; border-radius: 5px; border-width: 0.2; padding'
+HTML += b'-left: 5px; padding-right: 5px; outline-color: black; backgr'
+HTML += b'ound-color: transparent; margin: 1px; } .inputField:focus { '
+HTML += b'outline-color: maroon; } .equationPreview { position: absolu'
+HTML += b'te; top: 120%; left: 0%; padding-left: 8px; padding-right: 8'
+HTML += b'px; padding-top: 4px; padding-bottom: 4px; background-color:'
+HTML += b' rgb(128, 0, 0); border-radius: 5px; font-size: 12pt; color:'
+HTML += b' white; text-align: start; z-index: 20; opacity: 0.95; } .bu'
+HTML += b'tton { padding-left: 8px; padding-right: 8px; padding-top: 5'
+HTML += b'px; padding-bottom: 5px; font-size: 12pt; background-color: '
+HTML += b'rgb(0, 150, 0); color: white; border-style: none; border-rad'
+HTML += b'ius: 4px; height: 36px; cursor: pointer; } .buttonRow { disp'
+HTML += b'lay: flex; align-items: baseline; margin-top: 12px; } .matri'
+HTML += b'xResizeButton { width: 20px; background-color: black; color:'
+HTML += b' #fff; text-align: center; border-radius: 3px; position: abs'
+HTML += b'olute; z-index: 1; height: 20px; cursor: pointer; margin-bot'
+HTML += b'tom: 3px; } a { color: black; text-decoration: underline; } '
+HTML += b'</style> </head> <body> <h1 id="title"></h1> <div class="aut'
+HTML += b'hor" id="author"></div> <p id="courseInfo1" class="courseInf'
+HTML += b'o"></p> <p id="courseInfo2" class="courseInfo"></p> <h1 id="'
+HTML += b'debug" class="debugCode" style="display: none">DEBUG VERSION'
+HTML += b'</h1> <div id="questions"></div> <p style="font-size: 8pt; f'
+HTML += b'ont-style: italic; text-align: center"> This quiz was create'
+HTML += b'd using <a href="https://github.com/andreas-schwenk/pysell">'
+HTML += b'pySELL</a>, the <i>Python-based Simple E-Learning Language</'
+HTML += b'i>, written by Andreas Schwenk, GPLv3<br /> last update on <'
+HTML += b'span id="date"></span> </p> <script>let debug = false; let q'
+HTML += b'uizSrc = {};var sell=(()=>{var B=Object.defineProperty;var s'
+HTML += b'e=Object.getOwnPropertyDescriptor;var re=Object.getOwnProper'
+HTML += b'tyNames;var ne=Object.prototype.hasOwnProperty;var ae=(r,e)='
+HTML += b'>{for(var t in e)B(r,t,{get:e[t],enumerable:!0})},le=(r,e,t,'
+HTML += b'i)=>{if(e&&typeof e=="object"||typeof e=="function")for(let '
+HTML += b's of re(e))!ne.call(r,s)&&s!==t&&B(r,s,{get:()=>e[s],enumera'
+HTML += b'ble:!(i=se(e,s))||i.enumerable});return r};var oe=r=>le(B({}'
+HTML += b',"__esModule",{value:!0}),r);var pe={};ae(pe,{init:()=>ce});'
+HTML += b'function x(r=[]){let e=document.createElement("div");return '
+HTML += b'e.append(...r),e}function z(r=[]){let e=document.createEleme'
+HTML += b'nt("ul");return e.append(...r),e}function U(r){let e=documen'
+HTML += b't.createElement("li");return e.appendChild(r),e}function R(r'
+HTML += b'){let e=document.createElement("input");return e.spellcheck='
+HTML += b'!1,e.type="text",e.classList.add("inputField"),e.style.width'
+HTML += b'=r+"px",e}function j(){let r=document.createElement("button"'
+HTML += b');return r.type="button",r.classList.add("button"),r}functio'
+HTML += b'n g(r,e=[]){let t=document.createElement("span");return e.le'
+HTML += b'ngth>0?t.append(...e):t.innerHTML=r,t}function W(r,e,t=!1){k'
+HTML += b'atex.render(e,r,{throwOnError:!1,displayMode:t,macros:{"\\\\RR'
+HTML += b'":"\\\\mathbb{R}","\\\\NN":"\\\\mathbb{N}","\\\\QQ":"\\\\mathbb{Q}","\\'
+HTML += b'\\ZZ":"\\\\mathbb{Z}","\\\\CC":"\\\\mathbb{C}"}})}function y(r,e=!1'
+HTML += b'){let t=document.createElement("span");return W(t,r,e),t}var'
+HTML += b' O={en:"This page runs in your browser and does not store an'
+HTML += b'y data on servers.",de:"Diese Seite wird in Ihrem Browser au'
+HTML += b'sgef\\xFChrt und speichert keine Daten auf Servern.",es:"Esta'
+HTML += b' p\\xE1gina se ejecuta en su navegador y no almacena ning\\xFA'
+HTML += b'n dato en los servidores.",it:"Questa pagina viene eseguita '
+HTML += b'nel browser e non memorizza alcun dato sui server.",fr:"Cett'
+HTML += b'e page fonctionne dans votre navigateur et ne stocke aucune '
+HTML += b'donn\\xE9e sur des serveurs."},F={en:"You can * this page in '
+HTML += b'order to get new randomized tasks.",de:"Sie k\\xF6nnen diese '
+HTML += b'Seite *, um neue randomisierte Aufgaben zu erhalten.",es:"Pu'
+HTML += b'edes * esta p\\xE1gina para obtener nuevas tareas aleatorias.'
+HTML += b'",it:"\\xC8 possibile * questa pagina per ottenere nuovi comp'
+HTML += b'iti randomizzati",fr:"Vous pouvez * cette page pour obtenir '
+HTML += b'de nouvelles t\\xE2ches al\\xE9atoires"},K={en:"reload",de:"ak'
+HTML += b'tualisieren",es:"recargar",it:"ricaricare",fr:"recharger"},q'
+HTML += b'={en:["awesome","great","well done","nice","you got it","goo'
+HTML += b'd"],de:["super","gut gemacht","weiter so","richtig"],es:["im'
+HTML += b'presionante","genial","correcto","bien hecho"],it:["fantasti'
+HTML += b'co","grande","corretto","ben fatto"],fr:["g\\xE9nial","super"'
+HTML += b',"correct","bien fait"]},X={en:["try again","still some mist'
+HTML += b'akes","wrong answer","no"],de:["leider falsch","nicht richti'
+HTML += b'g","versuch\'s nochmal"],es:["int\\xE9ntalo de nuevo","todav\\x'
+HTML += b'EDa algunos errores","respuesta incorrecta"],it:["riprova","'
+HTML += b'ancora qualche errore","risposta sbagliata"],fr:["r\\xE9essay'
+HTML += b'er","encore des erreurs","mauvaise r\\xE9ponse"]};function Z('
+HTML += b'r,e){let t=Array(e.length+1).fill(null).map(()=>Array(r.leng'
+HTML += b'th+1).fill(null));for(let i=0;i<=r.length;i+=1)t[0][i]=i;for'
+HTML += b'(let i=0;i<=e.length;i+=1)t[i][0]=i;for(let i=1;i<=e.length;'
+HTML += b'i+=1)for(let s=1;s<=r.length;s+=1){let a=r[s-1]===e[i-1]?0:1'
+HTML += b';t[i][s]=Math.min(t[i][s-1]+1,t[i-1][s]+1,t[i-1][s-1]+a)}ret'
+HTML += b'urn t[e.length][r.length]}var Y=\'<svg xmlns="http://www.w3.o'
+HTML += b'rg/2000/svg" height="28" viewBox="0 0 448 512"><path d="M384'
+HTML += b' 80c8.8 0 16 7.2 16 16V416c0 8.8-7.2 16-16 16H64c-8.8 0-16-7'
+HTML += b'.2-16-16V96c0-8.8 7.2-16 16-16H384zM64 32C28.7 32 0 60.7 0 9'
+HTML += b'6V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.'
+HTML += b'3-28.7-64-64-64H64z"/></svg>\',G=\'<svg xmlns="http://www.w3.o'
+HTML += b'rg/2000/svg" height="28" viewBox="0 0 448 512"><path d="M64 '
+HTML += b'80c-8.8 0-16 7.2-16 16V416c0 8.8 7.2 16 16 16H384c8.8 0 16-7'
+HTML += b'.2 16-16V96c0-8.8-7.2-16-16-16H64zM0 96C0 60.7 28.7 32 64 32'
+HTML += b'H384c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 '
+HTML += b'0-64-28.7-64-64V96zM337 209L209 337c-9.4 9.4-24.6 9.4-33.9 0'
+HTML += b'l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L303 1'
+HTML += b'75c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/>\',J=\'<svg xmln'
+HTML += b's="http://www.w3.org/2000/svg" height="28" viewBox="0 0 512 '
+HTML += b'512"><path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 41'
+HTML += b'6 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z"/></svg>'
+HTML += b'\',$=\'<svg xmlns="http://www.w3.org/2000/svg" height="28" vie'
+HTML += b'wBox="0 0 512 512"><path d="M256 48a208 208 0 1 1 0 416 208 '
+HTML += b'208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 5'
+HTML += b'12zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 11'
+HTML += b'1-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 '
+HTML += b'9.4 24.6 9.4 33.9 0L369 209z"/></svg>\',I=\'<svg xmlns="http:/'
+HTML += b'/www.w3.org/2000/svg" height="25" viewBox="0 0 384 512" fill'
+HTML += b'="white"><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0'
+HTML += b' 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c1'
+HTML += b'4.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg>\',ee=\'<'
+HTML += b'svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="'
+HTML += b'0 0 512 512" fill="white"><path d="M0 224c0 17.7 14.3 32 32 '
+HTML += b'32s32-14.3 32-32c0-53 43-96 96-96H320v32c0 12.9 7.8 24.6 19.'
+HTML += b'8 29.6s25.7 2.2 34.9-6.9l64-64c12.5-12.5 12.5-32.8 0-45.3l-6'
+HTML += b'4-64c-9.2-9.2-22.9-11.9-34.9-6.9S320 19.1 320 32V64H160C71.6'
+HTML += b' 64 0 135.6 0 224zm512 64c0-17.7-14.3-32-32-32s-32 14.3-32 3'
+HTML += b'2c0 53-43 96-96 96H192V352c0-12.9-7.8-24.6-19.8-29.6s-25.7-2'
+HTML += b'.2-34.9 6.9l-64 64c-12.5 12.5-12.5 32.8 0 45.3l64 64c9.2 9.2'
+HTML += b' 22.9 11.9 34.9 6.9s19.8-16.6 19.8-29.6V448H352c88.4 0 160-7'
+HTML += b'1.6 160-160z"/></svg>\';function P(r,e=!1){let t=new Array(r)'
+HTML += b';for(let i=0;i<r;i++)t[i]=i;if(e)for(let i=0;i<r;i++){let s='
+HTML += b'Math.floor(Math.random()*r),a=Math.floor(Math.random()*r),o='
+HTML += b't[s];t[s]=t[a],t[a]=o}return t}function _(r,e,t=-1){if(t<0&&'
+HTML += b'(t=r.length),t==1){e.push([...r]);return}for(let i=0;i<t;i++'
+HTML += b'){_(r,e,t-1);let s=t%2==0?i:0,a=r[s];r[s]=r[t-1],r[t-1]=a}}v'
+HTML += b'ar C=class r{constructor(e,t){this.m=e,this.n=t,this.v=new A'
+HTML += b'rray(e*t).fill("0")}getElement(e,t){return e<0||e>=this.m||t'
+HTML += b'<0||t>=this.n?"0":this.v[e*this.n+t]}resize(e,t,i){if(e<1||e'
+HTML += b'>50||t<1||t>50)return!1;let s=new r(e,t);s.v.fill(i);for(let'
+HTML += b' a=0;a<s.m;a++)for(let o=0;o<s.n;o++)s.v[a*s.n+o]=this.getEl'
+HTML += b'ement(a,o);return this.fromMatrix(s),!0}fromMatrix(e){this.m'
+HTML += b'=e.m,this.n=e.n,this.v=[...e.v]}fromString(e){this.m=e.split'
+HTML += b'("],").length,this.v=e.replaceAll("[","").replaceAll("]","")'
+HTML += b'.split(",").map(t=>t.trim()),this.n=this.v.length/this.m}get'
+HTML += b'MaxCellStrlen(){let e=0;for(let t of this.v)t.length>e&&(e=t'
+HTML += b'.length);return e}toTeXString(e=!1,t=!0){let i="";t?i+=e?"\\\\'
+HTML += b'left[\\\\begin{array}":"\\\\begin{bmatrix}":i+=e?"\\\\left(\\\\begin'
+HTML += b'{array}":"\\\\begin{pmatrix}",e&&(i+="{"+"c".repeat(this.n-1)+'
+HTML += b'"|c}");for(let s=0;s<this.m;s++){for(let a=0;a<this.n;a++){a'
+HTML += b'>0&&(i+="&");let o=this.getElement(s,a);try{o=f.parse(o).toT'
+HTML += b'exString()}catch{}i+=o}i+="\\\\\\\\"}return t?i+=e?"\\\\end{array}'
+HTML += b'\\\\right]":"\\\\end{bmatrix}":i+=e?"\\\\end{array}\\\\right)":"\\\\en'
+HTML += b'd{pmatrix}",i}},f=class r{constructor(){this.root=null,this.'
+HTML += b'src="",this.token="",this.skippedWhiteSpace=!1,this.pos=0}cl'
+HTML += b'one(){let e=new r;return e.root=this.root.clone(),e}getVars('
+HTML += b'e,t="",i=null){if(i==null&&(i=this.root),i.op.startsWith("va'
+HTML += b'r:")){let s=i.op.substring(4);(t.length==0||t.length>0&&s.st'
+HTML += b'artsWith(t))&&e.add(s)}for(let s of i.c)this.getVars(e,t,s)}'
+HTML += b'setVars(e,t=null){t==null&&(t=this.root);for(let i of t.c)th'
+HTML += b'is.setVars(e,i);if(t.op.startsWith("var:")){let i=t.op.subst'
+HTML += b'ring(4);if(i in e){let s=e[i].clone();t.op=s.op,t.c=s.c,t.re'
+HTML += b'=s.re,t.im=s.im}}}renameVar(e,t,i=null){i==null&&(i=this.roo'
+HTML += b't);for(let s of i.c)this.renameVar(e,t,s);i.op.startsWith("v'
+HTML += b'ar:")&&i.op.substring(4)===e&&(i.op="var:"+t)}eval(e,t=null)'
+HTML += b'{let s=d.const(),a=0,o=0,l=null;switch(t==null&&(t=this.root'
+HTML += b'),t.op){case"const":s=t;break;case"+":case"-":case"*":case"/'
+HTML += b'":case"^":{let n=this.eval(e,t.c[0]),h=this.eval(e,t.c[1]);s'
+HTML += b'witch(t.op){case"+":s.re=n.re+h.re,s.im=n.im+h.im;break;case'
+HTML += b'"-":s.re=n.re-h.re,s.im=n.im-h.im;break;case"*":s.re=n.re*h.'
+HTML += b're-n.im*h.im,s.im=n.re*h.im+n.im*h.re;break;case"/":a=h.re*h'
+HTML += b'.re+h.im*h.im,s.re=(n.re*h.re+n.im*h.im)/a,s.im=(n.im*h.re-n'
+HTML += b'.re*h.im)/a;break;case"^":l=new d("exp",[new d("*",[h,new d('
+HTML += b'"ln",[n])])]),s=this.eval(e,l);break}break}case".-":case"abs'
+HTML += b'":case"sin":case"sinc":case"cos":case"tan":case"cot":case"ex'
+HTML += b'p":case"ln":case"log":case"sqrt":{let n=this.eval(e,t.c[0]);'
+HTML += b'switch(t.op){case".-":s.re=-n.re,s.im=-n.im;break;case"abs":'
+HTML += b's.re=Math.sqrt(n.re*n.re+n.im*n.im),s.im=0;break;case"sin":s'
+HTML += b'.re=Math.sin(n.re)*Math.cosh(n.im),s.im=Math.cos(n.re)*Math.'
+HTML += b'sinh(n.im);break;case"sinc":l=new d("/",[new d("sin",[n]),n]'
+HTML += b'),s=this.eval(e,l);break;case"cos":s.re=Math.cos(n.re)*Math.'
+HTML += b'cosh(n.im),s.im=-Math.sin(n.re)*Math.sinh(n.im);break;case"t'
+HTML += b'an":a=Math.cos(n.re)*Math.cos(n.re)+Math.sinh(n.im)*Math.sin'
+HTML += b'h(n.im),s.re=Math.sin(n.re)*Math.cos(n.re)/a,s.im=Math.sinh('
+HTML += b'n.im)*Math.cosh(n.im)/a;break;case"cot":a=Math.sin(n.re)*Mat'
+HTML += b'h.sin(n.re)+Math.sinh(n.im)*Math.sinh(n.im),s.re=Math.sin(n.'
+HTML += b're)*Math.cos(n.re)/a,s.im=-(Math.sinh(n.im)*Math.cosh(n.im))'
+HTML += b'/a;break;case"exp":s.re=Math.exp(n.re)*Math.cos(n.im),s.im=M'
+HTML += b'ath.exp(n.re)*Math.sin(n.im);break;case"ln":case"log":s.re=M'
+HTML += b'ath.log(Math.sqrt(n.re*n.re+n.im*n.im)),a=Math.abs(n.im)<1e-'
+HTML += b'9?0:n.im,s.im=Math.atan2(a,n.re);break;case"sqrt":l=new d("^'
+HTML += b'",[n,d.const(.5)]),s=this.eval(e,l);break}break}default:if(t'
+HTML += b'.op.startsWith("var:")){let n=t.op.substring(4);if(n==="pi")'
+HTML += b'return d.const(Math.PI);if(n==="e")return d.const(Math.E);if'
+HTML += b'(n==="i")return d.const(0,1);if(n in e)return e[n];throw new'
+HTML += b' Error("eval-error: unknown variable \'"+n+"\'")}else throw ne'
+HTML += b'w Error("UNIMPLEMENTED eval \'"+t.op+"\'")}return s}static par'
+HTML += b'se(e){let t=new r;if(t.src=e,t.token="",t.skippedWhiteSpace='
+HTML += b'!1,t.pos=0,t.next(),t.root=t.parseExpr(!1),t.token!=="")thro'
+HTML += b'w new Error("remaining tokens: "+t.token+"...");return t}par'
+HTML += b'seExpr(e){return this.parseAdd(e)}parseAdd(e){let t=this.par'
+HTML += b'seMul(e);for(;["+","-"].includes(this.token)&&!(e&&this.skip'
+HTML += b'pedWhiteSpace);){let i=this.token;this.next(),t=new d(i,[t,t'
+HTML += b'his.parseMul(e)])}return t}parseMul(e){let t=this.parsePow(e'
+HTML += b');for(;!(e&&this.skippedWhiteSpace);){let i="*";if(["*","/"]'
+HTML += b'.includes(this.token))i=this.token,this.next();else if(!e&&t'
+HTML += b'his.token==="(")i="*";else if(this.token.length>0&&(this.isA'
+HTML += b'lpha(this.token[0])||this.isNum(this.token[0])))i="*";else b'
+HTML += b'reak;t=new d(i,[t,this.parsePow(e)])}return t}parsePow(e){le'
+HTML += b't t=this.parseUnary(e);for(;["^"].includes(this.token)&&!(e&'
+HTML += b'&this.skippedWhiteSpace);){let i=this.token;this.next(),t=ne'
+HTML += b'w d(i,[t,this.parseUnary(e)])}return t}parseUnary(e){return '
+HTML += b'this.token==="-"?(this.next(),new d(".-",[this.parseMul(e)])'
+HTML += b'):this.parseInfix(e)}parseInfix(e){if(this.token.length==0)t'
+HTML += b'hrow new Error("expected unary");if(this.isNum(this.token[0]'
+HTML += b')){let t=this.token;return this.next(),this.token==="."&&(t+'
+HTML += b'=".",this.next(),this.token.length>0&&(t+=this.token,this.ne'
+HTML += b'xt())),new d("const",[],parseFloat(t))}else if(this.fun1().l'
+HTML += b'ength>0){let t=this.fun1();this.next(t.length);let i=null;if'
+HTML += b'(this.token==="(")if(this.next(),i=this.parseExpr(e),this.to'
+HTML += b'ken+="",this.token===")")this.next();else throw Error("expec'
+HTML += b'ted \')\'");else i=this.parseMul(!0);return new d(t,[i])}else '
+HTML += b'if(this.token==="("){this.next();let t=this.parseExpr(e);if('
+HTML += b'this.token+="",this.token===")")this.next();else throw Error'
+HTML += b'("expected \')\'");return t.explicitParentheses=!0,t}else if(t'
+HTML += b'his.token==="|"){this.next();let t=this.parseExpr(e);if(this'
+HTML += b'.token+="",this.token==="|")this.next();else throw Error("ex'
+HTML += b'pected \'|\'");return new d("abs",[t])}else if(this.isAlpha(th'
+HTML += b'is.token[0])){let t="";return this.token.startsWith("pi")?t='
+HTML += b'"pi":this.token.startsWith("C1")?t="C1":this.token.startsWit'
+HTML += b'h("C2")?t="C2":t=this.token[0],t==="I"&&(t="i"),this.next(t.'
+HTML += b'length),new d("var:"+t,[])}else throw new Error("expected un'
+HTML += b'ary")}static compare(e,t,i={}){let o=new Set;e.getVars(o),t.'
+HTML += b'getVars(o);for(let l=0;l<10;l++){let n={};for(let k of o)k i'
+HTML += b'n i?n[k]=i[k]:n[k]=d.const(Math.random(),Math.random());let '
+HTML += b'h=e.eval(n),p=t.eval(n),u=h.re-p.re,c=h.im-p.im;if(Math.sqrt'
+HTML += b'(u*u+c*c)>1e-9)return!1}return!0}fun1(){let e=["abs","sinc",'
+HTML += b'"sin","cos","tan","cot","exp","ln","sqrt"];for(let t of e)if'
+HTML += b'(this.token.toLowerCase().startsWith(t))return t;return""}ne'
+HTML += b'xt(e=-1){if(e>0&&this.token.length>e){this.token=this.token.'
+HTML += b'substring(e),this.skippedWhiteSpace=!1;return}this.token="";'
+HTML += b'let t=!1,i=this.src.length;for(this.skippedWhiteSpace=!1;thi'
+HTML += b's.pos<i&&`\t\n `.includes(this.src[this.pos]);)this.skippedWhi'
+HTML += b'teSpace=!0,this.pos++;for(;!t&&this.pos<i;){let s=this.src[t'
+HTML += b'his.pos];if(this.token.length>0&&(this.isNum(this.token[0])&'
+HTML += b'&this.isAlpha(s)||this.isAlpha(this.token[0])&&this.isNum(s)'
+HTML += b')&&this.token!="C")return;if(`^%#*$()[]{},.:;+-*/_!<>=?|\t\n `'
+HTML += b'.includes(s)){if(this.token.length>0)return;t=!0}`\t\n `.inclu'
+HTML += b'des(s)==!1&&(this.token+=s),this.pos++}}isNum(e){return e.ch'
+HTML += b'arCodeAt(0)>=48&&e.charCodeAt(0)<=57}isAlpha(e){return e.cha'
+HTML += b'rCodeAt(0)>=65&&e.charCodeAt(0)<=90||e.charCodeAt(0)>=97&&e.'
+HTML += b'charCodeAt(0)<=122||e==="_"}toString(){return this.root==nul'
+HTML += b'l?"":this.root.toString()}toTexString(){return this.root==nu'
+HTML += b'll?"":this.root.toTexString()}},d=class r{constructor(e,t,i='
+HTML += b'0,s=0){this.op=e,this.c=t,this.re=i,this.im=s,this.explicitP'
+HTML += b'arentheses=!1}clone(){let e=new r(this.op,this.c.map(t=>t.cl'
+HTML += b'one()),this.re,this.im);return e.explicitParentheses=this.ex'
+HTML += b'plicitParentheses,e}static const(e=0,t=0){return new r("cons'
+HTML += b't",[],e,t)}compare(e,t=0,i=1e-9){let s=this.re-e,a=this.im-t'
+HTML += b';return Math.sqrt(s*s+a*a)<i}toString(){let e="";if(this.op='
+HTML += b'=="const"){let t=Math.abs(this.re)>1e-14,i=Math.abs(this.im)'
+HTML += b'>1e-14;t&&i&&this.im>=0?e="("+this.re+"+"+this.im+"i)":t&&i&'
+HTML += b'&this.im<0?e="("+this.re+"-"+-this.im+"i)":t&&this.re>0?e=""'
+HTML += b'+this.re:t&&this.re<0?e="("+this.re+")":i?e="("+this.im+"i)"'
+HTML += b':e="0"}else this.op.startsWith("var")?e=this.op.split(":")[1'
+HTML += b']:this.c.length==1?e=(this.op===".-"?"-":this.op)+"("+this.c'
+HTML += b'.toString()+")":e="("+this.c.map(t=>t.toString()).join(this.'
+HTML += b'op)+")";return e}toTexString(e=!1){let i="";switch(this.op){'
+HTML += b'case"const":{let s=Math.abs(this.re)>1e-9,a=Math.abs(this.im'
+HTML += b')>1e-9,o=s?""+this.re:"",l=a?""+this.im+"i":"";l==="1i"?l="i'
+HTML += b'":l==="-1i"&&(l="-i"),!s&&!a?i="0":(a&&this.im>=0&&s&&(l="+"'
+HTML += b'+l),i=o+l);break}case".-":i="-"+this.c[0].toTexString();brea'
+HTML += b'k;case"+":case"-":case"*":case"^":{let s=this.c[0].toTexStri'
+HTML += b'ng(),a=this.c[1].toTexString(),o=this.op==="*"?"\\\\cdot ":thi'
+HTML += b's.op;i="{"+s+"}"+o+"{"+a+"}";break}case"/":{let s=this.c[0].'
+HTML += b'toTexString(!0),a=this.c[1].toTexString(!0);i="\\\\frac{"+s+"}'
+HTML += b'{"+a+"}";break}case"sin":case"sinc":case"cos":case"tan":case'
+HTML += b'"cot":case"exp":case"ln":{let s=this.c[0].toTexString(!0);i+'
+HTML += b'="\\\\"+this.op+"\\\\left("+s+"\\\\right)";break}case"sqrt":{let s'
+HTML += b'=this.c[0].toTexString(!0);i+="\\\\"+this.op+"{"+s+"}";break}c'
+HTML += b'ase"abs":{let s=this.c[0].toTexString(!0);i+="\\\\left|"+s+"\\\\'
+HTML += b'right|";break}default:if(this.op.startsWith("var:")){let s=t'
+HTML += b'his.op.substring(4);switch(s){case"pi":s="\\\\pi";break}i=" "+'
+HTML += b's+" "}else{let s="warning: Node.toString(..):";s+=" unimplem'
+HTML += b'ented operator \'"+this.op+"\'",console.log(s),i=this.op,this.'
+HTML += b'c.length>0&&(i+="\\\\left({"+this.c.map(a=>a.toTexString(!0)).'
+HTML += b'join(",")+"}\\\\right)")}}return!e&&this.explicitParentheses&&'
+HTML += b'(i="\\\\left({"+i+"}\\\\right)"),i}};function te(r,e){let t=1e-9'
+HTML += b';if(f.compare(r,e))return!0;r=r.clone(),e=e.clone(),N(r.root'
+HTML += b'),N(e.root);let i=new Set;r.getVars(i),e.getVars(i);let s=[]'
+HTML += b',a=[];for(let n of i.keys())n.startsWith("C")?s.push(n):a.pu'
+HTML += b'sh(n);let o=s.length;for(let n=0;n<o;n++){let h=s[n];r.renam'
+HTML += b'eVar(h,"_C"+n),e.renameVar(h,"_C"+n)}for(let n=0;n<o;n++)r.r'
+HTML += b'enameVar("_C"+n,"C"+n),e.renameVar("_C"+n,"C"+n);s=[];for(le'
+HTML += b't n=0;n<o;n++)s.push("C"+n);let l=[];_(P(o),l);for(let n of '
+HTML += b'l){let h=r.clone(),p=e.clone();for(let c=0;c<o;c++)p.renameV'
+HTML += b'ar("C"+c,"__C"+n[c]);for(let c=0;c<o;c++)p.renameVar("__C"+c'
+HTML += b',"C"+c);let u=!0;for(let c=0;c<o;c++){let m="C"+c,k={};k[m]='
+HTML += b'new d("*",[new d("var:C"+c,[]),new d("var:K",[])]),p.setVars'
+HTML += b'(k);let v={};v[m]=d.const(Math.random(),Math.random());for(l'
+HTML += b'et b=0;b<o;b++)c!=b&&(v["C"+b]=d.const(0,0));let S=new d("ab'
+HTML += b's",[new d("-",[h.root,p.root])]),T=new f;T.root=S;for(let b '
+HTML += b'of a)v[b]=d.const(Math.random(),Math.random());let M=he(T,"K'
+HTML += b'",v)[0];p.setVars({K:d.const(M,0)}),v={};for(let b=0;b<o;b++'
+HTML += b')c!=b&&(v["C"+b]=d.const(0,0));if(f.compare(h,p,v)==!1){u=!1'
+HTML += b';break}}if(u&&f.compare(h,p))return!0}return!1}function he(r'
+HTML += b',e,t){let i=1e-11,s=1e3,a=0,o=0,l=1,n=888;for(;a<s;){t[e]=d.'
+HTML += b'const(o);let p=r.eval(t).re;t[e]=d.const(o+l);let u=r.eval(t'
+HTML += b').re;t[e]=d.const(o-l);let c=r.eval(t).re,m=0;if(u<p&&(p=u,m'
+HTML += b'=1),c<p&&(p=c,m=-1),m==1&&(o+=l),m==-1&&(o-=l),p<i)break;(m='
+HTML += b'=0||m!=n)&&(l/=2),n=m,a++}t[e]=d.const(o);let h=r.eval(t).re'
+HTML += b';return[o,h]}function N(r){for(let e of r.c)N(e);switch(r.op'
+HTML += b'){case"+":case"-":case"*":case"/":case"^":{let e=[r.c[0].op,'
+HTML += b'r.c[1].op],t=[e[0]==="const",e[1]==="const"],i=[e[0].startsW'
+HTML += b'ith("var:C"),e[1].startsWith("var:C")];i[0]&&t[1]?(r.op=r.c['
+HTML += b'0].op,r.c=[]):i[1]&&t[0]?(r.op=r.c[1].op,r.c=[]):i[0]&&i[1]&'
+HTML += b'&e[0]==e[1]&&(r.op=r.c[0].op,r.c=[]);break}case".-":case"abs'
+HTML += b'":case"sin":case"sinc":case"cos":case"tan":case"cot":case"ex'
+HTML += b'p":case"ln":case"log":case"sqrt":r.c[0].op.startsWith("var:C'
+HTML += b'")&&(r.op=r.c[0].op,r.c=[]);break}}function ie(r){r.feedback'
+HTML += b'Span.innerHTML="",r.numChecked=0,r.numCorrect=0;for(let i in'
+HTML += b' r.expected){let s=r.types[i],a=r.student[i],o=r.expected[i]'
+HTML += b';switch(s){case"bool":r.numChecked++,a===o&&r.numCorrect++;b'
+HTML += b'reak;case"string":{r.numChecked++;let l=r.gapInputs[i],n=a.t'
+HTML += b'rim().toUpperCase(),h=o.trim().toUpperCase().split("|"),p=!1'
+HTML += b';for(let u of h)if(Z(n,u)<=1){p=!0,r.numCorrect++,r.gapInput'
+HTML += b's[i].value=u,r.student[i]=u;break}l.style.color=p?"black":"w'
+HTML += b'hite",l.style.backgroundColor=p?"transparent":"maroon";break'
+HTML += b'}case"int":r.numChecked++,Math.abs(parseFloat(a)-parseFloat('
+HTML += b'o))<1e-9&&r.numCorrect++;break;case"float":case"term":{r.num'
+HTML += b'Checked++;try{let l=f.parse(o),n=f.parse(a),h=!1;r.src.is_od'
+HTML += b'e?h=te(l,n):h=f.compare(l,n),h&&r.numCorrect++}catch(l){r.de'
+HTML += b'bug&&(console.log("term invalid"),console.log(l))}break}case'
+HTML += b'"vector":case"complex":case"set":{let l=o.split(",");r.numCh'
+HTML += b'ecked+=l.length;let n=[];for(let h=0;h<l.length;h++)n.push(r'
+HTML += b'.student[i+"-"+h]);if(s==="set")for(let h=0;h<l.length;h++)t'
+HTML += b'ry{let p=f.parse(l[h]);for(let u=0;u<n.length;u++){let c=f.p'
+HTML += b'arse(n[u]);if(f.compare(p,c)){r.numCorrect++;break}}}catch(p'
+HTML += b'){r.debug&&console.log(p)}else for(let h=0;h<l.length;h++)tr'
+HTML += b'y{let p=f.parse(n[h]),u=f.parse(l[h]);f.compare(p,u)&&r.numC'
+HTML += b'orrect++}catch(p){r.debug&&console.log(p)}break}case"matrix"'
+HTML += b':{let l=new C(0,0);l.fromString(o),r.numChecked+=l.m*l.n;for'
+HTML += b'(let n=0;n<l.m;n++)for(let h=0;h<l.n;h++){let p=n*l.n+h;a=r.'
+HTML += b'student[i+"-"+p];let u=l.v[p];try{let c=f.parse(u),m=f.parse'
+HTML += b'(a);f.compare(c,m)&&r.numCorrect++}catch(c){r.debug&&console'
+HTML += b'.log(c)}}break}default:r.feedbackSpan.innerHTML="UNIMPLEMENT'
+HTML += b'ED EVAL OF TYPE "+s}}r.state=r.numCorrect==r.numChecked?w.pa'
+HTML += b'ssed:w.errors,r.updateVisualQuestionState();let e=r.state==='
+HTML += b'w.passed?q[r.language]:X[r.language],t=e[Math.floor(Math.ran'
+HTML += b'dom()*e.length)];r.feedbackPopupDiv.innerHTML=t,r.feedbackPo'
+HTML += b'pupDiv.style.color=r.state===w.passed?"green":"maroon",r.fee'
+HTML += b'dbackPopupDiv.style.display="block",setTimeout(()=>{r.feedba'
+HTML += b'ckPopupDiv.style.display="none"},500),r.state===w.passed?r.s'
+HTML += b'rc.instances.length>0?r.checkAndRepeatBtn.innerHTML=ee:r.che'
+HTML += b'ckAndRepeatBtn.style.display="none":r.checkAndRepeatBtn.inne'
+HTML += b'rHTML=I}var A=class{constructor(e,t,i,s){t.student[i]="",thi'
+HTML += b's.question=t,this.inputId=i,i.length==0&&(this.inputId="gap-'
+HTML += b'"+t.gapIdx,t.types[this.inputId]="string",t.expected[this.in'
+HTML += b'putId]=s,t.gapIdx++);let a=s.split("|"),o=0;for(let p=0;p<a.'
+HTML += b'length;p++){let u=a[p];u.length>o&&(o=u.length)}let l=g("");'
+HTML += b'e.appendChild(l);let n=Math.max(o*15,24),h=R(n);if(t.gapInpu'
+HTML += b'ts[this.inputId]=h,h.addEventListener("keyup",()=>{this.ques'
+HTML += b'tion.editedQuestion(),h.value=h.value.toUpperCase(),this.que'
+HTML += b'stion.student[this.inputId]=h.value.trim()}),l.appendChild(h'
+HTML += b'),this.question.showSolution&&(this.question.student[this.in'
+HTML += b'putId]=h.value=a[0],a.length>1)){let p=g("["+a.join("|")+"]"'
+HTML += b');p.style.fontSize="small",p.style.textDecoration="underline'
+HTML += b'",l.appendChild(p)}}},E=class{constructor(e,t,i,s,a,o){t.stu'
+HTML += b'dent[i]="",this.question=t,this.inputId=i,this.outerSpan=g("'
+HTML += b'"),this.outerSpan.style.position="relative",e.appendChild(th'
+HTML += b'is.outerSpan),this.inputElement=R(Math.max(s*12,48)),this.ou'
+HTML += b'terSpan.appendChild(this.inputElement),this.equationPreviewD'
+HTML += b'iv=x(),this.equationPreviewDiv.classList.add("equationPrevie'
+HTML += b'w"),this.equationPreviewDiv.style.display="none",this.outerS'
+HTML += b'pan.appendChild(this.equationPreviewDiv),this.inputElement.a'
+HTML += b'ddEventListener("click",()=>{this.question.editedQuestion(),'
+HTML += b'this.edited()}),this.inputElement.addEventListener("keyup",('
+HTML += b')=>{this.question.editedQuestion(),this.edited()}),this.inpu'
+HTML += b'tElement.addEventListener("focusout",()=>{this.equationPrevi'
+HTML += b'ewDiv.innerHTML="",this.equationPreviewDiv.style.display="no'
+HTML += b'ne"}),this.inputElement.addEventListener("keydown",l=>{let n'
+HTML += b'="abcdefghijklmnopqrstuvwxyz";n+="ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+HTML += b'",n+="0123456789",n+="+-*/^(). <>=|",o&&(n="-0123456789"),l.'
+HTML += b'key.length<3&&n.includes(l.key)==!1&&l.preventDefault();let '
+HTML += b'h=this.inputElement.value.length*12;this.inputElement.offset'
+HTML += b'Width<h&&(this.inputElement.style.width=""+h+"px")}),this.qu'
+HTML += b'estion.showSolution&&(t.student[i]=this.inputElement.value=a'
+HTML += b')}edited(){let e=this.inputElement.value.trim(),t="",i=!1;tr'
+HTML += b'y{let s=f.parse(e);i=s.root.op==="const",t=s.toTexString(),t'
+HTML += b'his.inputElement.style.color="black",this.equationPreviewDiv'
+HTML += b'.style.backgroundColor="green"}catch{t=e.replaceAll("^","\\\\h'
+HTML += b'at{~}").replaceAll("_","\\\\_"),this.inputElement.style.color='
+HTML += b'"maroon",this.equationPreviewDiv.style.backgroundColor="maro'
+HTML += b'on"}W(this.equationPreviewDiv,t,!0),this.equationPreviewDiv.'
+HTML += b'style.display=e.length>0&&!i?"block":"none",this.question.st'
+HTML += b'udent[this.inputId]=e}},V=class{constructor(e,t,i,s){this.pa'
+HTML += b'rent=e,this.question=t,this.inputId=i,this.matExpected=new C'
+HTML += b'(0,0),this.matExpected.fromString(s),this.matStudent=new C(t'
+HTML += b'his.matExpected.m==1?1:3,this.matExpected.n==1?1:3),t.showSo'
+HTML += b'lution&&this.matStudent.fromMatrix(this.matExpected),this.ge'
+HTML += b'nMatrixDom()}genMatrixDom(){let e=x();this.parent.innerHTML='
+HTML += b'"",this.parent.appendChild(e),e.style.position="relative",e.'
+HTML += b'style.display="inline-block";let t=document.createElement("t'
+HTML += b'able");e.appendChild(t);let i=this.matExpected.getMaxCellStr'
+HTML += b'len();for(let c=0;c<this.matStudent.m;c++){let m=document.cr'
+HTML += b'eateElement("tr");t.appendChild(m),c==0&&m.appendChild(this.'
+HTML += b'generateMatrixParenthesis(!0,this.matStudent.m));for(let k=0'
+HTML += b';k<this.matStudent.n;k++){let v=c*this.matStudent.n+k,S=docu'
+HTML += b'ment.createElement("td");m.appendChild(S);let T=this.inputId'
+HTML += b'+"-"+v;new E(S,this.question,T,i,this.matStudent.v[v],!1)}c='
+HTML += b'=0&&m.appendChild(this.generateMatrixParenthesis(!1,this.mat'
+HTML += b'Student.m))}let s=["+","-","+","-"],a=[0,0,1,-1],o=[1,-1,0,0'
+HTML += b'],l=[0,22,888,888],n=[888,888,-22,-22],h=[-22,-22,0,22],p=[t'
+HTML += b'his.matExpected.n!=1,this.matExpected.n!=1,this.matExpected.'
+HTML += b'm!=1,this.matExpected.m!=1],u=[this.matStudent.n>=10,this.ma'
+HTML += b'tStudent.n<=1,this.matStudent.m>=10,this.matStudent.m<=1];fo'
+HTML += b'r(let c=0;c<4;c++){if(p[c]==!1)continue;let m=g(s[c]);l[c]!='
+HTML += b'888&&(m.style.top=""+l[c]+"px"),n[c]!=888&&(m.style.bottom="'
+HTML += b'"+n[c]+"px"),h[c]!=888&&(m.style.right=""+h[c]+"px"),m.class'
+HTML += b'List.add("matrixResizeButton"),e.appendChild(m),u[c]?m.style'
+HTML += b'.opacity="0.5":m.addEventListener("click",()=>{this.matStude'
+HTML += b'nt.resize(this.matStudent.m+a[c],this.matStudent.n+o[c],"0")'
+HTML += b',this.genMatrixDom()})}}generateMatrixParenthesis(e,t){let i'
+HTML += b'=document.createElement("td");i.style.width="3px";for(let s '
+HTML += b'of["Top",e?"Left":"Right","Bottom"])i.style["border"+s+"Widt'
+HTML += b'h"]="2px",i.style["border"+s+"Style"]="solid";return this.qu'
+HTML += b'estion.language=="de"&&(e?i.style.borderTopLeftRadius="5px":'
+HTML += b'i.style.borderTopRightRadius="5px",e?i.style.borderBottomLef'
+HTML += b'tRadius="5px":i.style.borderBottomRightRadius="5px"),i.rowSp'
+HTML += b'an=t,i}};var w={init:0,errors:1,passed:2},H=class{constructo'
+HTML += b'r(e,t,i,s){this.state=w.init,this.language=i,this.src=t,this'
+HTML += b'.debug=s,this.instanceOrder=P(t.instances.length,!0),this.in'
+HTML += b'stanceIdx=0,this.choiceIdx=0,this.gapIdx=0,this.expected={},'
+HTML += b'this.types={},this.student={},this.gapInputs={},this.parentD'
+HTML += b'iv=e,this.questionDiv=null,this.feedbackPopupDiv=null,this.t'
+HTML += b'itleDiv=null,this.checkAndRepeatBtn=null,this.showSolution=!'
+HTML += b'1,this.feedbackSpan=null,this.numCorrect=0,this.numChecked=0'
+HTML += b'}reset(){this.instanceIdx=(this.instanceIdx+1)%this.src.inst'
+HTML += b'ances.length}getCurrentInstance(){let e=this.instanceOrder[t'
+HTML += b'his.instanceIdx];return this.src.instances[e]}editedQuestion'
+HTML += b'(){this.state=w.init,this.updateVisualQuestionState(),this.q'
+HTML += b'uestionDiv.style.color="black",this.checkAndRepeatBtn.innerH'
+HTML += b'TML=I,this.checkAndRepeatBtn.style.display="block",this.chec'
+HTML += b'kAndRepeatBtn.style.color="black"}updateVisualQuestionState('
+HTML += b'){let e="black",t="transparent";switch(this.state){case w.in'
+HTML += b'it:e="rgb(0,0,0)",t="transparent";break;case w.passed:e="rgb'
+HTML += b'(0,150,0)",t="rgba(0,150,0, 0.025)";break;case w.errors:e="r'
+HTML += b'gb(150,0,0)",t="rgba(150,0,0, 0.025)",this.numChecked>=5&&(t'
+HTML += b'his.feedbackSpan.innerHTML=""+this.numCorrect+" / "+this.num'
+HTML += b'Checked);break}this.questionDiv.style.color=this.feedbackSpa'
+HTML += b'n.style.color=this.titleDiv.style.color=this.checkAndRepeatB'
+HTML += b'tn.style.backgroundColor=this.questionDiv.style.borderColor='
+HTML += b'e,this.questionDiv.style.backgroundColor=t}populateDom(){if('
+HTML += b'this.parentDiv.innerHTML="",this.questionDiv=x(),this.parent'
+HTML += b'Div.appendChild(this.questionDiv),this.questionDiv.classList'
+HTML += b'.add("question"),this.feedbackPopupDiv=x(),this.feedbackPopu'
+HTML += b'pDiv.classList.add("questionFeedback"),this.questionDiv.appe'
+HTML += b'ndChild(this.feedbackPopupDiv),this.feedbackPopupDiv.innerHT'
+HTML += b'ML="awesome",this.debug&&"src_line"in this.src){let a=x();a.'
+HTML += b'classList.add("debugInfo"),a.innerHTML="Source code: lines "'
+HTML += b'+this.src.src_line+"..",this.questionDiv.appendChild(a)}if(t'
+HTML += b'his.titleDiv=x(),this.questionDiv.appendChild(this.titleDiv)'
+HTML += b',this.titleDiv.classList.add("questionTitle"),this.titleDiv.'
+HTML += b'innerHTML=this.src.title,this.src.error.length>0){let a=g(th'
+HTML += b'is.src.error);this.questionDiv.appendChild(a),a.style.color='
+HTML += b'"red";return}let e=this.getCurrentInstance();if(e!=null&&"__'
+HTML += b'svg_image"in e){let a=e.__svg_image.v,o=x();this.questionDiv'
+HTML += b'.appendChild(o);let l=document.createElement("img");o.append'
+HTML += b'Child(l),l.classList.add("img"),l.src="data:image/svg+xml;ba'
+HTML += b'se64,"+a}for(let a of this.src.text.c)this.questionDiv.appen'
+HTML += b'dChild(this.generateText(a));let t=x();this.questionDiv.appe'
+HTML += b'ndChild(t),t.classList.add("buttonRow");let i=Object.keys(th'
+HTML += b'is.expected).length>0;i&&(this.checkAndRepeatBtn=j(),t.appen'
+HTML += b'dChild(this.checkAndRepeatBtn),this.checkAndRepeatBtn.innerH'
+HTML += b'TML=I,this.checkAndRepeatBtn.style.backgroundColor="black");'
+HTML += b'let s=g("&nbsp;&nbsp;&nbsp;");if(t.appendChild(s),this.feedb'
+HTML += b'ackSpan=g(""),t.appendChild(this.feedbackSpan),this.debug){i'
+HTML += b'f(this.src.variables.length>0){let l=x();l.classList.add("de'
+HTML += b'bugInfo"),l.innerHTML="Variables generated by Python Code",t'
+HTML += b'his.questionDiv.appendChild(l);let n=x();n.classList.add("de'
+HTML += b'bugCode"),this.questionDiv.appendChild(n);let h=this.getCurr'
+HTML += b'entInstance(),p="",u=[...this.src.variables];u.sort();for(le'
+HTML += b't c of u){let m=h[c].t,k=h[c].v;switch(m){case"vector":k="["'
+HTML += b'+k+"]";break;case"set":k="{"+k+"}";break}p+=m+" "+c+" = "+k+'
+HTML += b'"<br/>"}n.innerHTML=p}let a=["python_src_html","text_src_htm'
+HTML += b'l"],o=["Python Source Code","Text Source Code"];for(let l=0;'
+HTML += b'l<a.length;l++){let n=a[l];if(n in this.src&&this.src[n].len'
+HTML += b'gth>0){let h=x();h.classList.add("debugInfo"),h.innerHTML=o['
+HTML += b'l],this.questionDiv.appendChild(h);let p=x();p.classList.add'
+HTML += b'("debugCode"),this.questionDiv.append(p),p.innerHTML=this.sr'
+HTML += b'c[n]}}}i&&this.checkAndRepeatBtn.addEventListener("click",()'
+HTML += b'=>{this.state==w.passed?(this.state=w.init,this.reset(),this'
+HTML += b'.populateDom()):ie(this)})}generateMathString(e){let t="";sw'
+HTML += b'itch(e.t){case"math":case"display-math":for(let i of e.c){le'
+HTML += b't s=this.generateMathString(i);i.t==="var"&&t.includes("!PM"'
+HTML += b')&&(s.startsWith("{-")?(s="{"+s.substring(2),t=t.replaceAll('
+HTML += b'"!PM","-")):t=t.replaceAll("!PM","+")),t+=s}break;case"text"'
+HTML += b':return e.d;case"plus_minus":{t+=" !PM ";break}case"var":{le'
+HTML += b't i=this.getCurrentInstance(),s=i[e.d].t,a=i[e.d].v;switch(s'
+HTML += b'){case"vector":return"\\\\left["+a+"\\\\right]";case"set":return'
+HTML += b'"\\\\left\\\\{"+a+"\\\\right\\\\}";case"complex":{let o=a.split(",")'
+HTML += b',l=parseFloat(o[0]),n=parseFloat(o[1]);return d.const(l,n).t'
+HTML += b'oTexString()}case"matrix":{let o=new C(0,0);return o.fromStr'
+HTML += b'ing(a),t=o.toTeXString(e.d.includes("augmented"),this.langua'
+HTML += b'ge!="de"),t}case"term":{try{t=f.parse(a).toTexString()}catch'
+HTML += b'{}break}default:t=a}}}return e.t==="plus_minus"?t:"{"+t+"}"}'
+HTML += b'generateText(e,t=!1){switch(e.t){case"paragraph":case"span":'
+HTML += b'{let i=document.createElement(e.t=="span"||t?"span":"p");for'
+HTML += b'(let s of e.c)i.appendChild(this.generateText(s));return i}c'
+HTML += b'ase"text":return g(e.d);case"code":{let i=g(e.d);return i.cl'
+HTML += b'assList.add("code"),i}case"italic":case"bold":{let i=g("");r'
+HTML += b'eturn i.append(...e.c.map(s=>this.generateText(s))),e.t==="b'
+HTML += b'old"?i.style.fontWeight="bold":i.style.fontStyle="italic",i}'
+HTML += b'case"math":case"display-math":{let i=this.generateMathString'
+HTML += b'(e);return y(i,e.t==="display-math")}case"string_var":{let i'
+HTML += b'=g(""),s=this.getCurrentInstance(),a=s[e.d].t,o=s[e.d].v;ret'
+HTML += b'urn a==="string"?i.innerHTML=o:(i.innerHTML="EXPECTED VARIAB'
+HTML += b'LE OF TYPE STRING",i.style.color="red"),i}case"gap":{let i=g'
+HTML += b'("");return new A(i,this,"",e.d),i}case"input":case"input2":'
+HTML += b'{let i=e.t==="input2",s=g("");s.style.verticalAlign="text-bo'
+HTML += b'ttom";let a=e.d,o=this.getCurrentInstance()[a];if(this.expec'
+HTML += b'ted[a]=o.v,this.types[a]=o.t,!i)switch(o.t){case"set":s.appe'
+HTML += b'nd(y("\\\\{"),g(" "));break;case"vector":s.append(y("["),g(" "'
+HTML += b'));break}if(o.t==="string")new A(s,this,a,this.expected[a]);'
+HTML += b'else if(o.t==="vector"||o.t==="set"){let l=o.v.split(","),n='
+HTML += b'l.length;for(let h=0;h<n;h++){h>0&&s.appendChild(g(" , "));l'
+HTML += b'et p=a+"-"+h;new E(s,this,p,l[h].length,l[h],!1)}}else if(o.'
+HTML += b't==="matrix"){let l=x();s.appendChild(l),new V(l,this,a,o.v)'
+HTML += b'}else if(o.t==="complex"){let l=o.v.split(",");new E(s,this,'
+HTML += b'a+"-0",l[0].length,l[0],!1),s.append(g(" "),y("+"),g(" ")),n'
+HTML += b'ew E(s,this,a+"-1",l[1].length,l[1],!1),s.append(g(" "),y("i'
+HTML += b'"))}else{let l=o.t==="int";new E(s,this,a,o.v.length,o.v,l)}'
+HTML += b'if(!i)switch(o.t){case"set":s.append(g(" "),y("\\\\}"));break;'
+HTML += b'case"vector":s.append(g(" "),y("]"));break}return s}case"ite'
+HTML += b'mize":return z(e.c.map(i=>U(this.generateText(i))));case"sin'
+HTML += b'gle-choice":case"multi-choice":{let i=e.t=="multi-choice",s='
+HTML += b'document.createElement("table"),a=e.c.length,o=this.debug==!'
+HTML += b'1,l=P(a,o),n=i?G:$,h=i?Y:J,p=[],u=[];for(let c=0;c<a;c++){le'
+HTML += b't m=l[c],k=e.c[m],v="mc-"+this.choiceIdx+"-"+m;u.push(v);let'
+HTML += b' S=k.c[0].t=="bool"?k.c[0].d:this.getCurrentInstance()[k.c[0'
+HTML += b'].d].v;this.expected[v]=S,this.types[v]="bool",this.student['
+HTML += b'v]=this.showSolution?S:"false";let T=this.generateText(k.c[1'
+HTML += b'],!0),M=document.createElement("tr");s.appendChild(M),M.styl'
+HTML += b'e.cursor="pointer";let D=document.createElement("td");p.push'
+HTML += b'(D),M.appendChild(D),D.innerHTML=this.student[v]=="true"?n:h'
+HTML += b';let b=document.createElement("td");M.appendChild(b),b.appen'
+HTML += b'dChild(T),i?M.addEventListener("click",()=>{this.editedQuest'
+HTML += b'ion(),this.student[v]=this.student[v]==="true"?"false":"true'
+HTML += b'",this.student[v]==="true"?D.innerHTML=n:D.innerHTML=h}):M.a'
+HTML += b'ddEventListener("click",()=>{this.editedQuestion();for(let L'
+HTML += b' of u)this.student[L]="false";this.student[v]="true";for(let'
+HTML += b' L=0;L<u.length;L++){let Q=l[L];p[Q].innerHTML=this.student['
+HTML += b'u[Q]]=="true"?n:h}})}return this.choiceIdx++,s}case"image":{'
+HTML += b'let i=x(),a=e.d.split("."),o=a[a.length-1],l=e.c[0].d,n=e.c['
+HTML += b'1].d,h=document.createElement("img");i.appendChild(h),h.clas'
+HTML += b'sList.add("img"),h.style.width=l+"%";let p={svg:"svg+xml",pn'
+HTML += b'g:"png",jpg:"jpeg"};return h.src="data:image/"+p[o]+";base64'
+HTML += b',"+n,i}default:{let i=g("UNIMPLEMENTED("+e.t+")");return i.s'
+HTML += b'tyle.color="red",i}}}};function ce(r,e){["en","de","es","it"'
+HTML += b',"fr"].includes(r.lang)==!1&&(r.lang="en"),e&&(document.getE'
+HTML += b'lementById("debug").style.display="block"),document.getEleme'
+HTML += b'ntById("date").innerHTML=r.date,document.getElementById("tit'
+HTML += b'le").innerHTML=r.title,document.getElementById("author").inn'
+HTML += b'erHTML=r.author,document.getElementById("courseInfo1").inner'
+HTML += b'HTML=O[r.lang];let t=\'<span onclick="location.reload()" styl'
+HTML += b'e="text-decoration: underline; font-weight: bold; cursor: po'
+HTML += b'inter">\'+K[r.lang]+"</span>";document.getElementById("course'
+HTML += b'Info2").innerHTML=F[r.lang].replace("*",t);let i=[],s=docume'
+HTML += b'nt.getElementById("questions"),a=1;for(let o of r.questions)'
+HTML += b'{o.title=""+a+". "+o.title;let l=x();s.appendChild(l);let n='
+HTML += b'new H(l,o,r.lang,e);n.showSolution=e,i.push(n),n.populateDom'
+HTML += b'(),e&&o.error.length==0&&n.checkAndRepeatBtn.click(),a++}}re'
+HTML += b'turn oe(pe);})();sell.init(quizSrc,debug);</script></body> <'
+HTML += b'/html> '
+HTML = HTML.decode('utf-8')
 # @end(html)
 
 
-if __name__ == "__main__":
+def main():
+    """the main function"""
 
     # get input and output path
     if len(sys.argv) < 2:
         print("usage: python sell.py [-J] INPUT_PATH.txt")
         print("   option -J enables to output a JSON file for debugging purposes")
-        exit(-1)
+        sys.exit(-1)
     write_explicit_json_file = "-J" in sys.argv
     input_path = sys.argv[-1]
     input_dirname = os.path.dirname(input_path)
     output_path = input_path.replace(".txt", ".html")
     output_debug_path = input_path.replace(".txt", "_DEBUG.html")
     output_json_path = input_path.replace(".txt", ".json")
-    if os.path.isfile(input_path) == False:
+    if os.path.isfile(input_path) is False:
         print("error: input file path does not exist")
-        exit(-1)
+        sys.exit(-1)
 
     # read input
-    f = open(input_path)
-    src = f.read()
-    f.close()
+    input_src: str = ""
+    with open(input_path, mode="r", encoding="utf-8") as f:
+        input_src = f.read()
 
     # compile
-    out = compile(input_dirname, src)
+    out = compile_input_file(input_dirname, input_src)
     output_debug_json = json.dumps(out)
     output_debug_json_formatted = json.dumps(out, indent=2)
     for question in out["questions"]:
@@ -1464,24 +1524,24 @@ if __name__ == "__main__":
 
     # write test output
     if write_explicit_json_file:
-        f = open(output_json_path, "w")
-        f.write(output_debug_json_formatted)
-        # f.write(output_debug_json)
-        f.close()
+        with open(output_json_path, "w", encoding="utf-8") as f:
+            f.write(output_debug_json_formatted)
 
     # write html
     # (a) debug version (*_DEBUG.html)
-    f = open(output_debug_path, "w")
-    f.write(
-        html.replace(
-            "let quizSrc = {};", "let quizSrc = " + output_debug_json + ";"
-        ).replace("let debug = false;", "let debug = true;")
-    )
-    f.close()
+    with open(output_debug_path, "w", encoding="utf-8") as f:
+        f.write(
+            HTML.replace(
+                "let quizSrc = {};", "let quizSrc = " + output_debug_json + ";"
+            ).replace("let debug = false;", "let debug = true;")
+        )
     # (b) release version (*.html)
-    f = open(output_path, "w")
-    f.write(html.replace("let quizSrc = {};", "let quizSrc = " + output_json + ";"))
-    f.close()
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(HTML.replace("let quizSrc = {};", "let quizSrc = " + output_json + ";"))
 
     # exit normally
     sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()

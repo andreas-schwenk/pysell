@@ -16,6 +16,7 @@ import subprocess
 print("pySELL builder - 2024 by Andreas Schwenk")
 
 if __name__ == "__main__":
+
     # build web
     try:
         # install web dependencies
@@ -29,19 +30,18 @@ if __name__ == "__main__":
         print("          https://nodejs.org/en/download/package-manager")
         print("[Debian]  sudo apt install nodejs npm")
         print("[macOS]   brew install node")
+
     # build html template and update sell.py
-    f = open("web/index.html")
-    index_html_lines = f.readlines()
-    f.close()
-    f = open("web/dist/sell.min.js")
-    js = f.read().strip()
-    f.close()
-    f = open("sell.py")
-    sell_py_lines = f.readlines()
-    f.close()
+    with open("web/index.html", mode="r", encoding="utf-8") as f:
+        index_html_lines = f.readlines()
+    with open("web/dist/sell.min.js", mode="r", encoding="utf-8") as f:
+        js = f.read().strip()
+    with open("sell.py", mode="r", encoding="utf-8") as f:
+        sell_py_lines = f.readlines()
+
     # remove code between @begin(test) and @end(test)
-    html = ""
-    skip = False
+    html: str = ""
+    skip: bool = False
     for line in index_html_lines:
         if "@begin(test)" in line:
             skip = True
@@ -49,8 +49,10 @@ if __name__ == "__main__":
             skip = False
         elif skip is False:
             html += line
+
     # remove white spaces
     html = html.replace("  ", "").replace("\n", " ")
+
     # insert javascript code
     html = html.replace(
         "</body>",
@@ -58,8 +60,9 @@ if __name__ == "__main__":
         + js
         + "sell.init(quizSrc,debug);</script></body>",
     )
+
     # update file "sell.py" between "# @begin(html" and "# @end(html)"
-    py = ""
+    py: str = ""
     skip = False
     for line in sell_py_lines:
         if "@begin(html)" in line:
@@ -69,19 +72,20 @@ if __name__ == "__main__":
             # begin HTML
             py += "# @begin(html)\n"
             # insert HTML as byte-strings
-            py += "html = b''\n"
+            py += "HTML: str = b''\n"
             html_bytes = html.encode("utf-8")
             while len(html_bytes) > 0:
-                py += "html += " + str(html_bytes[:60]) + "\n"
+                py += "HTML += " + str(html_bytes[:60]) + "\n"
                 html_bytes = html_bytes[60:]
-            py += "html = html.decode('utf-8')\n"
+            py += "HTML = HTML.decode('utf-8')\n"
             # end HTML
             py += "# @end(html)\n"
         elif skip is False:
             py += line
+
     # write new version of sell.py
-    f = open("sell.py", "w")
-    f.write(py.strip() + "\n")
+    with open("sell.py", mode="w", encoding="utf-8") as f:
+        f.write(py.strip() + "\n")
 
 # compile example
 res = subprocess.run(["python3", "sell.py", "-J", "examples/ex1.txt"], cwd=".")

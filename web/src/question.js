@@ -343,7 +343,10 @@ export class Question {
             // e.g. "[[1,2,3],[4,5,6]]" -> "\begin{pmatrix}1&2&3\\4%5%6\end{pmatrix}"
             let mat = new Matrix(0, 0);
             mat.fromString(value);
-            s = mat.toTeXString(node.d.includes("augmented"));
+            s = mat.toTeXString(
+              node.d.includes("augmented"),
+              this.language != "de"
+            );
             return s;
           }
           case "term": {

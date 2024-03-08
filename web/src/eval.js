@@ -12,6 +12,7 @@ import { levenshteinDistance } from "./ext.js";
 import { iconCheck, iconRepeat } from "./icons.js";
 import { feedbackErr, feedbackOK } from "./lang.js";
 import { Matrix, Term } from "./math.js";
+import { compareODE } from "./math_ODE.js";
 import { Question, QuestionState } from "./question.js";
 
 /**
@@ -83,7 +84,7 @@ export function evalQuestion(question) {
           let u = Term.parse(expected);
           let v = Term.parse(student);
           let ok = false;
-          if (question.src["is_ode"]) ok = Term.compareODE(u, v);
+          if (question.src["is_ode"]) ok = compareODE(u, v);
           else ok = Term.compare(u, v);
           if (ok) question.numCorrect++;
         } catch (e) {

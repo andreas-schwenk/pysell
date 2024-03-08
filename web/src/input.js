@@ -314,6 +314,12 @@ export class MatrixInput {
       cell.style["border" + side + "Width"] = "2px";
       cell.style["border" + side + "Style"] = "solid";
     }
+    if (this.question.language == "de") {
+      if (left) cell.style.borderTopLeftRadius = "5px";
+      else cell.style.borderTopRightRadius = "5px";
+      if (left) cell.style.borderBottomLeftRadius = "5px";
+      else cell.style.borderBottomRightRadius = "5px";
+    }
     cell.rowSpan = rowSpan;
     return cell;
   }

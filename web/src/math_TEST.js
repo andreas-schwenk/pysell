@@ -13,6 +13,7 @@
 import assert from "assert";
 
 import { TermNode, Term } from "./math.js";
+import { compareODE } from "./math_ODE.js";
 
 // TODO: compare e.g. "1/x" -> need to adjust compare implementation!!
 
@@ -122,7 +123,7 @@ for (let test of tests.split("\n")) {
     case "==ODE":
     case "!=ODE": {
       let eq = compareType === "==ODE";
-      assert.equal(Term.compareODE(Term.parse(tk[0]), Term.parse(tk[1])), eq);
+      assert.equal(compareODE(Term.parse(tk[0]), Term.parse(tk[1])), eq);
       break;
     }
   }

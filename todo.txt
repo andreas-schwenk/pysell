@@ -1,3 +1,6 @@
+# TODO (sell.py): embed variables into string via f"{v}"
+
+
 # TODO: comment all code (e.g. build.py, sell.py lines 186ff); explain why sell.py is only ONE large file; insert "ToC" into large files and explain classes roughly
 
 # TODO: split examples into files and add example questions for common math topics (ODE, diff, int, ...)
@@ -9,6 +12,7 @@
 # TODO: conditional feedback
 # TODO: debug-mode: show comments in python and text source code
 
+# TODO: doc: matrix/vector parentheses based on langauge (German: round, other: brackets)
 # TODO: doc: if a variable in math mode is a matrix and contains "augmented" as subterm, then it is represented as augmented matrix
 # TODO: doc: note on packages -> which error occurs, if e.g. numpy is NOT installed??
 # TODO: documentation for Conditional Multiple Choice (NOT available for single choice!)

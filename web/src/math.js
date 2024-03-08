@@ -35,6 +35,30 @@ export function range(n, shuffled = false) {
 }
 
 /**
+ * Generates all permutations of a list and writes the result
+ * into a matrix, where each row is a distinct permutation of
+ * the list.
+ * @param {number} k
+ * @param {number[]} list
+ * @param {number[][]} result
+ * @returns {void}
+ */
+export function heapsAlgorithm(list, result, k = -1) {
+  if (k < 0) k = list.length;
+  if (k == 1) {
+    result.push([...list]);
+    return;
+  }
+  for (let i = 0; i < k; i++) {
+    heapsAlgorithm(list, result, k - 1);
+    let j = k % 2 == 0 ? i : 0;
+    let t = list[j];
+    list[j] = list[k - 1];
+    list[k - 1] = t;
+  }
+}
+
+/**
  * Data structure to store stringified terms, i.e. the elements.
  */
 export class Matrix {
@@ -124,11 +148,13 @@ export class Matrix {
   /**
    * Converts the matrix to a TeX-string. Elements are converted recursively.
    * @param {boolean} [augmented=false]
+   * @param {boolean} [brackets=true] -- true: "["..."]", false: "("...")"
    * @returns {string}
    */
-  toTeXString(augmented = false) {
-    // TODO switch "[]" and "()" based on language
-    let s = augmented ? "\\left[\\begin{array}" : "\\begin{bmatrix}";
+  toTeXString(augmented = false, brackets = true) {
+    let s = "";
+    if (brackets) s += augmented ? "\\left[\\begin{array}" : "\\begin{bmatrix}";
+    else s += augmented ? "\\left(\\begin{array}" : "\\begin{pmatrix}";
     if (augmented) s += "{" + "c".repeat(this.n - 1) + "|c}";
     for (let i = 0; i < this.m; i++) {
       for (let j = 0; j < this.n; j++) {
@@ -143,7 +169,8 @@ export class Matrix {
       }
       s += "\\\\";
     }
-    s += augmented ? "\\end{array}\\right]" : "\\end{bmatrix}";
+    if (brackets) s += augmented ? "\\end{array}\\right]" : "\\end{bmatrix}";
+    else s += augmented ? "\\end{array}\\right)" : "\\end{pmatrix}";
     return s;
   }
 }
@@ -211,6 +238,25 @@ export class Term {
         node.c = x.c;
         node.re = x.re;
         node.im = x.im;
+      }
+    }
+  }
+
+  /**
+   * Renames variables
+   * @param {string} oldName
+   * @param {string} newName
+   * @param {TermNode} node
+   */
+  renameVar(oldName, newName, node = null) {
+    if (node == null) node = this.root;
+    for (let c of node.c) {
+      this.renameVar(oldName, newName, c);
+    }
+    if (node.op.startsWith("var:")) {
+      let id = node.op.substring(4);
+      if (id === oldName) {
+        node.op = "var:" + newName;
       }
     }
   }
@@ -549,11 +595,14 @@ export class Term {
    * Compares two terms numerically. E.g. "x+x" and "2x" are equal.
    * This method randomly sets all occurring variables to a (complex) number
    * and then evaluates both terms.
+   * Optionally, a predefined context, with variable values can be given.
+   * Then only those variables that are not predefined are set randomly.
    * @param {Term} tu
    * @param {Term} tv
+   * @param {Object.<string,TermNode>} [predefinedContext={}]
    * @return {boolean}
    */
-  static compare(tu, tv) {
+  static compare(tu, tv, predefinedContext = {}) {
     const EPS = 1e-9;
     const NUM_TESTS = 10; // TODO
     let vars = new Set();
@@ -562,8 +611,10 @@ export class Term {
     for (let i = 0; i < NUM_TESTS; i++) {
       /** @type {Object.<string,TermNode>} */
       let context = {};
-      for (let v of vars)
-        context[v] = TermNode.const(Math.random(), Math.random());
+      for (let v of vars) {
+        if (v in predefinedContext) context[v] = predefinedContext[v];
+        else context[v] = TermNode.const(Math.random(), Math.random());
+      }
       let r1 = tu.eval(context); // TODO: catch DIV/0, ... -> test again
       let r2 = tv.eval(context); // TODO: catch DIV/0, ... -> test again
       let dre = r1.re - r2.re;
@@ -572,134 +623,6 @@ export class Term {
       if (abs > EPS) return false;
     }
     return true;
-  }
-
-  /**
-   * Compares two ODE strings. For example, valid solutions for
-   *     y'(x) = -2*x^2 / y(x)    are
-   *     sqrt(2/3)*sqrt(C-2*x^3)  [output from wolframalpha.com]   and
-   *     sqrt(C-12*x^3)/3         [output from sympy]
-   * Challenge: C_k can be replaced by any valid term that involves one or more
-   *     occurrences of C_k, as well as constants. For example, we may write
-   *     "sqrt(3*C+5)" instead of just "C". If we would compare both solutions
-   *     terms from the examples above numerically, i.e. by replacing C_k and x
-   *     with random numbers (equally numbers for both terms), then the test
-   *     would fail; even it should success.
-   * Too keep the math engine in this file simple, we use the following "trick"
-   * that is sufficient for math questions (but NOT for the real world...)
-   * (a) Compare both terms numerically, with all C_k := 0.
-   *     If this test fails, then both terms are unequal and we return FAILED.
-   * (b) To verify that C_k is used in an appropriate context, we reduce each
-   *     term to its "fundamental structure" and compare these new terms.
-   *     For example "sqrt(2/3)*sqrt(C-2*x^3)" becomes "sqrt(C-x)", and
-   *     "sqrt(C-12*x^3)/3" becomes "sqrt(C-x)" again. If the reduced terms
-   *     are equal, then the ODE term comparison SUCCEEDS.
-   *     Refer to method prepareODEconstantComparison(..) for more detail.
-   * @param {Term} tu
-   * @param {Term} tv
-   * @return {boolean}
-   */
-  static compareODE(tu, tv) {
-    // implementation of (a)
-    let tuClone = tu.clone();
-    let tvClone = tv.clone();
-    let constantVars = new Set();
-    tuClone.getVars(constantVars, "C");
-    tvClone.getVars(constantVars, "C");
-    /** @type {Object.<string,TermNode>} */
-    let context = {};
-    for (let v of constantVars.keys()) {
-      context[v] = TermNode.const(0, 0);
-    }
-    tuClone.setVars(context);
-    tvClone.setVars(context);
-    if (Term.compare(tuClone, tvClone) == false) {
-      return false;
-    }
-    // implementation of (b)
-    // TODO: special visual feedback for students, if only (b) fails
-    tuClone = tu.clone();
-    tvClone = tv.clone();
-    tuClone.prepareODEconstantComparison();
-    tvClone.prepareODEconstantComparison();
-    return Term.compare(tuClone, tvClone);
-  }
-
-  /**
-   * TODO: allow swapping of constants!!
-   * TODO: update comments to new implementation
-   *
-   * Numerical term comparison provides a testing-scope, that involves
-   * replacing all occurring variables with random numbers (same values for
-   * same variables in both terms; also refer to method "compare").
-   * "Proving" the equality for solutions of ODEs of order "n" is more
-   * challenging, since constants C_k \in \CC, with 0 < k < n, may be
-   * given ambiguously.
-   * For example, terms "sqrt(sin(2*C)+x^3)" and "sqrt(C+x^3)" must be
-   * considered equal.
-   * This method optimizes the occurrences of constants, i.e. removes any
-   * operations that involves constants and C.
-   * The Term Rewriting System (TRS) is specified as follows:
-   *   unary_op(C)           -> C      (e.g. unary minus)
-   *   binary_op(C,constant) -> C      (e.g. addition)
-   *   binary_op(constant,C) -> C      (e.g. addition)
-   *   function(C)           -> C      (e.g. the sine-function)
-   * @param {TermNode} node
-   * @return {void}
-   */
-  prepareODEconstantComparison(node = null) {
-    if (node == null) node = this.root;
-    for (let c of node.c) {
-      this.prepareODEconstantComparison(c);
-    }
-    switch (node.op) {
-      case "+":
-      case "-":
-      case "*":
-      case "/":
-      case "^": {
-        let op = [node.c[0].op, node.c[1].op];
-        let isConst = [op[0] === "const", op[1] === "const"];
-        let isVar = [op[0].startsWith("var:"), op[1].startsWith("var:")];
-        if (isVar[0] && isConst[1]) {
-          node.op = node.c[0].op;
-          node.c = [];
-        } else if (isVar[1] && isConst[0]) {
-          node.op = node.c[1].op;
-          node.c = [];
-        } else if (isVar[0] && isVar[1] && op[0] == op[1]) {
-          node.op = node.c[0].op;
-          node.c = [];
-        } else if (isConst[0]) {
-          node.op = node.c[1].op;
-          node.c = node.c[1].c;
-        } else if (isConst[1]) {
-          node.op = node.c[0].op;
-          node.c = node.c[0].c;
-        }
-        break;
-      }
-      case ".-":
-      case "abs":
-      case "sin":
-      case "sinc":
-      case "cos":
-      case "tan":
-      case "cot":
-      case "exp":
-      case "ln":
-      case "log":
-      case "sqrt":
-        if (node.c[0].op.startsWith("var:")) {
-          node.op = node.c[0].op;
-          node.c = [];
-        } else if (node.c[0].op === "const") {
-          node.op = "const";
-          node.re = node.im = 0;
-          node.c = [];
-        }
-        break;
-    }
   }
 
   /**
