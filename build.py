@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
     # update file "sell.py" between "# @begin(html" and "# @end(html)"
     py: str = ""
-    skip = False
+    skip: bool = False
     for line in sell_py_lines:
         if "@begin(html)" in line:
             skip = True

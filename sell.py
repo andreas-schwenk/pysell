@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# pylint: disable=too-many-lines
+
 """
 ======= pySELL =================================================================
         
@@ -41,6 +43,11 @@ import sys
 from typing import Self
 
 
+class SellError(Exception):
+    """exception"""
+
+
+# pylint: disable-next=too-few-public-methods
 class Lexer:
     """Scanner that takes a string input and returns a sequence of tokens;
     one at a time."""
@@ -186,6 +193,8 @@ skipVariables = [
 # function in Python scripts, embedded into the question descriptions.
 # It is an alternative version for "range", that excludes the zero.
 # This is beneficial for drawing random numbers of questions for math classes.
+# (the next line disables a warning, about camel-case function names)
+# pylint: disable-next=invalid-name
 def rangeZ(*a):
     """implements 'range', but excludes the zero"""
     r = []
@@ -211,6 +220,7 @@ class TextNode:
         self.data: str = data
         self.children: list[TextNode] = []
 
+    # pylint: disable-next=too-many-branches,too-many-statements
     def parse(self) -> None:
         """parses text recursively"""
         if self.type == "root":
@@ -257,7 +267,7 @@ class TextNode:
                     text = ")".join(option.split(")")[1:]).strip()
                 if option.startswith("[!"):
                     # conditionally set option
-                    # !!! TODO: check, if variable exists and is of type bool
+                    # TODO: check, if variable exists and is of type bool
                     var_id = option[2:].split("]")[0]
                     node.children.append(TextNode("var", var_id))
                 else:
@@ -295,7 +305,7 @@ class TextNode:
                 pass
 
         else:
-            raise Exception("unimplemented")
+            raise SellError("unimplemented")
 
     def parse_image(self) -> Self:
         """parses an image inclusion"""
@@ -324,6 +334,7 @@ class TextNode:
             span.children.append(self.parse_item(lex))
         return span
 
+    # pylint: disable-next=too-many-return-statements
     def parse_item(self, lex: Lexer, math_mode=False) -> Self:
         """parses a single item of a span/paragraph"""
         if not math_mode and lex.token == "*":
@@ -378,7 +389,7 @@ class TextNode:
         if lex.token == "$":
             math.type = "display-math"
             lex.next()
-        while lex.token != "" and lex.token != "$":
+        while lex.token not in ("", "$"):
             math.children.append(self.parse_item(lex, True))
         if lex.token == "$":
             lex.next()
@@ -438,6 +449,7 @@ class TextNode:
         }
 
 
+# pylint: disable-next=too-many-instance-attributes
 class Question:
     """Question of the quiz"""
 
@@ -482,6 +494,7 @@ class Question:
         self.post_process_text(self.text)
         self.text.optimize()
 
+    # pylint: disable-next=too-many-branches
     def post_process_text(self, node: TextNode, math=False) -> None:
         """post processes the textual part. For example, a semantical check
         for the existing of referenced variables is applied. Also images
@@ -529,7 +542,7 @@ class Question:
             if img_type not in supported_img_types:
                 self.error += f"ERROR: image type '{img_type}' is not supported. "
                 self.error += f"Use one of {', '.join(supported_img_types)}"
-            elif os.path.isfile(path) == False:
+            elif os.path.isfile(path) is False:
                 self.error += "ERROR: cannot find image at path '" + path + '"'
             else:
                 # load image
@@ -568,18 +581,21 @@ class Question:
             self.error += "Remove the call show(), "
             self.error += "since this would result in MANY open windows :-)"
 
+    # pylint: disable-next=too-many-locals,too-many-branches,too-many-statements
     def run_python_code(self) -> dict:
         """Runs the questions python code and gathers all local variables."""
-        locals = {}
+        local_variables = {}
         res = {}
         src = self.python_src
         try:
-            exec(src, globals(), locals)
+            # pylint: disable-next=exec-used
+            exec(src, globals(), local_variables)
+        # pylint: disable-next=broad-exception-caught
         except Exception as e:
             # print(e)
             self.error += str(e) + ". "
             return res
-        for local_id, value in locals.items():
+        for local_id, value in local_variables.items():
             if local_id in skipVariables or (local_id not in self.python_src_tokens):
                 continue
             type_str = str(type(value))
@@ -648,9 +664,8 @@ class Question:
             self.error += "ERROR: Wrong usage of Python imports. Refer to pySELL docs!"
             # TODO: write the docs...
 
-        if "matplotlib" in self.python_src:
-            import matplotlib.pyplot as plt
-
+        if "matplotlib" in self.python_src and "plt" in local_variables:
+            plt = local_variables["plt"]
             buf = io.BytesIO()
             plt.savefig(buf, format="svg", transparent=True)
             buf.seek(0)
@@ -678,6 +693,7 @@ class Question:
             "python_src_tokens": list(self.python_src_tokens),
         }
 
+    # pylint: disable-next=too-many-branches,too-many-statements
     def syntax_highlight_text_line(self, src: str) -> str:
         """syntax highlights a single questions text line and returns the
         formatted code in HTML format"""
