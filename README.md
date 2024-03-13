@@ -4,6 +4,8 @@
 
 `pySELL` is a Python-based Simple E-Learning Language for the rapid creation of interactive STEM quizzes, with a focus on randomized math questions.
 
+Quizzes can be used on mobile devices.
+
 Compared to other solutions (e.g. `STACK` questions), `pySELL` has NO technological runtime dependencies, except `katex` for math rendering. Generated quizzes consist each of one self-contained HTML file. Theses files can be hosted on a web-server or imported to an existing LMS courses (e.g. _Moodle_ via "file upload", or _Ilias_ via "HTML course").
 
 Student answers are not stored on servers, so `pySELL` quizzes provide an 100 % anonymous training. This is very well received by students on their first contact with new topics.
