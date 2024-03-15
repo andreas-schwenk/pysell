@@ -40,6 +40,14 @@ export let feedbackOK = {
   fr: ["génial", "super", "correct", "bien fait"],
 };
 
+export let feedbackIncomplete = {
+  en: ["fill all fields"],
+  de: ["bitte alles ausfüllen"],
+  es: ["por favor, rellene todo"],
+  it: ["compilare tutto"],
+  fr: ["remplis tout s'il te plait"],
+};
+
 export let feedbackErr = {
   en: ["try again", "still some mistakes", "wrong answer", "no"],
   de: ["leider falsch", "nicht richtig", "versuch's nochmal"],

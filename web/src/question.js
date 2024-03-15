@@ -36,6 +36,7 @@ export let QuestionState = {
   init: 0, // not evaluated
   errors: 1, // evaluated with errors
   passed: 2, // evaluated with no errors
+  incomplete: 3, // some fields are not filled
 };
 
 /**
@@ -134,6 +135,7 @@ export class Question {
     let color2 = "transparent";
     switch (this.state) {
       case QuestionState.init:
+      case QuestionState.incomplete:
         color1 = "rgb(0,0,0)";
         color2 = "transparent";
         break;

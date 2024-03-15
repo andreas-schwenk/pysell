@@ -1,0 +1,22 @@
+# v1.2.1
+
+- feedback for unfilled input fields
+
+# v1.2.0
+
+- the title line is split in case it is too long (prevents enabling horizontal page scroll on mobile devices)
+- fixed many pylint warnings
+- removed the explicit import of matplotlib
+
+# v1.1.0
+
+- improved comparison of ODE solutions
+- bug fixes
+
+# v1.0.1
+
+- bug fixes
+
+# v1.0.0
+
+- first release
