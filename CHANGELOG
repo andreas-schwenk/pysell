@@ -1,3 +1,8 @@
+# v1.2.2
+
+- bug fix: filled matrix elements vanished after resizing the matrix
+- minor bug fixes
+
 # v1.2.1
 
 - feedback for unfilled input fields

@@ -30,8 +30,6 @@ export class GapInput {
    * @param {string} solutionString -- the sample solution
    */
   constructor(parent, question, inputId, solutionString) {
-    // initialize the students answer to "unset"
-    question.student[inputId] = "";
     /** @type {Question} */
     this.question = question;
     /** @type {string} */
@@ -39,11 +37,13 @@ export class GapInput {
     if (inputId.length == 0) {
       // generate a new id, if the input does not correspond to a variable,
       // but the solution was given directly as string in the text.
-      this.inputId = "gap-" + question.gapIdx;
+      this.inputId = inputId = "gap-" + question.gapIdx;
       question.types[this.inputId] = "string";
       question.expected[this.inputId] = solutionString;
       question.gapIdx++;
     }
+    // initialize the students answer to "unset" in case it does not yet exist
+    if (inputId in question.student == false) question.student[inputId] = "";
     // split the solution string into single answers
     let expectedList = solutionString.split("|");
     // get the maximum number of characters (to estimate the width of the input)
@@ -86,6 +86,7 @@ export class TermInput {
    * @param {number} numChars -- number of characters for the width-estimation
    * @param {string} solutionString -- the sample solution
    * @param {boolean} integersOnly -- if true, then only numbers can be entered
+   * @param {boolean} forceSolution -- if true, the solution string will be set, regardless of question.showSolution
    */
   constructor(
     parent,
@@ -93,10 +94,11 @@ export class TermInput {
     inputId,
     numChars,
     solutionString,
-    integersOnly
+    integersOnly,
+    forceSolution = false
   ) {
-    // initialize the students answer to "unset"
-    question.student[inputId] = "";
+    // initialize the students answer to "unset" in case it does not yet exist
+    if (inputId in question.student == false) question.student[inputId] = "";
     /** @type {Question} */
     this.question = question;
     /** @type {string} */
@@ -149,7 +151,7 @@ export class TermInput {
         this.inputElement.style.width = "" + requiredWidth + "px";
     });
     // for debugging purposes
-    if (this.question.showSolution)
+    if (forceSolution || this.question.showSolution)
       question.student[inputId] = this.inputElement.value = solutionString;
   }
 
@@ -207,13 +209,14 @@ export class MatrixInput {
     );
     if (question.showSolution) this.matStudent.fromMatrix(this.matExpected);
     // generate the DOM
-    this.genMatrixDom();
+    this.genMatrixDom(true);
   }
 
   /**
    * Generate the DOM (HTMLTable and children)
+   * @param {boolean} initial -- true, iff generated the first time
    */
-  genMatrixDom() {
+  genMatrixDom(initial) {
     // we need an additional HTMLDivElement that contains both the table for the
     // matrix, as well as the resizing buttons ("+" and "-")
     let div = genDiv();
@@ -247,7 +250,8 @@ export class MatrixInput {
           elementId,
           maxCellStrlen,
           this.matStudent.v[idx],
-          false
+          false,
+          !initial
         );
       }
       // insert a column for the right (rendered by a bordered HTMLDivElement)
@@ -290,12 +294,24 @@ export class MatrixInput {
         btn.style.opacity = "0.5";
       } else {
         btn.addEventListener("click", () => {
+          // set values from input to matrix elements
+          for (let u = 0; u < this.matStudent.m; u++) {
+            for (let v = 0; v < this.matStudent.n; v++) {
+              let idx = u * this.matStudent.n + v;
+              let id = this.inputId + "-" + idx;
+              let value = this.question.student[id];
+              this.matStudent.v[idx] = value;
+              delete this.question.student[id];
+            }
+          }
+          // resize matrix (and reuse old values if feasible)
           this.matStudent.resize(
             this.matStudent.m + deltaM[i],
             this.matStudent.n + deltaN[i],
-            "0"
+            ""
           );
-          this.genMatrixDom();
+          // generate DOM
+          this.genMatrixDom(false);
         });
       }
     }

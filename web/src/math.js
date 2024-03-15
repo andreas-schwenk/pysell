@@ -76,13 +76,13 @@ export class Matrix {
   }
 
   /**
-   * Returns the term of element (i,j), or "0" if the index is invalid.
+   * Returns the term of element (i,j), or "" if the index is invalid.
    * @param {number} i
    * @param {number} j
    * @returns {string}
    */
   getElement(i, j) {
-    if (i < 0 || i >= this.m || j < 0 || j >= this.n) return "0";
+    if (i < 0 || i >= this.m || j < 0 || j >= this.n) return "";
     return this.v[i * this.n + j];
   }
 

@@ -162,7 +162,7 @@ export function evalQuestion(question) {
           for (let j = 0; j < mat.n; j++) {
             let idx = i * mat.n + j;
             student = question.student[id + "-" + idx];
-            if (student.length == 0) isComplete = false;
+            if (student != undefined && student.length == 0) isComplete = false;
             let e = mat.v[idx];
             try {
               let u = Term.parse(e);
