@@ -66,6 +66,8 @@ export class Question {
     this.instanceIdx = 0;
     /** @type {number} -- distinct index for every multiple or single choice */
     this.choiceIdx = 0;
+    /** @type {boolean} -- true, iff one ore more single choice blocks are involved */
+    this.includesSingleChoice = false;
     /** @type {number} -- distinct index for every gap field */
     this.gapIdx = 0;
     /** @type {Object.<string,string>} -- the expected solution (variable -> stringified solution) */
@@ -94,6 +96,8 @@ export class Question {
     this.numCorrect = 0;
     /** @type {number} -- number of checked answers */
     this.numChecked = 0;
+    /** @type {boolean} -- true, iff the question as a check button */
+    this.hasCheckButton = true;
   }
 
   /**
@@ -146,7 +150,10 @@ export class Question {
       case QuestionState.errors:
         color1 = "rgb(150,0,0)";
         color2 = "rgba(150,0,0, 0.025)";
-        if (this.numChecked >= 5) {
+        if (this.includesSingleChoice == false && this.numChecked >= 5) {
+          // TODO: support this feedback, if there are answer fields beyond
+          // single-choice. Currently, each single-choice option increments
+          // this.numChecked; so scoring feedback is turned off.
           this.feedbackSpan.innerHTML =
             "" + this.numCorrect + " / " + this.numChecked;
         }
@@ -216,8 +223,8 @@ export class Question {
     this.questionDiv.appendChild(buttonDiv);
     buttonDiv.classList.add("buttonRow");
     // (a) check button
-    let hasCheckButton = Object.keys(this.expected).length > 0;
-    if (hasCheckButton) {
+    this.hasCheckButton = Object.keys(this.expected).length > 0;
+    if (this.hasCheckButton) {
       this.checkAndRepeatBtn = genButton();
       buttonDiv.appendChild(this.checkAndRepeatBtn);
       this.checkAndRepeatBtn.innerHTML = iconCheck;
@@ -280,7 +287,7 @@ export class Question {
       }
     }
     // evaluation
-    if (hasCheckButton) {
+    if (this.hasCheckButton) {
       this.checkAndRepeatBtn.addEventListener("click", () => {
         if (this.state == QuestionState.passed) {
           this.state = QuestionState.init;
@@ -519,6 +526,7 @@ export class Question {
       case "single-choice":
       case "multi-choice": {
         let mc = node.t == "multi-choice";
+        if (!mc) this.includesSingleChoice = true;
         let table = document.createElement("table");
         let n = node.c.length;
         let shuffled = this.debug == false;

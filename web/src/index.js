@@ -51,7 +51,7 @@ export function init(quizSrc, debug) {
     question.populateDom();
     if (debug && questionSrc.error.length == 0) {
       // if the debug version is active, evaluate the question immediately
-      question.checkAndRepeatBtn.click();
+      if (question.hasCheckButton) question.checkAndRepeatBtn.click();
     }
     idx++;
   }

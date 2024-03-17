@@ -1,3 +1,9 @@
+# v1.2.3
+
+- bug fix: single-choice answers with at least 5 options no longer produce strange progress hints to the student
+- bug fix: variables from Python code are now forbidden to be asked twice or more. Instead an error is shown and the teacher is requested to declare distinct variables per input field.
+- bug fix: questions without answer field have previously thrown an exception in the debug output HTML-file.
+
 # v1.2.2
 
 - bug fix: filled matrix elements vanished after resizing the matrix

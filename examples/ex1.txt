@@ -6,6 +6,10 @@ AUTHOR  Andreas Schwenk
 # this is a comment line
 
 
+QUESTION Empty Question
+This is a pure question text without any input fields.
+
+
 QUESTION Single-Choice
 Mark the correct answer
 (x) This answer is **correct**
@@ -17,6 +21,7 @@ QUESTION Multiple-Choice
 Mark the correct answer(s)
 [x] This answer is correct
 [x] This answer is correct
+[ ] This answer is incorrect
 [ ] This answer is incorrect
 
 
