@@ -651,6 +651,7 @@ class Question:
                 # e.g. 'Matrix([[-1, 0, -2], [-1, 5*sin(x)*cos(x)/7, 2], [-1, 2, 0]])'
                 t = "matrix"
                 v = str(value)[7:-1]
+                v = v.replace("**", "^")
             elif (
                 type_str == "<class 'numpy.matrix'>"
                 or type_str == "<class 'numpy.ndarray'>"
