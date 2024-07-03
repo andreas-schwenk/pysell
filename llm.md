@@ -44,6 +44,8 @@ The question code starts and ends with `"""` on separate lines.
 
 The code itself follows, written in pure Python. It should be concise and understandable.
 
+Variable names must NOT use underscores (`_`). Use camelCase instead.
+
 Only the `random` and `math` libraries should be used for simple questions. If the result may contain real numbers, use the `sympy` library.
 
 Example:
@@ -66,8 +68,6 @@ Mathematical equations can be embedded using TeX. Enclose equations with dollar 
 Identifiers within equations refer to variables from the question code if a variable with the same name exists. Otherwise, the name is displayed. Input fields for student answers are created by preceding a variable name with `%`. These input fields must be outside of mathematical equations.
 
 Input types must be one of the following: integer values, fractions, vectors, matrices, or terms. Real-valued solutions are not expected to be solved by students.
-
-Variable names must not use underscores (`_`). Use camelCase instead.
 
 Itemizations can be created by starting a line with `-` to begin a new item.
 
