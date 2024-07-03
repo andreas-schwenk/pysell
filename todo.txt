@@ -1,3 +1,13 @@
+
+# TODO: audio feedback
+# TODO: LaTeX between questions (-> complete course)
+# TODO: Pysell Diff example: switch randomly sin/cos
+# TODO: pySELL: sets/vectors with terms working??
+# TODO: venv tutorial for READEME.md in pySELL repo
+# TODO: Add  GitHub link to readme md in sell.py
+# TODO: !! pysell: moodle/ilias guide
+# TODO: !! arg for using local katex 
+
 # TODO (sell.py): embed variables into string via f"{v}"
 
 
@@ -95,3 +105,49 @@ Berechne die folgenden Restklassen und gib jeweils den **Standardrepräsentaten*
 - $ a \cdot (b + c \cdot 2^{d}) \mod n1 = $ #x
 ---
 
+
+--------------
+
++++ tODO: start with JavaScript as student language!
+
+
+QUESTION Addition
+"""
+import random
+x = random.randint(1,10)
+y = random.randint(1,10)
+z = x + y
+"""
+$x+y=$ %z
+
+
+QUESTION Addition
+"""js
+x = Math.floor(Math.random()*10);
+y = Math.floor(Math.random()*10);
+z = x + y;
+"""
+$x+y=$ %z
+
+
+
+QUESTION (JavaScript) Functions
+Write a JavaScript function `function add(x, y)` that adds
+two numbers and returns the result. \\
+%javascript `function add(x, y) {
+    return x + y;
+}`
+"""js
+assert(add(3,5)==8);
+"""
+
+
+
+QUESTION (Python) Functions
+Write a Python function `def add(x,y)` that adds
+two numbers and returns the result. \\
+%python `def add(x, y):
+    return x + y`
+"""js
+assert(add(3,5)==8);
+"""
