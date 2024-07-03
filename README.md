@@ -2,19 +2,19 @@
 
 ![](docs/logo-white-bg.svg)
 
-`pySELL` is a Python-based Simple E-Learning Language for the rapid creation of interactive STEM quizzes, with a focus on randomized math questions.
+`pySELL` is a Python-based Simple E-Learning Language designed for the rapid creation of interactive STEM quizzes, with a focus on randomized math questions.
 
-Quizzes can be used on mobile devices.
+Quizzes created with `pySELL` can be used on mobile devices.
 
-Compared to other solutions (e.g. `STACK` questions), `pySELL` has NO technological runtime dependencies, except `katex` for math rendering. Generated quizzes consist each of one self-contained HTML file. Theses files can be hosted on a web-server or imported to an existing LMS courses (e.g. _Moodle_ via "file upload", or _Ilias_ via "HTML course").
+Compared to other solutions (e.g., `STACK` questions), `pySELL` has NO technological runtime dependencies, except for `katex` for math rendering. Each generated quiz consists of a single self-contained HTML file. These files can be hosted on a web server or imported into existing LMS courses (e.g., _Moodle_ via "file upload" or _Ilias_ via "HTML course").
 
-Student answers are not stored on servers, so `pySELL` quizzes provide an 100 % anonymous training. This is very well received by students on their first contact with new topics.
+Student answers are not stored on servers, ensuring that `pySELL` quizzes provide 100% anonymous training. This anonymity is highly appreciated by students when first engaging with new topics.
 
-Teachers benefit from a simple to learn syntax. After some practice, even sophisticated questions can be generated with very little time investment.
+Teachers benefit from a simple-to-learn syntax. With some practice, even sophisticated questions can be generated with minimal time investment.
 
-If you are using `pySELL` in one of your (university) classes, I would love to hear about it! Write a mail with feedback / bug reports / feature requests to `contact@compiler-construction.com`
+If you are using `pySELL` in one of your (university) classes, I would love to hear about it! Please send feedback, bug reports, or feature requests to `contact@compiler-construction.com`.
 
-As a member of the Free Software Foundation (FSF), I decided to publish `pySELL` as free and open-source software under the license of `GPLv3`.
+As a member of the Free Software Foundation (FSF), I have decided to publish `pySELL` as free and open-source software under the `GPLv3` license.
 
 ![](docs/example.jpg)
 
@@ -204,6 +204,18 @@ _Hint: if a question as no input fields, the evaluation button is not shown._
 <!-- TODO: write about types (impl is WIP):
 int, float, set, matrix
 -->
+
+### LLM generated questions
+
+Generating questions can be time-consuming, but Large Language Models (LLMs) like ChatGPT can assist.
+
+Use the following prompt to generate questions:
+
+```
+Generate 10 questions for students in a math course on the topic of complex numbers using the pySELL formal language. The pySELL language is defined here: https://raw.githubusercontent.com/andreas-schwenk/pysell/main/llm.md. Ensure that each question is correctly formatted according to the pySELL specification and covers a range of topics related to complex numbers, including arithmetic operations, modulus, argument, conjugate, and forms of representation.
+```
+
+_Note that the specification in the `llm.md` file is not yet complete. Additionally, the quality of generated questions may not be perfect and may require human post-correction._
 
 ### Hints on generating random variables
 
