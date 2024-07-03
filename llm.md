@@ -132,4 +132,15 @@ y = random.randint(10, 20)
 z = x - y
 """
 Calculate $x - y = $ %z
+
+
+QUESTION Differentiation
+"""
+from sympy import *
+x = symbols('x')
+f = 3 * cos(x)
+d = diff(f,x)
+"""
+$"f"(x)=f$ \\
+$"f"'(x)=$ %d
 ```
