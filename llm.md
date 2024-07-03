@@ -65,6 +65,8 @@ Mathematical equations can be embedded using TeX within dollar signs, e.g., `$x^
 
 Identifiers within equations refer to variables from the question code if a variable with the same name exists. Otherwise, the name is displayed. Input fields for student answers are created by preceding a variable name with `%`. These input fields must be outside of mathematical equations.
 
+Variable names must not use underscores (`_`). Use camelCase instead.
+
 Itemizations can be created by starting a line with `-` to begin a new item.
 
 Instead of input fields for numerical inputs, you can also create single-choice and multiple-choice questions. It is also possible to combine different types of questions within a single question.
