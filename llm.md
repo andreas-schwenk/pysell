@@ -44,7 +44,7 @@ The question code starts and ends with `"""` on separate lines.
 
 The code itself follows, written in pure Python. It should be concise and understandable.
 
-Only the `random` and `math` libraries should be used.
+Only the `random` and `math` libraries should be used for simple questions. If the result may contain real numbers, use the `sympy` library.
 
 Example:
 
@@ -59,11 +59,13 @@ z = x + y
 
 ## The Question Text
 
-The question text is mainly plain text.
+The question text is primarily plain text. To keep lines short, use line breaks. Insert ` \\` at the end of the line to create a line break.
 
-Mathematical equations can be embedded using TeX within dollar signs, e.g., `$x^2 + y^2 = z^2$`.
+Mathematical equations can be embedded using TeX. Enclose equations with dollar signs (`$`). For example: `The equation is $x^2 + y^2 = z^2$. Some more text follows.`. Note that dollar signs are not allowed within the equations themselves.
 
 Identifiers within equations refer to variables from the question code if a variable with the same name exists. Otherwise, the name is displayed. Input fields for student answers are created by preceding a variable name with `%`. These input fields must be outside of mathematical equations.
+
+Input types must be one of the following: integer values, fractions, vectors, matrices, or terms. Real-valued solutions are not expected to be solved by students.
 
 Variable names must not use underscores (`_`). Use camelCase instead.
 
