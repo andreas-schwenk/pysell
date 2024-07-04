@@ -155,7 +155,7 @@ All text shown to the student is written as plain text. Formatting options are a
 
 - **Bold text** is enclosed in double asterisks `**` (e.g., `math can be **challenging**`).
 
-- Embedded code is enclosed in backticks `\``.
+- Embedded code is enclosed in backticks `` ` ``.
 
 - Items in a list are preceded by `-`.
 
