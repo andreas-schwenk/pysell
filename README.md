@@ -20,27 +20,27 @@ As a member of the Free Software Foundation (FSF), I have decided to publish `py
 
 ## User Guide
 
-Download file [`sell.py`](https://raw.githubusercontent.com/andreas-schwenk/pysell/main/sell.py) from this repository. Only this single file is required. All other files are used for the development of `pySELL`.
+Download the file [`sell.py`](https://raw.githubusercontent.com/andreas-schwenk/pysell/main/sell.py) from this repository. This is the only file required; all other files are used for the development of `pySELL`.
 
-Run `python3 sell.py FILENAME.txt` to generate a self-contained quiz-website `FILENAME.html` from sources in `FILENAME.txt`. You will find an example below, and more examples in directory `examples/`.
+Run `python3 sell.py FILENAME.txt` to generate a self-contained quiz website `FILENAME.html` from the sources in `FILENAME.txt`. An example is provided below, with more examples available in the `examples/` directory.
 
-Also a file `FILENAME_debug.html` is created, which can be used for debugging purposes. The debug output differs to the release files in the following aspects:
+Additionally, a file `FILENAME_debug.html` is created for debugging purposes. The debug output differs from the release files in the following aspects:
 
 - The sample solution is rendered in the input fields
-- All questions are evaluated directly, for testing the evaluation
-- Single and multiple choice answers are displayed in static order
+- All questions are evaluated directly for testing purposes
+- Single and multiple-choice answers are displayed in a static order
 - Python and text sources are displayed with syntax highlighting
-- The line numbers of the source file are shown for each exercise
+- Line numbers from the source file are shown for each exercise
 
-If you like to use `SageMath` in your code, then run `sage -python sell.py FILENAME.txt`.
+If you would like to use `SageMath` in your code, run `sage -python sell.py FILENAME.txt`.
 
 _A short developer guide can be found at the end of this document._
 
 ## Dependencies
 
-**Users:** Only vanilla Python 3 is required to create basic questions. If you like to use symbolic calculations in your questions, then also `sympy` should be installed (`pip install sympy`). If you require linear algebra, for example `numpy` can be used (`pip install numpy`). For enabling plots, `matplotlib` is supported (`pip install matplotlib`). Also `SageMath` can be used.
+**Users:** Only vanilla Python 3 is required to create basic questions. If you want to use symbolic calculations in your questions, you should also install `sympy` (`pip install sympy`). For linear algebra, you can use `numpy` (`pip install numpy`). To enable plotting, `matplotlib` is supported (`pip install matplotlib`). You can also use `SageMath` for advanced mathematical computations.
 
-**Developers:** Node.js + a local web server for debugging the web code (or alternatively install the recommended VS-code extension in this repository).
+**Developers:** Node.js and a local web server are recommended for debugging the web code. Alternatively, you can install the recommended VS Code extension available in this repository.
 
 ## Example
 
@@ -129,77 +129,77 @@ What is shown in the image?
 
 ## Syntax
 
-This section describes the syntax of `pySELL`. Many aspects are self-explanatory and can be derived from the [example file](https://github.com/andreas-schwenk/pysell/blob/main/examples/ex1.txt).
+This section describes the syntax of `pySELL`. Many aspects are self-explanatory and can be understood from the [example file](https://github.com/andreas-schwenk/pysell/blob/main/examples/ex1.txt).
 
 ### Global
 
-- `LANG` defines the natural language, used in the few built-in output strings. Currently, `en`, `de`, `es`, `it`, `fr` are supported.
+- `LANG` defines the natural language used in the few built-in output strings. Currently supported languages are `en`, `de`, `es`, `it`, and `fr`.
 
-- `TITLE` defines the title of the page. You may include HTML-code, but everything must be written in the same line, where the title-keyword starts.
+- `TITLE` defines the title of the page. You may include HTML code, but everything must be written on the same line where the title keyword starts.
 
-- `AUTHOR` defines the author/institution of the quizzes. You may include HTML-code, but everything must be written in the same line, where the author-keyword starts.
+- `AUTHOR` defines the author or institution of the quizzes. You may include HTML code, but everything must be written on the same line where the author keyword starts.
 
-- `QUESTION` marks the beginning of a new question. The title of the question is written into the same line.
+- `QUESTION` marks the beginning of a new question. The title of the question should be written on the same line.
 
-- `#` introduces a comment, i.e. text that is not considered by the compiler.
+- `#` introduces a comment, i.e., text that is not considered by the compiler.
 
 ### Questions
 
-A question consists of a textual part, and optionally of Python code that generates random variables and calculates the sample solution.
+A question consists of a textual part and optionally includes Python code that generates random variables and calculates the sample solution.
 
 **Question text**
 
 All text shown to the student is written as plain text. Formatting options are as follows:
 
-- Italic text is embedded into a pair of single asterisks `*` (e.g. `math is *cool*`).
+- _Italic text_ is enclosed in single asterisks `*` (e.g., `math is *cool*`).
 
-- Bold text is embedded into a pair of double asterisks `**` (e.g. `math can be **challenging**`).
+- **Bold text** is enclosed in double asterisks `**` (e.g., `math can be **challenging**`).
 
-- Embedded code is written into a pair of accent graves `\``.
+- Embedded code is enclosed in backticks `\``.
 
-- Itemizations are preceded by `-`.
+- Items in a list are preceded by `-`.
 
-- TeX-based inline math is embedded into a pair of `$` (e.g. `$\sqrt{x^2+y^2}$` for $\sqrt{x^2+y^2}$).
+- TeX-based inline math is enclosed in dollar signs `$` (e.g., `$\sqrt{x^2+y^2}$` for $\sqrt{x^2+y^2}$).
 
-- TeX-based display style math is embedded into a pair of `$$` (display mode in inline math can also be activated in inline math mode by writing e.g. `$\displaystyle \sum_{i=1}^n i^2$`).
+- TeX-based display style math is enclosed in double dollar signs `$$`. Display mode in inline math can also be activated by writing, e.g., `$\displaystyle \sum_{i=1}^n i^2$`.
 
-- Multiple-Choice questions are preceded by `[x]` for correct answers, or `[ ]` for incorrect answers, respectively. The text is separated by a space (e.g. `[x] This answer is correct`).
+- Multiple-choice questions use `[x]` for correct answers and `[ ]` for incorrect answers, with text separated by a space (e.g., `[x] This answer is correct`).
 
-- Single-Choice questions are preceded by `(x)` for the correct answer, and `( )` for incorrect answers, respectively. Only one answer can be true. (e.g. `( ) This answer is incorrect`).
+- Single-choice questions use `(x)` for the correct answer and `( )` for incorrect answers. Only one answer can be true (e.g., `( ) This answer is incorrect`).
 
-- A line break can be forced by `\\` at the end of a line (e.g. `A new paragraph will start after this line. \\`).
+- A line break can be forced with `\\` at the end of a line (e.g., `A new paragraph will start after this line. \\`).
 
-- Static images can be included with `!`, following the path and optionally following the width in percentage (path and width are separated by `:`). For example, `!myImage.svg:25` shows the image in path `myImage.svg` with a width of `25%` (related to the question box). File paths are relative to the currently translated `pySELL` input file. If the width is omitted, `100%` is assumed. Supported image formats are `svg`, `png`, and `jpg`. Note that image data is directly embedded into the output files, so you do not need to publish them separately. You should care about the file size of images! Usually, `svg` files are very small for vector graphics (hint: use the tool `pdf2svg` to generate SVG-files from PDF-files. The latter can e.g. be generated by `tikZ`). For dynamic plots via `matplotlib`, read the next section.
+- Static images can be included with `!`, followed by the path and optionally the width in percentage (path and width are separated by `:`). For example, `!myImage.svg:25` shows the image located at `myImage.svg` with a width of `25%` relative to the question box. If the width is omitted, `100%` is assumed. Supported image formats are `svg`, `png`, and `jpg`. Note that image data is directly embedded into the output files, so you do not need to publish them separately. Be mindful of image file sizes. SVG files are usually very small for vector graphics (hint: use the tool `pdf2svg` to generate SVG files from PDF files. The latter can be generated by `tikZ`). For dynamic plots via `matplotlib`, refer to the next section.
 
 **Question code**
 
-To generate randomized variables, arbitrary Python-Code can be evaluated (this is secure, since the code is executed only locally on the teachers computer).
+To generate randomized variables, arbitrary Python code can be evaluated (this is secure, as the code is executed only locally on the teacher's computer).
 
-For each question that includes randomization (the compiler checks, if your Python code contains the string `rand`), 5 distinct instances are drawn. If you use a bad randomization, some instances may be equal. In case that you won't use random numbers, there will be only one instance.
+For each question that includes randomization (the compiler checks if your Python code contains the string `rand`), 5 distinct instances are drawn. If your randomization is poor, some instances may be identical. If no random numbers are used, only one instance will be created.
 
-- Python code is embedded into a pair of `"""`. The triple-quotations must be written in distinct lines, without any other characters in these lines. Python code must be provided **before** its variables are accessed in the textual part.
+- Python code is embedded within a pair of triple quotes `"""`. The triple quotes must be on separate lines without any other characters on these lines. Python code must be provided **before** its variables are accessed in the textual part.
 
-- Variables denoted in math mode are replaced by its actual values (the execution environment randomly chooses one of the 5 instances). This behavior can be suppressed by embedding the variable name into double quotes (e.g. write `"x"` instead of just `x`).
+- Variables denoted in math mode are replaced by their actual values (the execution environment randomly selects one of the 5 instances). This behavior can be suppressed by embedding the variable name in double quotes (e.g., write `"x"` instead of just `x`).
 
-  **Warning: Variable names with underscore (e.g. `x_1`) are not allowed, since the underscore would be ambiguous in TeX.**
+**Warning: Variable names with underscores (e.g., `x_1`) are not allowed, as the underscore can cause ambiguity in TeX.**
 
-- Input fields are generated by `%`, followed by the referred variable name. The structure of the input field depends on the variable type of the variable (`int`, `set`, `numpy.array`, ...). If the variable is non-scalar, parentheses (or brackets, or braces) will be rendered around vectors/sets/... To suppress theses parentheses, write `%!`, followed by the variable name. This is e.g. used in the _Fibonacci_ example in the example file. Example: `The answer is %answer`.
+- Input fields are generated using `%`, followed by the variable name. The structure of the input field depends on the type of the variable (`int`, `set`, `numpy.array`, etc.). If the variable is non-scalar, parentheses (or brackets, or braces) will be rendered around vectors/sets/etc. To suppress these parentheses, write `%!` followed by the variable name. This is used, for example, in the _Fibonacci_ example in the example file. Example: `The answer is %answer`.
 
-- In general, variables can only be accessed within math mode (i.e. in `$...$`). If you like to use Python-generated variables of type `str` (strings) seamlessly in the question text, use the ampersand operator `&`, followed by the variable name in text mode. Example: `Today I feel &mood`.
+- In general, variables can only be accessed within math mode (i.e., in `$...$`). To use Python-generated variables of type `str` (strings) seamlessly in the question text, use the ampersand operator `&`, followed by the variable name in text mode. Example: `Today I feel &mood`.
 
-- For asking gap questions, use `%`, followed the expected word(s), embedded into double quotes (e.g. `%"three"`). If you like to accept more than one answer, separate the words by the pipe operator `|`. Example: `%"three|tres|trois|tre"`.
+- To create gap questions, use `%` followed by the expected word(s), enclosed in double quotes (e.g., `%"three"`). To accept multiple answers, separate the words with the pipe operator `|`. Example: `%"three|tres|trois|tre"`.
 
-- Dynamic gaps can be created with Python code. Just generate a string variable (e.g. `answer = "three|tres"`) and ask it exactly as for number inputs (e.g. `%answer`)
+- Dynamic gaps can be created with Python code. Generate a string variable (e.g., `answer = "three|tres"`) and ask it exactly as for number inputs (e.g., `%answer`).
 
 - For static or dynamic plots, refer to the `Plot` example in the examples. `pySELL` supports using `matplotlib`.
 
-_Hint: if a question as no input fields, the evaluation button is not shown._
+_Hint: If a question has no input fields, the evaluation button is not shown._
 
 **Important notes**
 
-- Consider to exclude Python variables from the output. For example, `matplotlib` requires to define axes. The $x$-vector `x = np.linspace(-10,10,1000)` has length 1000. `pySELL` will write that to the question database by default, so you should write `del x` at the end of your Python code, to exclude `x`.
+- Consider excluding certain Python variables from the output. For example, `matplotlib` requires defining axes, and the $x$-vector `x = np.linspace(-10,10,1000)` has a length of 1000. By default, `pySELL` will include this in the question database. To prevent this, you should write `del x` at the end of your Python code to exclude `x`.
 
-- In general, you may import arbitrary Python libraries. `pySELL` will do its best to map data types to internal data types (e.g. some commonly used `sage` data types are mapped). For all unimplemented types, the variable is considered to be a _term_ and the value is exported by `str(my_var)`. This may work, or may not. Feel free to ask the author of `pySELL` to extend support of missing/exotic data types.
+- In general, you may import arbitrary Python libraries. `pySELL` will attempt to map data types to its internal data types (e.g., some commonly used `sage` data types are mapped). For all unimplemented types, the variable is considered a _term_ and the value is exported using `str(my_var)`. This may work or may not. Feel free to ask the author of `pySELL` to extend support for missing or exotic data types.
 
 <!-- TODO: write about types (impl is WIP):
 int, float, set, matrix
