@@ -1,3 +1,8 @@
+# v1.2.4
+
+- bug fix: the internal counter for single/multiple choice sections was not reset after retrying a question
+- bug fix: context-sensitive boolean variables were not correctly compared.
+
 # v1.2.3
 
 - bug fix: single-choice answers with at least 5 options no longer produce strange progress hints to the student

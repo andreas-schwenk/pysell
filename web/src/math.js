@@ -13,6 +13,8 @@
  * Both terms must be treated equivalent.
  */
 
+// TODO: boolean
+
 /**
  * Given n, the list [0,1,...,n-1] (or a permutation in case "shuffled" is true)
  * is returned.

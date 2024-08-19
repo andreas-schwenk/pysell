@@ -42,7 +42,8 @@ export function evalQuestion(question) {
         // boolean types primarily occur in single/multiple choice questions.
         // boolean values are stringified as "true" and "false".
         question.numChecked++;
-        if (student === expected) question.numCorrect++;
+        if (student.toLowerCase() === expected.toLowerCase())
+          question.numCorrect++;
         break;
       case "string": {
         // gap question

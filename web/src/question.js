@@ -104,6 +104,8 @@ export class Question {
    * Gets the next instance.
    */
   reset() {
+    this.gapIdx = 0;
+    this.choiceIdx = 0;
     this.instanceIdx = (this.instanceIdx + 1) % this.src.instances.length;
   }
 
