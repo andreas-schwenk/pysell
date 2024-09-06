@@ -1,0 +1,233 @@
+LANG    de
+TITLE   Komplexe Zahlen
+AUTHOR  Andreas Schwenk
+
+
+QUESTION Addition
+"""
+import random
+[a,b,c,d] = random.sample(rangeZ(-5,5+1),k=4)
+u = a + b*1j
+v = c + d*1j
+w = u + v
+"""
+Seien $z_1=u$ und $z_2=v$ komplexe Zahlen. \\
+Berechne die folgende **Summe** und gebe das Ergebnis in Normalform an:
+- $z_1+z_2=$ %w
+
+
+QUESTION Multiplikation 1
+"""
+import random
+[a,b,c] = random.sample(rangeZ(-5,5+1),k=3)
+u = a + b*1j
+v = c*1j
+w = u * v
+"""
+Seien $z_1=u$ und $z_2=v$ komplexe Zahlen. \\
+Berechne das folgende **Produkt** und gebe das Ergebnis in Normalform an:
+- $z_1 \cdot z_2=$ %w
+
+
+QUESTION Multiplikation 2
+"""
+import random
+[a,b,c,d] = random.sample(rangeZ(-5,5+1),k=4)
+u = a + b*1j
+v = c + d*1j
+w = u * v
+"""
+Seien $z_1=u$ und $z_2=v$ komplexe Zahlen. \\
+Berechne das folgende **Produkt** und gebe das Ergebnis in Normalform an:
+- $z_1 \cdot z_2=$ %w
+
+
+QUESTION Komplex konjugierte Zahl
+"""
+import random
+[a,b] = random.sample(rangeZ(-5,5+1),k=2)
+z = a + b*1j
+c = a - b*1j
+z2 = z * c
+"""
+Sei $"z" \in \CC$ und $"z"=z$. \\
+Berechne die zu $"z"$ **komplex konjugierte** Zahl:
+- $\overline{"z"}=$ %c
+Berechne:
+- $"z" \cdot \overline{"z"}=$ %z2
+
+
+QUESTION Betrag einer komplexen Zahl
+"""
+import random
+[a,b] = random.sample(rangeZ(2,4+1),k=2)
+x = a**2 - b**2
+y = 2 * a * b
+z = x + y*1j
+r = abs(z)
+"""
+Sei $"z" \in \CC$ und $"z"=z$.
+- Berechne $|"z"|=$ %r
+
+
+QUESTION Inverse einer komplexen Zahl
+"""
+import random
+[a,b] = random.sample(rangeZ(2,5+1),k=2)
+c = a**2 + b**2
+r = a + b*1j
+"""
+Sei $"z" \in \CC$ und $z=\frac{a}{c}-\frac{b}{c} \cdot i $.
+- Berechne $\frac{1}{z}=$ %r
+
+
+QUESTION Division 1
+"""
+import random
+[a,b,c,d] = random.sample(rangeZ(2,5+1),k=4)
+a = 0        # simplification; next exercises is more difficult
+z2 = a + b*1j
+r = c + d*1j
+z1 = z2 * r
+"""
+Seien $z_1=z1$ und $z_2=z2$ komplexe Zahlen. \\
+Berechne den folgenden **Quotienten** und gebe das Ergebnis in Normalform an:
+- $\displaystyle \frac{z_1}{z_2}=$ %r
+
+
+QUESTION Division 2
+"""
+import random
+[a,b,c,d] = random.sample(rangeZ(2,5+1),k=4)
+a = random.choice(rangeZ(-1,1+1)) * a    # flip sign randomly
+z2 = a + b*1j
+r = c + d*1j
+z1 = z2 * r
+"""
+Seien $z_1=z1$ und $z_2=z2$ komplexe Zahlen. \\
+Berechne den folgenden **Quotienten** und gebe das Ergebnis in Normalform an:
+- $\frac{z_1}{z_2}=$ %r
+
+
+QUESTION Komplexe Terme
+"""
+import random
+[a,b,c,d] = random.choices(rangeZ(1,3+1),k=4)
+pow = 2
+z1 = a + b*1j
+z2 = c + d*1j
+res = z1**pow + z2
+"""
+Berechne den folgenden **komplexen Term** und gebe das Ergebnis in Normalform an:
+- $ (z1)^{pow} + z2 = $ %res
+
+
+QUESTION Umrechnung zwischen kartesischen Koordinaten und Polarkoordinaten
+Die kartesische Form $z=x+yi \in \CC$ lässt sich aus den Polarkoordinaten $(r,\varphi)$ wie folgt berechnen:
+(x) $x = r \cdot \cos(\varphi)$ und $y=r \cdot \sin(\varphi)$
+( ) $x = r \cdot \sin(\varphi)$ und $y=r \cdot \cos(\varphi)$
+
+
+QUESTION Umrechnung zwischen kartesischen Koordinaten und Polarkoordinaten
+Kreuze die richtigen Antworten zur Berechnung von $\varphi$ an:
+[x] Sei $x>0,~ y\geq 0$. Dann gilt: $\varphi=\arctan\left(\frac y x\right)$
+[x] Sei $x=0,~ y> 0$. Dann gilt: $\varphi=\frac{\pi}2$
+[ ] Sei $x>0,~ y\geq 0$. Dann gilt: $\varphi=\arctan\left(\frac x y\right)$
+[ ] Sei $x=0,~ y< 0$. Dann gilt: $\varphi=\frac{\pi}2$
+
+
+QUESTION Komplexe Folgen 1
+"""
+import random
+c = random.randint(2,4)
+z = c * 1j
+a1 = z**1
+a2 = z**2
+a3 = z**3
+"""
+Bestimme die ersten $3$ **Folgenglieder** der komplexen Folge $$(a_n)_{n \in \NN} = \left( \left(c \cdot i \right)^n\right)_{n \in \NN}$$
+- $n=1:$ %a1
+- $n=2:$ %a2
+- $n=3:$ %a3
+( ) Die Folge ist **konvergent**
+(x) Die Folge ist **divergent**
+
+
+QUESTION Komplexe Folgen 2
+"""
+import random
+from sympy import *
+c = random.randint(2,4)
+z = Rational(1,c) + Rational(1,c) * I
+a1 = z**1
+# must explicitly construct the normal form here,
+# since sympy is not available at frontend..
+[a1r,a1i] = (z**1).as_real_imag()
+[a2r,a2i] = (z**2).as_real_imag()
+"""
+Bestimme die **ersten beiden Folgenglieder** der komplexen Folge $$(a_n)_{n \in \NN} = \left( \left( \frac 1 c + \frac 1 c \cdot i \right)^n \right)_{n \in \NN}$$
+- $n=1:$ %a1r $ + $ %a1i $i$
+- $n=2:$ %a2r $ + $ %a2i $i$
+(x) Die Folge ist **konvergent**
+( ) Die Folge ist **divergent**
+
+
+QUESTION Komplexe Reihen
+"""
+import random
+[a,b] = random.sample(rangeZ(2,6+1),k=2)
+"""
+Ist die folgende geometrische Reihe **absolut konvergent**?
+$$\sum_{k=0}^{\infty} \left( \frac{1}{a} + \frac{1}{b} \cdot i \right)^k$$
+(x) ja
+( ) nein
+
+
+QUESTION Komplexe Nullstellen
+"""
+import random, math
+a = random.randint(2,8) ** 2
+z1 = math.sqrt(a) * 1j
+z2 = -z1
+res = {z1,z2}
+"""
+Gegeben sei das Polynom $$f(z) = z^2 + a$$
+Bestimme die beiden **Nullstellen**:
+- $z=$ %res
+
+
+QUESTION Quotienten von Polynomen
+"""
+import random, math
+[a,b,c,d] = random.sample(rangeZ(2,8+1),k=4)
+ee = random.randint(2,9) ** 2
+res = { 0, math.sqrt(ee)*1j, -math.sqrt(ee)*1j }
+"""
+Gegeben sei die folgende rationale Funktion:
+$$r(z) = \frac{(a+b i) \cdot z+c i+d}{z \cdot (z^2+ee)}$$
+Bestimme den Definitionsbereich $D_r = \CC \setminus X$
+- $X=$ %res
+
+
+QUESTION Konvergenzradius
+"""
+import random, math
+[a,b] = random.sample(rangeZ(2,10+1),k=2)
+z1 = a + b*1j
+res = 1
+"""
+Bestimme den **Konvergenzradius** der Potenzreihe
+$$\sum_{k=0}^{\infty} k \cdot (z1) \cdot z^k$$
+- $R=$ %res
+
+
+QUESTION Komplexe Potenzen
+"""
+import random, math
+a = random.randint(1,2)
+c = random.randint(4,8)
+z = a + a*1j
+res = z**c
+"""
+Berechne $(z)^c$ unter Verwendung der Exponentialform:
+- %res

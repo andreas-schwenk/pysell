@@ -1,0 +1,220 @@
+LANG    de
+TITLE   Differentialgleichungen
+AUTHOR  Andreas Schwenk
+
+
+QUESTION DGL erster Ordnung mit trennbaren Variablen
+"""
+import random
+from sympy import *
+y = Function('y')
+x = symbols('x')
+
+a = random.randint(2,5)
+f = Derivative(y(x), x) + a * x**2 / y(x)
+
+result = dsolve(f, y(x))
+if not checkodesol(f, result)[0]:
+    raise Exception("sympy failed to solve the ODE")
+# skip first solution with preceding minus
+result = result[1].rhs.expand()
+"""
+Löse die DGL $$ y'(x) = -a \frac{x^2}{y(x)} $$ \\
+$ y(x) = \pm $ %result \\
+- *schreibe `C` für $C \in \R$*
+- *schreibe `sqrt(...)` für $\sqrt{...}$*
+
+
+QUESTION DGL erster Ordnung
+"""
+import random
+from sympy import *
+y = Function('y')
+x = symbols('x')
+
+a = random.randint(2,8)
+f = Derivative(y(x), x) - a * y(x)
+
+result = dsolve(f, y(x))
+if not checkodesol(f, result)[0]:
+    raise Exception("sympy failed to solve the ODE")
+result = result.rhs.expand()
+"""
+Löse die DGL $$ y'(x) = a \cdot y(x) $$ \\
+$ y(x) = $ %result \\
+- *schreibe `C` für $C \in \R$*
+
+
+QUESTION DGL erster Ordnung
+"""
+import random
+from sympy import *
+y = Function('y')
+x = symbols('x')
+
+[a,b] = random.sample(rangeZ(2,5+1),k=2)
+f = Derivative(y(x), x) - a * y(x) - b * y(x)
+
+result = dsolve(f, y(x))
+if not checkodesol(f, result)[0]:
+    raise Exception("sympy failed to solve the ODE")
+result = result.rhs.expand()
+"""
+Löse die DGL $$ y'(x) = a \cdot y(x) + b \cdot y(x) $$ \\
+$ y(x) = $ %result \\
+- *schreibe `C` für $C \in \R$*
+
+
+QUESTION DGL erster Ordnung
+"""
+import random
+from sympy import *
+y = Function('y')
+x = symbols('x')
+
+[a,b,c] = random.sample(rangeZ(2,5+1),k=3)
+f = Derivative(y(x), x) - a * y(x) - b * x - c * x**2
+
+result = dsolve(f, y(x))
+if not checkodesol(f, result)[0]:
+    raise Exception("sympy failed to solve the ODE")
+result = result.rhs.expand()
+"""
+Löse die DGL $$ y'(x) = a \cdot y(x) + b \cdot x + c \cdot x^2 $$ \\
+$ y(x) = $ %result \\
+- *schreibe `C` für $C \in \R$*
+
+
+QUESTION DGL erster Ordnung
+"""
+import random
+from sympy import *
+y = Function('y')
+x = symbols('x')
+
+[a,b,c] = random.sample(rangeZ(2,5+1),k=3)
+f = Derivative(y(x), x) - a * y(x) - b * exp(c*x)
+
+result = dsolve(f, y(x))
+if not checkodesol(f, result)[0]:
+    raise Exception("sympy failed to solve the ODE")
+result = result.rhs.expand()
+"""
+Löse die DGL $$ y'(x) = a \cdot y(x) + b \cdot e^{c x} $$ \\
+$ y(x) = $ %result \\
+- *schreibe `C` für $C \in \R$*
+
+
+QUESTION DGL erster Ordnung
+"""
+import random
+from sympy import *
+y = Function('y')
+x = symbols('x')
+
+[a,b,c] = random.sample(rangeZ(2,5+1),k=3)
+f = Derivative(y(x), x) - a * y(x) - b * cos(c*x)
+
+result = dsolve(f, y(x))
+if not checkodesol(f, result)[0]:
+    raise Exception("sympy failed to solve the ODE")
+result = result.rhs.expand()
+"""
+Löse die DGL $$ y'(x) = a \cdot y(x) + b \cdot \cos(c x) $$ \\
+$ y(x) = $ %result \\
+- *schreibe `C` für $C \in \R$*
+
+
+QUESTION Lineare DGL zweiter Ordnung
+"""
+import random
+from sympy import *
+y = Function('y')
+x = symbols('x')
+
+[a,b] = random.sample(rangeZ(-3,3+1),k=2)
+p = -(a+b)
+q = a*b
+f = Derivative(y(x), x, x) - p * Derivative(y(x), x) - q * y(x)
+
+result = dsolve(f, y(x))
+if not checkodesol(f, result)[0]:
+    raise Exception("sympy failed to solve the ODE")
+result = result.rhs.expand()
+"""
+Löse die DGL $$ y''(x) = p y'(x) +- q y(x) $$ \\
+$ y(x) = $ %result \\
+- *schreibe `C1` und `C2` für $C_{1,2} \in \R$*
+
+
+QUESTION Lineare DGL zweiter Ordnung
+"""
+import random
+from sympy import *
+y = Function('y')
+x = symbols('x')
+
+a = random.randint(2,8)
+b = a**2
+f = Derivative(y(x), x, x) - b * y(x)
+
+result = dsolve(f, y(x))
+if not checkodesol(f, result)[0]:
+    raise Exception("sympy failed to solve the ODE")
+result = result.rhs.expand()
+"""
+Löse die DGL $$ y''(x) = b y(x) $$ \\
+$ y(x) = $ %result \\
+- *schreibe `C1` und `C2` für $C_{1,2} \in \R$*
+
+
+QUESTION Lineare DGL zweiter Ordnung
+"""
+import random
+from sympy import *
+y = Function('y')
+x = symbols('x')
+
+ok = False
+while not ok:
+    [a,b] = random.sample(rangeZ(-3,3+1),k=2)
+    c = random.randint(2,4)
+    p = - (a+b)
+	ok = p != 0
+q = a*b
+f = Derivative(y(x), x, x) + p * Derivative(y(x), x) + q * y(x) - x * exp(-c*x)
+
+result = dsolve(f, y(x))
+if not checkodesol(f, result)[0]:
+    raise Exception("sympy failed to solve the ODE")
+result = result.rhs.expand()
+"""
+Löse die DGL $$ y''(x) +- p y'(x) +- q y(x) = x e^{-c x} $$ \\
+$ y(x) = $ %result \\
+- *schreibe `C1` und `C2` für $C_{1,2} \in \R$*
+
+
+QUESTION Lineare DGL zweiter Ordnung
+"""
+import random
+from sympy import *
+y = Function('y')
+x = symbols('x')
+
+ok = False
+while not ok:
+    [a,b] = random.sample(rangeZ(-3,3+1),k=2)
+    c = 2 * random.randint(1,4)
+    p = - (a+b)
+	ok = p != 0
+q = a*b
+f = Derivative(y(x), x, x) + p * Derivative(y(x), x) + q * y(x) - c * sin(2*x)
+
+result = dsolve(f, y(x))
+if not checkodesol(f, result)[0]:
+    raise Exception("sympy failed to solve the ODE")
+result = result.rhs.expand()
+"""
+Löse die DGL $$ y''(x) +- p y'(x) +- q y(x) = c \sin(2 x) $$ \\
+$ y(x) = $ %result \\
+- *schreibe `C1` und `C2` für $C_{1,2} \in \R$*

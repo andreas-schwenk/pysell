@@ -1,0 +1,329 @@
+LANG    de
+TITLE   Differentialrechnung
+AUTHOR  Andreas Schwenk
+
+
+QUESTION Geradensteigung
+Sei $g$ eine Gerade im $\RR^2$ und $(x_0, y_0), (x_1, y_1)$ zwei verschiedene Punkte auf $g$. \\
+Dann ist die Steigung $m$ definiert durch:
+(x) $m = \frac{y_1-y_0}{x_1-x_0} = \frac{\Delta y}{\Delta x}$
+( ) $m = \frac{x_1-x_0}{y_1-y_0} = \frac{\Delta x}{\Delta y}$
+
+
+QUESTION Ableitungen
+"""
+import random
+from sympy import *
+a = random.randint(3,8)
+x = symbols('x')
+f = a
+fd = diff(f, x)
+"""
+$"f"(x) = f$ \\
+$"f"'(x)=$ %fd
+
+
+QUESTION Ableitungen
+"""
+import random
+from sympy import *
+a = random.randint(3,8)
+x = symbols('x')
+f = a * x
+fd = diff(f, x)
+"""
+$"f"(x) = f$ \\
+$"f"'(x)=$ %fd
+
+
+QUESTION Ableitungen
+"""
+import random
+from sympy import *
+[a,b] = random.choices(range(3,8+1),k=2)
+x = symbols('x')
+f = a * x**b
+fd = diff(f, x)
+"""
+$"f"(x) = f$ \\
+$"f"'(x)=$ %fd
+
+
+QUESTION Ableitungen
+"""
+import random
+from sympy import *
+[a,b,c] = random.choices(range(3,8+1),k=3)
+x = symbols('x')
+f = a * x**2 + b * x + c
+fd = diff(f, x)
+"""
+$"f"(x) = f$ \\
+$"f"'(x)=$ %fd
+
+
+QUESTION Ableitungen
+"""
+import random
+from sympy import *
+[a,b] = random.choices(range(3,8+1),k=2)
+x = symbols('x')
+f = a / x
+fd = diff(f, x)
+"""
+$"f"(x) = f$ \\
+$"f"'(x)=$ %fd
+
+
+QUESTION Ableitungen
+"""
+import random
+from sympy import *
+[a,b,c,d] = random.choices(range(3,8+1),k=4)
+x = symbols('x')
+f = (a * x**3 + b*x) * (c*x + d)
+fd = diff(f, x)
+"""
+$"f"(x) = f$ \\
+$"f"'(x)=$ %fd
+
+
+QUESTION Ableitungen
+"""
+from sympy import *
+x = symbols('x')
+f = exp(x)
+fd = diff(f, x)
+"""
+$"f"(x) = f$ \\
+$"f"'(x)=$ %fd
+
+
+QUESTION Ableitungen
+"""
+from sympy import *
+x = symbols('x')
+f = sin(x)
+fd = diff(f, x)
+"""
+$"f"(x) = f$ \\
+$"f"'(x)=$ %fd
+
+
+QUESTION Ableitungen
+"""
+from sympy import *
+x = symbols('x')
+f = cos(x)
+fd = diff(f, x)
+"""
+$"f"(x) = f$ \\
+$"f"'(x)=$ %fd
+
+
+QUESTION Ableitungen
+"""
+import random
+from sympy import *
+a = random.randint(3,8)
+x = symbols('x')
+f = a * x * exp(x)
+fd = diff(f, x)
+"""
+$"f"(x) = f$ \\
+$"f"'(x)=$ %fd
+
+
+QUESTION Ableitungen
+"""
+import random
+from sympy import *
+[a,b] = random.choices(range(3,8+1),k=2)
+x = symbols('x')
+f = a * exp(b*x)
+fd = diff(f, x)
+"""
+$"f"(x) = f$ \\
+$"f"'(x)=$ %fd
+
+
+QUESTION Ableitungen
+"""
+import random
+from sympy import *
+[a,b,c] = random.choices(range(3,8+1),k=3)
+x = symbols('x')
+f = sin(a * x**2 + b*x + c)
+fd = diff(f, x)
+"""
+$"f"(x) = f$ \\
+$"f"'(x)=$ %fd
+
+
+QUESTION Ableitungen
+"""
+import random
+from sympy import *
+[a,b] = random.choices(range(3,8+1),k=2)
+x = symbols('x')
+f = sin(a*x) + cos(b*x)
+fd = diff(f, x)
+"""
+$"f"(x) = f$ \\
+$"f"'(x)=$ %fd
+
+
+QUESTION Höhere Ableitungen
+"""
+import random
+from sympy import *
+[a,b,c] = random.choices(range(3,8+1),k=3)
+x = symbols('x')
+f = a * x**2 + b * x + c
+fd1 = diff(f, x)
+fd2 = diff(fd1, x)
+fd3 = diff(fd2, x)
+"""
+$"f"(x) = f$ \\
+$"f"'(x)=$ %fd1 \\
+$"f"''(x)=$ %fd2 \\
+$"f"'''(x)=$ %fd3 \\
+
+
+QUESTION Höhere Ableitungen
+"""
+import random
+from sympy import *
+[a,b] = random.choices(range(3,8+1),k=2)
+x = symbols('x')
+f = sin(a * x + b)
+fd1 = diff(f, x)
+fd2 = diff(fd1, x)
+fd3 = diff(fd2, x)
+"""
+$"f"(x) = f$ \\
+$"f"'(x)=$ %fd1 \\
+$"f"''(x)=$ %fd2 \\
+$"f"'''(x)=$ %fd3 \\
+
+
+QUESTION Höhere Ableitungen
+"""
+import random
+from sympy import *
+a = random.randint(3,8)
+x = symbols('x')
+f = a * x * exp(x)
+fd1 = diff(f, x)
+fd2 = diff(fd1, x)
+fd3 = diff(fd2, x)
+"""
+$"f"(x) = f$ \\
+$"f"'(x)=$ %fd1 \\
+$"f"''(x)=$ %fd2 \\
+$"f"'''(x)=$ %fd3 \\
+
+
+QUESTION Stationäre Stellen
+Sei $f$ eine auf $]a,b[$ zweimal differenzierbare Funktion und $x_0 \in ]a,b[$ eine Stelle mit $f'(x_0)=0$. \\
+Gilt $f''(x_0)<0$, so besitzt $f$ an der Stelle $x_0$:
+(x) ein lokales **Maximum**.
+( ) ein lokales **Minimum**.
+
+
+QUESTION Stationäre Stellen
+"""
+import random
+from sympy import *
+[a,b] = random.choices(range(3,8+1),k=2)
+x = symbols('x')
+f = a * x**2 + b
+fd1 = diff(f, x)
+fd2 = diff(fd1, x)
+s = 0
+"""
+Sei $ "f"(x) = f $. ie stationäre Stelle ist $x_0=$ %s. \\
+Also besitzt $"f"$ in $x_0$
+( ) ... ein lokales Maximum
+(x) ... ein lokales Minimum
+
+
+QUESTION Krümmung
+Sei $f$ eine auf $[a,b]$ stetige und auf $]a,b[$ zweimal differenzierbare Funktion. \\
+Gilt $f''(x)>0$ für alle $x \in ]a,b[$, so ist $f$ auf dem Intervall $]a,b[$
+(x) linksgekrümmt oder konvex.
+( ) rechtsgekrümmt oder konkav.
+
+
+QUESTION Taylorpolynom
+"""
+import math
+from sympy import *
+x = symbols('x')
+f = exp(x)
+x0 = 0
+f1 = diff(f, x)
+f2 = diff(f1, x)
+#p0 = f(x0) / fac(0) * (x - x0)^0
+p0  = f.subs({x:x0}) / math.factorial(0) * (x - x0)**0
+#p1 = f1(x0) / fac(1) * (x - x0)^1
+p1  = f1.subs({x:x0}) / math.factorial(1) * (x - x0)**1
+#p2 = f2(x0) / fac(2) * (x - x0)^2
+p2  = f2.subs({x:x0}) / math.factorial(2) * (x - x0)**2
+"""
+Bestimme das zweite Taylorpolynom $$ p_2(x) = \sum_{k=0}^2 \frac{ "f"^{(k)}(x_0) }{ k } (x-x_0)^k $$ für $"f"(x)=f$ und $x_0=0$:
+- $ p_0(x) =$ %p0
+- $ p_1(x) =$ %p1
+- $ p_2(x) =$ %p2
+
+
+QUESTION Taylorpolynom
+"""
+import math
+from sympy import *
+x = symbols('x')
+f = sin(x)
+x0 = 0
+f1 = diff(f, x)
+f2 = diff(f1, x)
+f3 = diff(f2, x)
+#p0 = f(x0) / fac(0) * (x - x0)^0
+p0  = f.subs({x:x0}) / math.factorial(0) * (x - x0)**0
+#p1 = f1(x0) / fac(1) * (x - x0)^1
+p1  = f1.subs({x:x0}) / math.factorial(1) * (x - x0)**1
+#p2 = f2(x0) / fac(2) * (x - x0)^2
+p2  = f2.subs({x:x0}) / math.factorial(2) * (x - x0)**2
+#p3 = f3(x0) / fac(3) * (x - x0)^3
+p3  = f3.subs({x:x0}) / math.factorial(2) * (x - x0)**3
+"""
+Bestimme das dritte Taylorpolynom $$ p_3(x) = \sum_{k=0}^3 \frac{ "f"^{(k)}(x_0) }{ k } (x-x_0)^k $$ für $"f"(x)=f$ und $x_0=0$:
+- $ p_0(x) =$ %p0
+- $ p_1(x) =$ %p1
+- $ p_2(x) =$ %p2
+- $ p_3(x) =$ %p3
+
+
+QUESTION Taylorpolynom
+"""
+import math
+from sympy import *
+x = symbols('x')
+f = cos(x)
+x0 = 0
+f1 = diff(f, x)
+f2 = diff(f1, x)
+f3 = diff(f2, x)
+#p0 = f(x0) / fac(0) * (x - x0)^0
+p0  = f.subs({x:x0}) / math.factorial(0) * (x - x0)**0
+#p1 = f1(x0) / fac(1) * (x - x0)^1
+p1  = f1.subs({x:x0}) / math.factorial(1) * (x - x0)**1
+#p2 = f2(x0) / fac(2) * (x - x0)^2
+p2  = f2.subs({x:x0}) / math.factorial(2) * (x - x0)**2
+#p3 = f3(x0) / fac(3) * (x - x0)^3
+p3  = f3.subs({x:x0}) / math.factorial(2) * (x - x0)**3
+"""
+Bestimme das dritte Taylorpolynom $$ p_3(x) = \sum_{k=0}^3 \frac{ "f"^{(k)}(x_0) }{ k } (x-x_0)^k $$ für $"f"(x)=f$ und $x_0=0$:
+- $ p_0(x) =$ %p0
+- $ p_1(x) =$ %p1
+- $ p_2(x) =$ %p2
+- $ p_3(x) =$ %p3

@@ -1,0 +1,451 @@
+LANG    de
+TITLE   Lineare Algebra
+AUTHOR  Andreas Schwenk
+
+
+QUESTION Vektorrechnung
+"""
+import random, numpy
+lamb = random.choice(rangeZ(-9,9+1))
+u = numpy.random.randint(-9, 9, size=(3,1))
+v = numpy.random.randint(-9, 9, size=(3,1))
+w = u + v
+x = lamb * u
+"""
+Gegeben sind die beiden Vektoren $"u"=u$ und $"v"=v$ im $\RR^3$. \\
+- $ "u" + "v" = $ %w
+- $ lamb \cdot "u" = $ %x
+
+
+QUESTION Einheitsvektor
+"""
+import random, numpy
+k = random.randint(0,2)
+k1 = k+1
+v = numpy.random.randint(0, 0+1, size=(3,1))
+v[k,0] = 1
+"""
+Gebe den Einheitsvektor $e_k1$ im $\RR^3$ an:
+- %v
+
+
+QUESTION Rechenregeln
+Welche der folgenden Rechenregeln zur Addition und skalaren Multiplikation im $\RR^n$ sind korrekt?
+[x] $ (u+v)+w = u+(v+w) ~~~~ \forall u, v, w \in \RR^n $
+[x] $ 1 \cdot v = v ~~~~ \forall v \in V $
+[x] $ (\lambda + \mu) v = \lambda v + \mu v ~~~~ \forall \lambda, \mu \in \RR, ~~ v \in \RR^n $
+[x] $ v + w = w + v ~~~~ \forall v, w \in \RR^n $
+
+
+QUESTION Kollinear
+"""
+import random, numpy
+[a,b] = random.choices(rangeZ(-4,4+1),k=2)
+u1 = numpy.random.randint(-3, 3+1, size=(2,1))
+u2 = numpy.random.randint(-3, 3+1, size=(2,1))
+v1 = a * u1
+v2 = numpy.matrix([[ u2[0,0]*b ],[ u2[1,0]*(-b) ]])
+"""
+Welche der folgenden Ortsvektoren sind **kollinear**?
+[x] $ u=u1 $ und $ v=v1 $
+[ ] $ u=u2 $ und $ v=v2 $
+
+
+QUESTION Skalarprodukt
+"""
+import random, numpy
+u = numpy.random.randint(-5, 5+1, size=(3,1))
+v = numpy.random.randint(-5, 5+1, size=(3,1))
+s = numpy.dot(u[:,0],v[:,0])
+#u = random.choices(range(-5,5+1),k=3)
+#v = random.choices(range(-5,5+1),k=3)
+#s = numpy.dot(u,v)
+"""
+Gegeben sind die beiden Vektoren $"u"=u$ und $"v"=v$ im $\RR^3$. \\
+Berechne das **Skalarprodukt** $ "u" \cdot "v" = $ %s
+
+
+QUESTION Euklidische Norm
+
+Sei $u=\begin{pmatrix}u_1\\u_2\\u_3\end{pmatrix} \in \RR^n$. \\
+Wie ist die **euklidische Norm** definiert?
+(x) $ \sqrt{u_1^2 + u_2^2 + \dots + u_n^2} $
+( ) $ |u_1| + |u_2| + \dots + |u_n| $
+( ) $ \displaystyle \max_{i=1,\dots,n} |u_i| $
+
+
+QUESTION Euklidische Norm
+""" 
+import numpy
+from sympy import *
+u = numpy.random.randint(-5, 5+1, size=(3,1))
+n = sqrt( u[0,0]**2 + u[1,0]**2 + u[2,0]**2 )
+"""
+Sei $ "u"=u \in \RR^3 $. Berechne die **euklidische Norm**:
+- $ ||"u"|| = $ %n
+*Schreibe `sqrt(x)` für $\sqrt{x}$.*
+
+
+QUESTION Winkel zwischen Vektoren
+"""
+# We use symbolic computations by sympy to get a simplified 
+# term as a result. E.g. numpy.linalg.norm only delivers
+# numerical results...
+import random, numpy
+from sympy import *
+u = numpy.zeros([3,1],dtype=int)
+v = numpy.zeros([3,1],dtype=int)
+u[0,0] = random.randint(1,3)
+u[1,0] = random.randint(1,3)
+v[0,0] = 3
+v[2,0] = 4
+dot = u[0,0]*v[0,0] + u[1,0]*v[1,0] + u[2,0]*v[2,0]
+nu = sqrt( u[0,0]**2 + u[1,0]**2 + u[2,0]**2 )   # norm2(u)
+nv = sqrt( v[0,0]**2 + v[1,0]**2 + v[2,0]**2 )   # norm2(v)
+a = acos( dot / (nu*nv) )
+"""
+Gegeben sind die beiden Vektoren $"u"=u$ und $"v"=v$ im $\RR^3$. \\
+Berechne den **Winkel** zwischen den Vektoren $"u"$ und $"v"$:
+- %a
+*Schreibe `sqrt(x)` für $\sqrt{x}$ und `asin(x)`, `acos(x)` für die Arkusfunktionen.
+
+
+QUESTION Orthogonale Vektoren
+"""
+import random, numpy
+from sympy import *
+u = numpy.random.randint(-1, 1+1, size=(2,1))
+v = numpy.random.randint(-1, 1+1, size=(2,1))
+w = numpy.random.randint(-1, 1+1, size=(2,1))
+x = numpy.random.randint(-1, 1+1, size=(2,1))
+y = numpy.random.randint(-1, 1+1, size=(2,1))
+z = numpy.random.randint(-1, 1+1, size=(2,1))
+duv = u[0,0]*v[0,0] + u[1,0]*v[1,0]
+dwx = w[0,0]*x[0,0] + w[1,0]*x[1,0]
+dyz = y[0,0]*z[0,0] + y[1,0]*z[1,0]
+uv = duv == 0
+wx = dwx == 0
+yz = dyz == 0
+"""
+Welche der folgenden Vektoren im $\RR^2$ sind **orthogonal**?
+[!uv] $u$ und $v$
+[!wx] $w$ und $x$
+[!yz] $y$ und $z$
+
+
+QUESTION Projektion
+"""
+import numpy
+from sympy import *
+v = numpy.random.randint(-5, 5+1, size=(2,1))
+w = numpy.random.randint(-5, 5+1, size=(2,1))
+# p = dot(v,w) / dot(v,v) * v
+# p = dvw / dvv * v
+dvw = v[0,0]*w[0,0] + v[1,0]*w[1,0]
+dvv = v[0,0]*v[0,0] + v[1,0]*v[1,0]
+f = Rational(dvw,dvv)
+p = Matrix([f*v[0,0],f*v[1,0]])
+"""
+Berechne die **Projektion** des Vektors $w$ auf den Vektor $v$:
+%p
+
+
+QUESTION Vektorprodukt
+In welchen der folgenden euklidischen Räumen kann das Vektorprodukt bestimmt werden?
+[ ] $\RR^2$
+[x] $\RR^3$
+[ ] $\RR^4$
+
+
+QUESTION Vektorprodukt
+"""
+import numpy, random
+u = random.sample(range(-2,2+1),k=3)
+ut = numpy.array([u]).transpose()
+v = random.sample(range(-2,2+1),k=3)
+vt = numpy.array([v]).transpose()
+c = numpy.cross(u,v)
+ct = numpy.array([c]).transpose()
+"""
+Gegeben sind die beiden Vektoren $"u"=ut$ und $"v"=vt$ im $\RR^3$. \\
+Bestimme das Vektorprodukt von $"u"$ und $"v"$:
+- $"u" \times "v" =$ %ct
+
+
+QUESTION Matrizenoperationen
+"""
+import numpy
+A = numpy.random.randint(-1, 3+1, size=(3,3))
+B = numpy.random.randint(-1, 3+1, size=(3,3))
+C = A - B
+"""
+Berechne $ A - B = $ %C
+
+
+QUESTION Matrizenoperationen
+"""
+import random, numpy
+A = numpy.random.randint(2, 5+1, size=(3,3))
+b = random.randint(2,5)
+B = b * A
+"""
+Berechne $ b \cdot A = $ %B
+
+
+QUESTION Transponierte Matrix
+"""
+import random, numpy
+A = numpy.random.randint(1, 3+1, size=(3,2))
+B = A.transpose()
+"""
+Bestimme $ A^T = $ %B
+
+
+QUESTION Matrizenoperationen
+"""
+import numpy
+A = numpy.random.randint(1, 3+1, size=(2,2))
+B = numpy.random.randint(1, 3+1, size=(2,2))
+C = numpy.matmul(A,B)
+"""
+Berechne $ A \cdot B = $ %C
+
+
+QUESTION Matrizenoperationen
+"""
+import numpy
+A = numpy.random.randint(1, 3+1, size=(2,1))
+B = numpy.random.randint(1, 3+1, size=(2,2))
+C = numpy.random.randint(1, 3+1, size=(2,1))
+D = (A + numpy.matmul(B.transpose(),C)).transpose()
+"""
+Berechne $ \left( A + B^T \cdot C \right)^T = $ %D
+
+
+QUESTION Matrizenoperationen
+"""
+import numpy
+MA = numpy.random.randint(-5, 5+1, size=(2,3))
+MB = numpy.random.randint(-5, 5+1, size=(3,2))
+MC = numpy.random.randint(-5, 5+1, size=(2,2))
+"""
+Gegeben seien die folgenden Matrizen:
+- $ A=MA, B=MB, C=MC $
+Welche der folgenden Operationen sind erlaubt?
+[x] $ A \cdot B $
+[ ] $ A + B $
+[ ] $ A^T \cdot B $
+[ ] $ A \cdot B^T $
+[x] $ A \cdot B - C $
+[x] $ (A \cdot B)^T + C $
+
+
+QUESTION Lineare Gleichungssysteme
+"""
+from sympy import *
+x, y = symbols("x, y")
+A = randMatrix(2,2, min=2, max=4)
+A[1,0] = 0
+b = randMatrix(2,1, min=1, max=3)
+set = linsolve((A, b), [x, y])
+first = set.args[0]
+v = Matrix([first[0], first[1]])
+# get elements for notation
+a11 = A[0,0]
+a12 = A[0,1]
+a21 = A[1,0]
+a22 = A[1,1]
+b1 = b[0]
+b2 = b[0]
+"""
+Gegeben ist das folgende **lineare Gleichungssystem (LGS)**:
+- $ a11 x_1 + a12 x_2 = b1 $
+- $ a22 x_2 = b2 $
+Schreibe das LGS in **Matrizenschreibweise** $ "A" \cdot "x" = "b" $:
+- $ "A" = $ %A
+- $ "b" = $ %b
+Das LGS liegt bereits in Dreiecksform vor. Bestimme den **Lösungsvektor** $"x"$:
+- $ "x" = $ %v
+
+
+QUESTION Lineare Gleichungssysteme
+"""
+from sympy import *
+A = randMatrix(3,3, min=1, max=3)
+b = randMatrix(3,1, min=0, max=1)
+homogen = b.is_zero
+"""
+Gegeben sei das folgende LGS in Matrizenschreibweise: \\
+$ A \cdot x = b$ \\
+Ist die folgende Aussage korrekt?
+[!homogen] Das LGS ist **homogen**.
+
+
+QUESTION Lösungsmenge
+"""
+import numpy
+A = numpy.random.randint(3, 13, size=(3,3))
+A = numpy.triu(A)
+b = numpy.random.randint(-3, 3, size=(3,1))
+augmented = numpy.concatenate((A,b),axis=1)
+"""
+Ein lineares Gleichungssystem ist durch den Gauß-Algorithmus bereits in Dreiecksform gebracht worden. \\
+Die erweiterte Koeffizientenmatrix sieht folgendermaßen aus:
+$$ augmented $$
+Welche Aussage über die **Lösungsmenge** ist korrekt?
+(x) Es gibt eine eindeutige Lösung $x \in \RR^n$.
+( ) Es gibt keine Lösung.
+( ) Die Lösungsmenge kann mit einer freien Variable beschrieben werden.
+
+
+QUESTION Lösungsmenge
+"""
+import numpy
+A = numpy.random.randint(3, 13, size=(3,3))
+A = numpy.triu(A)
+b = numpy.random.randint(-3, 3, size=(3,1))
+A[2,2] = 0
+b[2,0] = 0
+augmented = numpy.concatenate((A,b),axis=1)
+"""
+Ein lineares Gleichungssystem ist durch den Gauß-Algorithmus bereits in Dreiecksform gebracht worden. \\
+Die erweiterte Koeffizientenmatrix sieht folgendermaßen aus:
+$$ augmented $$
+Welche Aussage über die **Lösungsmenge** ist korrekt?
+( ) Es gibt eine eindeutige Lösung $x \in \RR^n$.
+( ) Es gibt keine Lösung.
+(x) Die Lösungsmenge kann mit einer freien Variable beschrieben werden.
+
+
+QUESTION Lösungsmenge
+"""
+import numpy
+A = numpy.random.randint(3, 13, size=(3,3))
+A = numpy.triu(A)
+b = numpy.random.randint(-3, 3, size=(3,1))
+A[2,2] = 0
+augmented = numpy.concatenate((A,b),axis=1)
+"""
+Ein lineares Gleichungssystem ist durch den Gauß-Algorithmus bereits in Dreiecksform gebracht worden. \\
+Die erweiterte Koeffizientenmatrix sieht folgendermaßen aus:
+$$ augmented $$
+Welche Aussage über die **Lösungsmenge** ist korrekt?
+( ) Es gibt eine eindeutige Lösung $x \in \RR^n$.
+(x) Es gibt keine Lösung.
+( ) Die Lösungsmenge kann mit einer freien Variable beschrieben werden.
+
+
+QUESTION Gauß-Algorithmus
+"""
+from sympy import *
+x, y = symbols("x, y")
+A = randMatrix(2,2, min=1, max=4)
+while A.det() == 0:  # A must be invertible
+    A = randMatrix(2,2, min=1, max=4)
+b = randMatrix(2,1, min=1, max=4)
+set = linsolve((A, b), [x, y])
+first = set.args[0]
+v = Matrix([first[0], first[1]])
+augmented = A.row_join(b)
+"""
+Löse das folgende lineare Gleichungssystem mit Hilfe des **Gauß-Algorithmus**:
+$$ augmented $$
+Lösungsvektor: $x=$ %v
+
+
+QUESTION Gauß-Algorithmus
+"""
+from sympy import *
+x, y, z = symbols("x, y, z")
+A = randMatrix(3,3, min=1, max=4)
+while A.det() == 0:  # A must be invertible
+    A = randMatrix(3,3, min=1, max=4)
+b = randMatrix(3,1, min=1, max=4)
+set = linsolve((A, b), [x, y, z])
+first = set.args[0]
+v = Matrix([first[0], first[1], first[2]])
+augmented = A.row_join(b)
+"""
+Löse das folgende lineare Gleichungssystem mit Hilfe des **Gauß-Algorithmus**:
+$$ augmented $$
+Lösungsvektor: $x=$ %v
+
+
+QUESTION Gauß-Algorithmus
+"""
+from sympy import *
+x, y, z, w = symbols("x, y, z, w")
+A = randMatrix(4,4, min=1, max=4)
+while A.det() == 0:  # A must be invertible
+    A = randMatrix(4,4, min=1, max=4)
+b = randMatrix(4,1, min=1, max=4)
+set = linsolve((A, b), [x, y, z, w])
+first = set.args[0]
+v = Matrix([first[0], first[1], first[2], first[3]])
+augmented = A.row_join(b)
+"""
+Löse das folgende lineare Gleichungssystem mit Hilfe des **Gauß-Algorithmus**:
+$$ augmented $$
+Lösungsvektor: $x=$ %v
+
+
+QUESTION Lineare Unabhängigkeit
+"""
+import numpy
+a = 0
+b = 3
+v1 = numpy.random.randint(a, b, size=(2,1))
+v2 = numpy.random.randint(a, b, size=(2,1))
+A = numpy.concatenate((v1,v2),axis=1)
+q1 = abs(numpy.linalg.det(A)) > 1e-9
+a = 1
+v3 = numpy.random.randint(a, b, size=(2,1))
+v4 = numpy.random.randint(a, b, size=(2,1))
+A = numpy.concatenate((v3,v4),axis=1)
+q2 = abs(numpy.linalg.det(A)) > 1e-9
+v5 = numpy.random.randint(a, b, size=(3,1))
+v6 = numpy.random.randint(a, b, size=(3,1))
+v7 = numpy.random.randint(a, b, size=(3,1))
+A = numpy.concatenate((v5,v6,v7),axis=1)
+q3 = abs(numpy.linalg.det(A)) > 1e-9
+"""
+Welche der unten stehenden Vektoren sind **linear unabhängig**?
+[!q1] $v1,v2$
+[!q2] $v3,v4$
+[!q3] $v5,v6,v7$
+
+
+QUESTION Rang
+"""
+import numpy
+A = numpy.random.randint(0, 2, size=(3,3))
+r = numpy.linalg.matrix_rank(A)
+"""
+Sei $ "A" = A $ eine $3 \times 3$ Matrix über $ \RR $. \\
+Bestimme den **Rang**:
+- $\text{rg}("A") = $ %r
+
+
+QUESTION Inverse Matrix
+"""
+from sympy import *
+A = randMatrix(3,3, min=-2, max=2)
+while abs(A.det()) < 1e-9:  # A must be invertible
+    A = randMatrix(3,3, min=-2, max=2)
+iA = A.inv()
+"""
+Berechne die **inverse** Matrix:
+- $ A^{-1} = $ %iA
+
+
+QUESTION Determinante
+"""
+import numpy
+A = numpy.random.randint(-5, 5, size=(3,3))
+A[0,0] = 0
+A[0,1] = 0
+d = round(numpy.linalg.det(A))
+"""
+Sei $ "A" = A $ eine $3 \times 3$ Matrix über $ \RR $. \\
+Berechne die **Determinante**:
+- $ \det("A") = $ %d

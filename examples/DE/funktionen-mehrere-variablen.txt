@@ -1,0 +1,317 @@
+LANG    de
+TITLE   Funktionen von mehreren Variablen
+AUTHOR  Andreas Schwenk
+
+
+QUESTION Komponentenfunktionen
+"""
+import random
+from sympy import *
+[a,b,c,d,e,_f,g,h,i] = random.choices(range(0,1+1),k=9)
+x, y, z = symbols('x,y,z')
+f1 = a*x + b*y + c*z
+f2 = d*x + e*y + _f*z
+f3 = g*x + h*y + i*z
+"""
+Sei $ f : \R^3 \to \R^3 $; $ f(x,y,z) = (f1,f2,f3) $ ein Vektorfeld. \\
+Bestimme die **Komponentenfunktionen** von $f$:
+- $f_1(x,y,z)=$ %f1
+- $f_2(x,y,z)=$ %f2
+- $f_3(x,y,z)=$ %f3
+
+
+QUESTION Partielle Ableitungen
+"""
+import random
+from sympy import *
+[a,b,c,d,e] = random.choices(range(2,5+1),k=5)
+x, y = symbols('x,y')
+f = a * x**b  +  c * x**d * y**e
+fx = diff(f, x)
+fy = diff(f, y)
+"""
+Sei $"f"(x,y)=f$. \\
+Bestimme die **partiellen Ableitungen**:
+- $\frac{\partial "f"}{\partial x}=$ %fx
+- $\frac{\partial "f"}{\partial y}=$ %fy
+
+
+QUESTION Partielle Ableitungen
+"""
+import random
+from sympy import *
+a = random.randint(0,1)
+b = 1 - a
+c = random.randint(4,8)
+x, y = symbols('x,y')
+f = c / (a * x**2 + b * y**2)
+fx = diff(f, x)
+fy = diff(f, y)
+"""
+Sei $"f"(x,y)=f$. \\
+Bestimme die **partiellen Ableitungen**:
+- $\frac{\partial "f"}{\partial x}=$ %fx
+- $\frac{\partial "f"}{\partial y}=$ %fy
+
+
+QUESTION Gradient
+"""
+import random
+from sympy import *
+[a,b] = random.choices(range(0,1+1),k=2)
+c = random.randint(2,5)
+x, y = symbols('x,y')
+f = - x**3 - a * y**3 + b * c * x * y
+fx = diff(f, x)
+fy = diff(f, y)
+"""
+Gegeben sei eine Funktion $"f"(x,y)=f$. \\
+Bestimme den **Gradienten**:
+- $\nabla "f"=($  %fx  ,  %fy  $)$
+
+
+QUESTION Gradient
+"""
+import random
+from sympy import *
+c = random.randint(2,5)
+u, v = symbols('u,v')
+f = u**2 / v**2 + c
+fu = diff(f, u)
+fv = diff(f, v)
+"""
+Gegeben sei eine Funktion $"f"(u,v)=f$. \\
+Bestimme den **Gradienten**:
+- $\nabla "f"=($  %fu  ,  %fv  $)$
+
+
+QUESTION Gradient
+"""
+import random
+from sympy import *
+a = random.randint(0,1)
+b = 1 - a
+[c,d] = random.choices(range(2,5+1),k=2)
+x, y = symbols('x,y')
+f = exp(c*x) * (a*sin(d*y) + b*cos(d*y))
+fx = diff(f, x)
+fy = diff(f, y)
+"""
+Gegeben sei eine Funktion $"f"(x,y)=f$. \\
+Bestimme den **Gradienten**:
+- $\nabla "f"=($  %fx  ,  %fy  $)$
+
+
+QUESTION Jacobi-Matrix
+"""
+import random
+from sympy import *
+a = random.randint(0,1)
+b = 1 - a
+c = random.randint(-1,1)
+d = random.randint(1,5)
+x, y = symbols('x,y')
+f1 = a * x * y * sin(x) + b * x * y * cos(x)
+f2 = x**2 + c * y**2 + d
+df1x = diff(f1, x)
+df1y = diff(f1, y)
+df2x = diff(f2, x)
+df2y = diff(f2, y)
+J = Matrix([[df1x, df1y], [df2x, df2y]])
+"""
+Sei $f(x,y) = ( f1, f2 )$. \\
+Bestimme die **Jacobi-Matrix**:
+- $ "J"_f(x,y) = $ %J
+
+
+QUESTION Rotation und Divergenz
+"""
+import random
+from sympy import *
+[a,b] = random.choices(range(0,1+1),k=2)
+c = 1 - a
+dd = 1 - b
+e = random.randint(2,9)
+x, y, z = symbols('x,y,z')
+f1 = a * x + c * z
+f2 = b * sin(pi*y) + dd * cos(pi*x)
+f3 = x**3 + e * z**2
+rx = diff(f3,y) - diff(f2,z)
+ry = diff(f1,z) - diff(f3,x)
+rz = diff(f2,x) - diff(f1,y)
+d = diff(f1,x) + diff(f2,y) + diff(f3,z)
+"""
+Sei $f(x,y) = ( f1, f2, f3 )$. \\
+Bestimme **Rotation** und **Divergenz** des Vektorfeldes.
+- rot$(f)=($  %rx  ,  %ry ,  %rz  $)$
+- div$(f)=$ %d
+
+
+QUESTION Höhere partielle Ableitungen
+"""
+import random
+from sympy import *
+x, y = symbols('x,y')
+a = random.randint(0,1)
+b = 1 - a
+[c,d] = random.choices(range(3,4+1),k=2)
+f = c * x**d * y + x**(d-1)
+dxx = diff( diff(f,x), x)
+dxy = diff( diff(f,x), y)
+dyy = diff( diff(f,y), y)
+"""
+Sei $"f"(x,y)=f$. Bestimme die folgenden **höheren partiellen Ableitungen**:
+- $\displaystyle \frac{\partial^2 "f"}{\partial x^2}=$ %dxx
+- $\displaystyle \frac{\partial^2 "f"}{\partial x \partial y}=$ %dxy
+- $\displaystyle \frac{\partial^2 "f"}{\partial y^2}=$ %dyy
+
+
+QUESTION Stationäre Stellen
+"""
+import random
+from sympy import *
+x, y = symbols('x,y')
+[a,b] = random.choices(range(2,8+1),k=2)
+f = a * x**2 - b * y**2
+fx = diff(f, x)
+fy = diff(f, y)
+sx = 0
+sy = 0
+"""
+Gegeben sei eine Funktion $"f"(x,y)=f$.
+- Bestimme zunächst den **Gradienten**:
+$\nabla "f"=($  %fx  ,  %fy $)$
+- Gebe die (einzige) **stationäre Stelle** an:
+$($  %sx  ,  %sy $)$
+
+
+QUESTION Definitheit
+"""
+import random
+from sympy import *
+[a,b,c] = random.choices(range(-1,2+1),k=3)
+A = Matrix([[a,0,0], [0,b,0], [0,0,c]])
+s = {a,b,c}
+p1 = min(s) > 0
+p2 = max(s) < 0
+p3 = not(p1 or p2)
+"""
+Sei $"A"=A$ eine Matrix über $\RR$. \\
+Welche der folgenden Aussagen ist korrekt?
+[!p1] $"A"$ ist **positiv definit**
+[!p2] $"A"$ ist **negativ definit**
+[!p3] $"A"$ ist **indefinit**
+
+
+QUESTION Definitheit
+"""
+from sympy import *
+A = randMatrix(2,2, min=1, max=4)
+while abs(A.det()) < 1e-9 or not A.is_symmetric():  # A must be invertible and symmetric
+    A = randMatrix(2,2, min=1, max=4)
+s = set(A.eigenvals().keys())
+p1 = min(s) > 0
+p2 = max(s) < 0
+p3 = not(p1 or p2)
+"""
+Sei $"A"=A$ eine Matrix über $\RR$. \\
+Welche der folgenden Aussagen ist korrekt?
+[!p1] $"A"$ ist **positiv definit**
+[!p2] $"A"$ ist **negativ definit**
+[!p3] $"A"$ ist **indefinit**
+
+
+QUESTION Hesse-Matrix
+"""
+import random
+from sympy import *
+x, y = symbols('x,y')
+a = random.randint(2,8)
+b = random.randint(2,4)
+f = a * x**b * y**(b+1)
+h11 = diff( diff(f,x), x)
+h12 = diff( diff(f,x), y)
+h21 = diff( diff(f,y), x)
+h22 = diff( diff(f,y), y)
+H = Matrix([ [ h11, h12 ], [ h21, h22 ] ])
+"""
+Sei $"f"(x,y) = f$. \\
+Bestimme die **Hesse-Matrix**:
+- $ "H" "f"=$ %H
+
+
+QUESTION Hesse-Matrix
+"""
+import random
+from sympy import *
+x, y = symbols('x,y')
+a = random.randint(0,1)
+b = random.randint(0,1)
+c = 1 - a
+d = 1 - b
+e = random.randint(2,8)
+f = exp(a*x + c*y) + e * x**2 + y**2 + b * cos(y) + d * sin(y)
+h11 = diff( diff(f,x), x)
+h12 = diff( diff(f,x), y)
+h21 = diff( diff(f,y), x)
+h22 = diff( diff(f,y), y)
+H = Matrix([ [ h11, h12 ], [ h21, h22 ] ])
+"""
+Sei $"f"(x,y) = f$. \\
+Bestimme die **Hesse-Matrix**:
+- $ "H" "f"=$ %H
+
+
+QUESTION Extremwerte
+"""
+import random
+from sympy import *
+x, y = symbols('x,y')
+w1 = random.randint(0,1)
+w2 = 1 - w1
+[w3,w4,w5,w6,w7,w8,w9,w10] = random.choices(range(2,3+1),k=8)
+f = w4 * x**w5 * y**w6 + w7 * x**w8 + w9 * y**w10
+h11 = diff( diff(f,x), x)
+h12 = diff( diff(f,x), y)
+h21 = diff( diff(f,y), x)
+h22 = diff( diff(f,y), y)
+H = Matrix([ [ h11, h12 ], [ h21, h22 ] ])
+ax = 0
+ay = 0
+A = H.subs({x:ax,y:ay})
+ev = set(A.eigenvals().keys())
+p1 = min(ev) > 0
+p2 = max(ev) < 0
+p3 = min(ev) < 0 and max(ev) > 0
+"""
+Sei $"f"(x,y) = f$. \\
+Bestimme die **Hesse-Matrix**:
+- $ "H" "f"=$ %H
+Betrachte die potentielle Extremstelle $ a=(ax,ay) $ und berechne die Eigenwerte von $ ("H" "f")(a) $:
+- $\lambda=$ %ev
+Welche der folgenden Aussagen ist korrekt?
+[!p1] $"f"$ besitzt bei $a$ ein **lokales Minimum**
+[!p2] $"f"$ besitzt bei $a$ ein **lokales Maximum**
+[!p3] $"f"$ besitzt bei $a$ einen **Sattelpunkt**
+
+
+QUESTION Fehlerfortpflanzung
+"""
+import random
+from sympy import *
+x, y = symbols('x,y')
+[a,b,c,vx,vy] = random.choices(range(2,4+1),k=5)
+f = a * x**b * y**c + x * y
+ex = diff(f, x)
+ey = diff(f, y)
+delta = Rational(1,10)
+zmax = abs( ex.subs({x:vx,y:vy}) )*delta + abs( ey.subs({x:vx,y:vy}))*delta
+"""
+Sei $"f"(x,y) = f$. \\
+Bestimme die **maximale Messunsicherheit** bei **linearer Fehlerfortpflanzung**: \\
+$ (\Delta z)_{\max} = |"a"| \Delta "x" + |"b"| \Delta "y" $
+- $"a"=$  %ex
+- $"b"=$  %ey
+Seien nun $x=vx$, $y=vy$ und $\Delta x = \Delta y = delta$. \\
+Berechne die folgende Fehlergröße:
+- $ (\Delta z)_{\max} =$  %zmax

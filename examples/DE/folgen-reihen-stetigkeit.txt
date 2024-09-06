@@ -1,0 +1,207 @@
+LANG    de
+TITLE   Folgen, Reihen und Stetigkeit
+AUTHOR  Andreas Schwenk
+
+
+QUESTION Reelle Folgen
+"""
+import random
+from sympy import *
+x = random.randint(2,5)
+a1 = Rational(1*x,2)
+a2 = Rational(2*x,3)
+a3 = Rational(3*x,4)
+"""
+Bestimme die ersten drei Glieder der reellen Folge $ (a_n)_{n \in \NN} = \left( \frac{x\cdot n}{n+1} \right)_{n \in \NN} $
+- $n=1:$ %a1
+- $n=2:$ %a2
+- $n=3:$ %a3
+
+
+QUESTION Rekursiv definierte Folgen
+"""
+import random
+[x,y,z] = random.choices(range(2,5+1),k=3)
+a1 = z
+a2 = x*a1 + y
+a3 = x*a2 + y
+"""
+Bestimme die ersten drei Glieder der **rekursiv** definierten Folge $(a_n)_{n \in \NN}$ \\
+mit $ a_1 = z, a_{n+1} = x \cdot a_n + y $
+- $n=1:$ %a1
+- $n=2:$ %a2
+- $n=3:$ %a3
+
+
+QUESTION Konvergenz von Folgen
+"""
+import random
+from sympy import *
+[x,y,z] = random.choices(range(2,5+1),k=3)
+[u,v,w] = random.choices(range(2,5+1),k=3)
+res1 = 0
+res2 = Rational(x,y)
+res3 = Rational(x,u)
+"""
+Bestimme:
+- $ \displaystyle \lim_{n \to \infty} \frac{x}{n}=$ %res1
+- $ \displaystyle \lim_{n \to \infty} \frac{x \cdot n}{y \cdot n+z}=$ %res2
+- $ \displaystyle \lim_{n \to \infty} \frac{x \cdot n^2 + y \cdot n + z}{u \cdot n^2 + v \cdot n + w}=$ %res3
+
+
+QUESTION Konvergenz von Folgen
+Sei $ (a_n)_{n \in \NN} $ eine konvergente Folge. Dann ist die Folge $ (a_n) $
+[x] beschränkt
+[ ] unbeschränkt
+
+
+QUESTION Häufungspunkte
+"""
+import random
+[x,y,z] = random.choices(range(2,5+1),k=3)
+"""
+Welche der Folgen besitzt **zwei** Häufungspunkte?
+[x] $ \displaystyle (a_n)_{n \in \NN} $ mit $ a_n = (-1)^n ~\cdot~ \frac{n^2-x}{n^2-y} $
+[ ] $ \displaystyle (a_n)_{n \in \NN} $ mit $ a_n = 1^n ~\cdot~ \frac{n^2-x}{n^2-y} $
+
+
+QUESTION Konvergente Folgen
+"""
+import random
+[x,y,z,w] = random.choices(range(2,5+1),k=4)
+"""
+Welche der folgenden Folgen sind **konvergent**?
+[x] $ (a_n)_{n \in \NN} $ mit $ a_n = x $
+[ ] $ (a_n)_{n \in \NN} $ mit $ a_n = x \cdot n $
+[x] $ (a_n)_{n \in \NN} $ mit $ a_n = \frac{x \cdot n^{10} + y \cdot n^2}{z \cdot n^{10} + w \cdot n^4} $
+[ ] $ (a_n)_{n \in \NN} $ mit $ a_n = (-1)^n \cdot x $
+
+
+QUESTION Bestimmt divergent
+"""
+import random
+[x,y,z,w] = random.choices(range(2,5+1),k=4)
+"""
+Welche der folgenden Folgen sind **bestimmt divergent**?
+[x] $ (a_n)_{n \in \NN} $ mit $ a_n = x \cdot n $
+[x] $ (a_n)_{n \in \NN} $ mit $ a_n = \frac{x \cdot n^5+y \cdot n}{z \cdot n^4+w} $
+[ ] $ (a_n)_{n \in \NN} $ mit $ a_n = (-1)^n \cdot x + y $
+
+
+QUESTION Unbestimmt divergent
+"""
+import random
+[x,y,z,w,u] = random.choices(range(2,5+1),k=5)
+"""
+Welche der folgenden Folgen sind **unbestimmt divergent**?
+[x] $ (a_n)_{n \in \NN} $ mit $ a_n = (-1)^n \cdot x $
+[ ] $ (a_n)_{n \in \NN} $ mit $ a_n = \left| x - \frac{y \cdot n}{x \cdot n+z} \right| $
+[ ] $ (a_n)_{n \in \NN} $ mit $ a_n = \frac{x \cdot n^3+w \cdot n}{y \cdot n^3+u} $
+
+
+QUESTION Geometrische Reihe
+"""
+import random
+from sympy import *
+x = random.randint(2,5)
+q = Rational(1,x)
+res = Rational(1,1-q)
+"""
+Bestimme $ \displaystyle \sum_{k=0}^{\infty} \left(\frac{1}{x}\right)^k $
+- %res
+
+
+QUESTION Geometrische Reihe
+"""
+import random
+from sympy import *
+x = random.randint(2,5)
+q = Rational(1,x)
+res = Rational(1,1-q) - 1 - q
+"""
+Bestimme $ \displaystyle \sum_{k=2}^{\infty} \left(\frac{1}{x}\right)^k $
+- %res
+
+
+QUESTION Potenzreihe
+"""
+import random, math
+from sympy import *
+[a,b] = random.choices(range(2,4+1),k=2)
+x = Rational(1, b)
+k0 = Rational(1, math.factorial(0)) * (a*x)**0
+k1 = Rational(1, math.factorial(1)) * (a*x)**1
+k2 = Rational(1, math.factorial(2)) * (a*x)**2
+"""
+Gebe die ersten **drei Summanden der Potenzreihe** von $ e^{a \cdot "x"} $ an. Weiterhin sei $ "x" = \frac{1}{b} $:
+- $ k=0: $ %k0
+- $ k=1: $ %k1
+- $ k=2: $ %k2
+
+
+QUESTION Konvergenzradius
+"""
+import random
+from sympy import *
+a = random.randint(3,8)
+r = Rational(1,a)
+"""
+Bestimme den Konvergenzradius $R$ der Potenzreihe $ \displaystyle \sum_{k=0}^{\infty} a^k \cdot x^k $:
+- $R=$ %r
+
+
+QUESTION Grenzwerte
+"""
+import random
+[a,b,c] = random.choices(range(3,8+1),k=3)
+[u,v] = random.choices(range(2,4+1),k=2)
+res1 = a
+res2 = 0
+res3 = u**v
+"""
+Bestimme die folgenden Grenzwerte:
+- $ \lim_{x \to \infty} \frac{a \cdot x-b}{x}=$ %res1
+- $ \lim_{x \to -\infty} e^{c \cdot x}=$ %res2
+- $ \lim_{x \to \infty} \left( \frac{u \cdot x^2+a}{x^2+x+b} \right)^v=$ %res3
+
+
+QUESTION Stetigkeit
+"""
+import random
+[a1,b1,c1,d1] = random.choices(range(3,8+1),k=4)
+[a2,b2] = random.choices(range(3,8+1),k=2)
+a3 = random.randint(3,8)
+[a4,b4,c4] = random.choices(range(3,8+1),k=3)
+[a5,b5] = random.choices(range(3,8+1),k=2)
+[a6,b6] = random.choices(range(3,8+1),k=2)
+[a7,b7] = random.choices(range(2,4+1),k=2)
+c7 = random.randint(5,7)
+"""
+Welche der folgenden Funktionen sind auf ganz $\RR$ stetig?
+[x] $f(x) = a1 \cdot x^3 + b1 \cdot x^2 + c1 \cdot x + d1$
+[x] $f(x) = a2 \cdot \sin(b2 \cdot x)$
+[x] $f(x)= \frac{a3 \cdot x^2}{x}$
+[x] $f(x)= a4 \cdot e^{b4 \cdot x+c4}$
+[ ] $f(x)= a5 \cdot \sqrt{b5 \cdot x}$
+[x] $f(x)= \frac{ (x-a6) \cdot (x-b6) }{ x-a6 }$
+[ ] $f(x)= \frac{ (x-a7) \cdot (x-b7) }{ x-c7 }$
+
+
+QUESTION Stetigkeit
+"""
+import random
+[a,b] = random.choices(range(2,5+1),k=2)
+c = random.randint(6,8)
+"""
+An welcher Stelle $x_0 \in \RR$ ist $f(x)=\frac{ (x-a) \cdot (x-b) }{ x-c }$ **unstetig**?
+- $x_0=$ %c
+
+
+QUESTION Asymptote
+"""
+import random
+[m,b,c,d] = random.choices(range(2,8+1),k=4)
+"""
+Bestimme die Asymptote $ y = "m" \cdot x+"b" $, welche die Funktion $ f(x) = m \cdot x + b - \frac{c \cdot x}{d \cdot x^2} $ für $x \to \infty$ annähert:
+- $"m"=$ %m
+- $"b"=$ %b

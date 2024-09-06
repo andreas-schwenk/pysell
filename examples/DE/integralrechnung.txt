@@ -1,0 +1,257 @@
+LANG    de
+TITLE   Integralrechnung
+AUTHOR  Andreas Schwenk
+
+
+QUESTION Riemann Integral
+Zur Bestimmung des **Riemann-Integrals** einer Funktion $f:[a,b] \to \RR$ unterteilt man $[a,b]$ in "kleine" Teilintervalle und bestimmt für diese Intervalle jeweils den kleinsten und größten Funktionswert. \\
+Die Summation der vorzeichenbehafteten Flächen mit dem größten Funktionswert liefert die
+(x) **Obersumme**
+( ) **Untersumme**
+
+
+QUESTION Begriffe
+Sei $ \displaystyle \int_a^b f(x) \,dx$. Finde die richtigen **Begriffe**:
+- $a$ und $b$ heißen %"Integrationsgrenzen".
+- $x$ heißt %"Integrationsvariable".
+- $f(x)$ heißt %"Integrand".
+- $dx$ heißt %"Differential".
+
+
+QUESTION Grenzen
+"""
+import random
+a = random.randint(3,8)
+i = 0
+"""
+$ \displaystyle \int_a^a f(x) ~ dx = $ %i
+
+
+QUESTION Eigenschaften des Riemann-Integrals
+Seien $a<b<c$ und $f:[a,c] \to \RR$ eine Funktion die auf dem Intervall $[a,c]$ Riemann-integrierbar ist.
+Wähle die korrekten Aussagen:
+[x] $ \displaystyle \int_a^c f(x) ~ dx = \int_a^b f(x) ~ dx + \int_b^c f(x) ~ dx $
+[x] $ \displaystyle \int_b^a f(x) ~ dx = - \int_a^b f(x) ~ dx $
+[ ] $ \displaystyle \int_b^a f(x) ~ dx = \int_a^b f(x) ~ dx $
+
+
+QUESTION Integrierbarkeit
+Seien $a,b \in \RR, a < b$:
+[x] Jede **stetige** Funktion $f:[a,b] \to \RR$ ist integrierbar.
+[x] Jede **monotone** Funktion $f:[a,b] \to \RR$ ist integrierbar.
+
+
+QUESTION Bestimmtes Integral
+""" 
+import random
+from sympy import *
+x = symbols('x')
+a = random.randint(0,1)
+b = random.randint(4,5)
+u = random.randint(3,8)
+f = u
+fi = integrate(f,(x,a,b))
+"""
+Bestimme das folgende **bestimmte** Integral:
+- $ \displaystyle \int_a^b f ~ dx = $ %fi
+
+
+QUESTION Unbestimmte Integrale
+"""
+import random
+from sympy import *
+x,y = symbols('x,y')
+[u1,u2] = random.sample(range(2,9+1),k=2)
+f = u1
+fi = integrate(f,x)
+g = u2
+gi = integrate(f,y)
+"""
+Bestimme die folgenden **unbestimmten** Integrale:
+- $ \displaystyle \int f ~ dx = $ %fi $ + C ~~ (C \in \RR)$
+- $ \displaystyle \int g ~ dy = $ %gi $ + C ~~ (C \in \RR)$
+
+
+QUESTION Stammfunktion
+"""
+import random
+from sympy import *
+u = random.randint(3,8)
+x = symbols('x')
+f = u * x
+fi = integrate(f,x)
+"""
+Bestimme die Stammfunktion zu $"f"(x) = f $
+- $ \displaystyle F(x) = $ %fi $ + C ~~ (C \in \RR)$
+
+
+QUESTION Stammfunktion
+"""
+import random
+from sympy import *
+[u,v] = random.sample(range(3,8+1),k=2)
+x = symbols('x')
+f = u + v * x
+fi = integrate(f,x)
+"""
+Bestimme die Stammfunktion zu $"f"(x) = f $
+- $ \displaystyle F(x) = $ %fi $ + C ~~ (C \in \RR)$
+
+
+QUESTION Stammfunktion
+"""
+import random
+from sympy import *
+u = random.randint(3,8)
+x = symbols('x')
+f = u * x**2
+fi = integrate(f,x)
+"""
+Bestimme die Stammfunktion zu $"f"(x) = f $
+- $ \displaystyle F(x) = $ %fi $ + C ~~ (C \in \RR)$
+
+
+QUESTION Stammfunktion
+"""
+import random
+from sympy import *
+x = symbols('x')
+f = cos(x)
+fi = integrate(f,x)
+"""
+Bestimme die Stammfunktion zu $"f"(x) = f $
+- $ \displaystyle F(x) = $ %fi $ + C ~~ (C \in \RR)$
+
+
+QUESTION Stammfunktion
+"""
+import random
+from sympy import *
+a = random.randint(2,4)
+x = symbols('x')
+f = a * sin(x)
+fi = integrate(f,x)
+"""
+Bestimme die Stammfunktion zu $"f"(x) = f $
+- $ \displaystyle F(x) = $ %fi $ + C ~~ (C \in \RR)$
+
+
+QUESTION Uneigentliches Integral
+"""
+import random
+from sympy import *
+a = random.randint(2,4)
+x = symbols('x')
+f = a / x**2
+fi = integrate(f,x)
+"""
+Bestimme das folgende uneigentliche Integral:
+- $ \displaystyle \int_1^{\infty} f ~ dx = $ %a
+
+
+QUESTION Uneigentliche Integrale
+"""
+import random
+[a,b,c,d,e] = random.choices(range(3,4+1),k=5)
+"""
+Welche der folgenden Integrale sind **konvergent**?
+[ ] $ \displaystyle\int_0^{\infty} a x^2 + b ~ dx$
+[ ] $ \displaystyle\int_0^c \frac{d}{x} ~ dx $
+[x] $ \displaystyle\int_1^c \frac{e}{x} ~ dx $
+
+
+QUESTION Partielle Integration
+"""
+from sympy import *
+x = symbols('x')
+f = x * exp(x)
+fi = integrate(f,x)
+"""
+Bestimme durch **partielle Integration:**
+- $ \displaystyle \int f ~ dx = $ %fi $ + C ~~ (C \in \RR)$
+
+
+QUESTION Partielle Integration
+"""
+from sympy import *
+x = symbols('x')
+f = x * sin(x)
+fi = integrate(f,x)
+"""
+Bestimme durch **partielle Integration:**
+- $ \displaystyle \int f ~ dx = $ %fi $ + C ~~ (C \in \RR)$
+
+
+QUESTION Partielle Integration
+"""
+from sympy import *
+x = symbols('x')
+# f = (x+1) / exp(x)
+f = parse_expr("(x+1) / exp(x)", evaluate=False)
+fi = integrate(f,x)
+"""
+Bestimme durch **partielle Integration:**
+- $ \displaystyle \int f ~ dx = $ %fi $ + C ~~ (C \in \RR)$
+
+
+QUESTION Substitutionsregel
+"""
+from sympy import *
+x = symbols('x')
+f = (x+1)**2
+fi = integrate(f,x)
+"""
+Bestimme durch **Substitution:**
+- $ \displaystyle \int f ~ dx = $ %fi $ + C ~~ (C \in \RR)$
+
+
+QUESTION Substitutionsregel
+"""
+from sympy import *
+x = symbols('x')
+f = exp(3*x-1)
+fi = integrate(f,x)
+"""
+Bestimme durch **Substitution:**
+- $ \displaystyle \int f ~ dx = $ %fi $ + C ~~ (C \in \RR)$
+
+
+QUESTION Substitutionsregel
+"""
+from sympy import *
+x = symbols('x')
+f = 3*x * sin(x**2 + 1)
+fi = integrate(f,x)
+"""
+Bestimme durch **Substitution:**
+- $ \displaystyle \int f ~ dx = $ %fi $ + C ~~ (C \in \RR)$
+
+
+QUESTION Partialbruchzerlegung
+"""
+import random
+[a,b] = random.choices(range(3,5+1),k=2)
+"""
+Das folgende Integral soll gelöst werden:
+- $ \displaystyle \int \frac{b}{x (x-a)^2} ~ dx$
+Welcher ist der richtige **Ansatz**?
+(x) $ \displaystyle \frac{A}{x} + \frac{B_1}{x-a} + \frac{B_2}{(x-a)^2}$
+( ) $ \displaystyle \frac{A}{x} + \frac{B}{(x-a)^2}$
+( ) $ \displaystyle \frac{A}{(x-a)^2}$
+( ) $ \displaystyle \frac{A}{x-a} + \frac{B}{(x-a)^2}$
+
+
+QUESTION Partialbruchzerlegung
+"""
+import random
+[a,b] = random.choices(range(2,5+1),k=2)
+c = 2*a
+d = a**2 + b
+"""
+Das folgende Integral soll gelöst werden:
+- $ \displaystyle \int \frac{1}{x^2 + c x + d} ~ dx$
+Welcher ist der richtige **Ansatz**?
+(x) $ \displaystyle \frac{A}{(x+a)^2+b}$
+( ) $ \displaystyle \frac{A}{x-a}$
+( ) $ \displaystyle \frac{A}{x-a} + \frac{B}{(x-a)^2}$
+( ) $ \displaystyle \frac{A}{x-c}^2 + \frac{B}{x-d}$

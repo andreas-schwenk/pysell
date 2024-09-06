@@ -1,0 +1,388 @@
+LANG    de
+TITLE   Lineare Algebra
+AUTHOR  Andreas Schwenk
+
+
+QUESTION Matrizenoperationen
+"""
+import numpy
+A = numpy.random.randint(-3, 3+1, size=(3,3))
+B = numpy.random.randint(-3, 3+1, size=(3,3))
+C = A - B
+"""
+Berechne $ A - B = $ %C
+
+
+QUESTION Matrizenoperationen
+"""
+import random, numpy
+a = random.randint(2,5)
+A = numpy.random.randint(-3, 3+1, size=(3,3))
+B = a * A
+"""
+Berechne $a \cdot A=$ %B
+
+
+QUESTION Transponierte Matrix
+"""
+import random, numpy
+A = numpy.random.randint(1, 3+1, size=(3,2))
+B = A.transpose()
+"""
+Bestimme $ A^T = $ %B
+
+
+QUESTION Matrizenoperationen
+"""
+import numpy
+A = numpy.random.randint(1, 3+1, size=(2,2))
+B = numpy.random.randint(1, 3+1, size=(2,2))
+C = numpy.matmul(A,B)
+"""
+Berechne $ A \cdot B = $ %C
+
+
+QUESTION Matrizenoperationen
+"""
+import numpy
+A = numpy.random.randint(1, 3+1, size=(2,1))
+B = numpy.random.randint(1, 3+1, size=(2,2))
+C = numpy.random.randint(1, 3+1, size=(2,1))
+D = (A + numpy.matmul(B.transpose(),C)).transpose()
+"""
+Berechne $ \left( A + B^T \cdot C \right)^T = $ %D
+
+
+QUESTION Restklassen
+"""
+import random
+[a,b,c] = random.choices(range(10,20+1),k=3)
+[a2,b2,c2,c3] = random.choices(range(2,5+1),k=4)
+sa = a % a2
+b = - b
+sb = b % b2
+sc = (c2*c3) % c2
+"""
+Gebe jeweils den **Standardrepräsentanten** an:
+- $ \ZZ_c2: c2 \cdot c3 \equiv$ %sc $\mod c2 $
+- $ \ZZ_a2: a \equiv$  %sa  $\mod a2 $
+- $ \ZZ_b2: b \equiv$  %sb  $\mod b2 $
+
+
+QUESTION Körper
+Welche der folgenden Restklassen sind **Körper**?
+[x] $\ZZ_3$
+[ ] $\ZZ_4$
+[x] $\ZZ_7$
+[ ] $\ZZ_{10}$
+
+
+QUESTION Multiplikativ inverses Element
+"""
+import random
+n = 7
+b = random.randint(1,6)
+c = b + 1
+b = b % (n-1) + 1
+c = c % (n-1) + 1
+s1 = pow(b, -1, n)
+s2 = pow(c, -1, n)
+"""
+Gebe die **multiplikativ inversen Elemente** für den Körper $GF(n)$ an:
+- $b^{-1} \equiv$  %s1  $\mod n$
+- $c^{-1} \equiv$  %s2  $\mod n$
+
+
+QUESTION Untervektorräume
+"""
+import random, numpy
+[a,b,c,d] = random.choices(range(1,5+1),k=4)
+A = numpy.matrix([[a],[b]])
+Z = numpy.matrix([[0],[0]])
+B = numpy.matrix([[c],[d]])
+"""
+Welche der folgenden Mengen sind Untervektorräume des $\RR^2$?
+[ ] $ M_1 = \left\{ A \right\} $
+[x] $ M_2 = \left\{ Z \right\} $
+[ ] $ M_3 = \left\{ \mu \cdot B ~|~ \mu \in \ZZ \right\} $
+
+
+QUESTION Untervektorräume
+"""
+import random, numpy
+A = numpy.matrix([[1],[1]])
+B = numpy.matrix([[0],[0]])
+C = numpy.matrix([[0],[1]])
+"""
+Welche der folgenden Mengen sind Untervektorräume des $GF(2)^2$?
+[ ] $ M_1 = \left\{ A \right\} $
+[x] $ M_2 = \left\{ B \right\} $
+[x] $ M_4 = \left\{ \lambda \cdot C ~|~ \lambda \in GF(2) \right\} $
+
+
+QUESTION Erzeugendensysteme
+"""
+import random, numpy
+[a,b,c,d,e,f] = random.choices(range(0,1+1),k=6)
+a = 1
+d = 0
+e = 1
+l1 = 0
+l2 = 1
+l3 = 1
+l4 = 1
+g = (a*l1 + d*l2) % 2
+h = (b*l1 + e*l2) % 2
+i = (c*l1 + f*l2) % 2
+j = (a*l3 + d*l4) % 2
+k = (b*l3 + e*l4) % 2
+l = (c*l3 + f*l4) % 2
+abc = numpy.matrix([[a],[b],[c]])
+deff = numpy.matrix([[d],[e],[f]])
+ghi = numpy.matrix([[g],[h],[i]])
+jkl = numpy.matrix([[j],[k],[l]])
+"""
+Seien $ v_1 = abc $, $ v_2 = deff $ Vektoren im $ GF(2)^3 $ und $ U = <v_1,v_2> $. \\
+Welche der folgenden Antworten sind richtig?
+[x] $ w_1 = ghi \in U $
+[x] $ w_2 = jkl \in U $
+
+
+QUESTION Matrizenoperationen
+"""
+import numpy
+A = numpy.random.randint(0, 1+1, size=(2,1))
+B = numpy.random.randint(0, 1+1, size=(2,2))
+C = numpy.random.randint(0, 1+1, size=(2,1))
+Z = (A + numpy.matmul(B.transpose(),C)).transpose()
+Z = numpy.mod(Z, 2)
+"""
+Berechne den folgenden Term über $GF(2)$.
+- $ \left[ A + B^T \cdot C \right]^T =$ %Z
+
+
+QUESTION Matrix-Vektor Multiplikation
+"""
+import numpy
+A = numpy.random.randint(1, 4+1, size=(2,2))
+x = numpy.random.randint(1, 4+1, size=(2,1))
+Ax = numpy.matmul(A,x)
+"""
+Seien $"A"=A$ und $"x"=x$. \\
+$ f("x") = "A" \cdot "x"$ = %Ax
+
+
+QUESTION Determinante
+"""
+import numpy
+A = numpy.random.randint(-5, 5+1, size=(3,3))
+A[0,0] = 0
+A[0,1] = 0
+if A[0,2] == 0:
+    A[0,2] = 1
+d = round(numpy.linalg.det(A))
+"""
+Sei $"A"=A$ eine $3 \times 3$ Matrix über $K=\RR$. \\
+Berechne die **Determinante**:
+- $ \det("A")=$ %d
+
+
+QUESTION Rang
+"""
+import numpy
+A = numpy.random.randint(0, 2, size=(3,3))
+r = numpy.linalg.matrix_rank(A)
+"""
+Sei $ "A" = A $ eine $3 \times 3$ Matrix über $ \RR $. \\
+Bestimme den **Rang**:
+- $\text{rg}("A") = $ %r
+
+
+QUESTION Inverse Matrix
+"""
+from sympy import *
+A = randMatrix(3,3, min=-2, max=2)
+while abs(A.det()) < 1e-9:  # A must be invertible
+    A = randMatrix(3,3, min=-2, max=2)
+iA = A.inv()
+"""
+Berechne die **inverse** Matrix:
+- $ A^{-1} = $ %iA
+
+
+QUESTION Lineare Abbildungen
+"""
+import random
+[a,b,c,d] = random.sample(range(2,9+1),k=4)
+"""
+Ist $f:\RR^2\to\RR^2$, $f(x_1,x_2)=(a x_1 + b x_2, c x_1 + d)$ eine **lineare Abbildung**?
+( ) ja
+(x) nein
+
+
+QUESTION Lineare Abbildungen
+"""
+import numpy, random
+[a,b,c,d,e] = random.sample(range(2,9+1),k=5)
+A = numpy.matrix([[a,0,b],[e,c,d]])
+"""
+Sei die folgende **lineare Abbildung** gegeben:
+- $ f:\RR^3 \to \RR^2 = (a \cdot x_1 + b \cdot x_3, c \cdot x_2 + d \cdot x_3 + e \cdot x_1)$
+Gebe die zugehörige Abbildungsmatrix $"A"$ an:
+- $ "A"=$ %A
+
+
+QUESTION Zusammengesetzte lineare Abbildungen
+"""
+import numpy, random
+[a,b,c,d,e,f,g,h,i] = random.choices(range(0,1+1),k=9)
+A = numpy.matrix([[a,b],[c,d]])
+B = numpy.matrix([[e,f],[g,h]])
+AB = numpy.mod(A*B, 2)
+"""
+Seien die beiden linearen Abbildungen $"f","g" : GF(2)^2 \to GF(2)^2 $ gegeben:
+- $ "f"(x_1, x_2) = ( a \cdot x_1 + b \cdot x_2, c \cdot x_1 + d \cdot x_2 ) $
+- $ "g"(x_1, x_2) = ( e \cdot x_1 + f \cdot x_2, g \cdot x_1 + h \cdot x_2 ) $
+Bestimme zunächst die **lineare Abbildung** $"f"$ und gebe die Lösung als Matrix an:
+- $"A"=$ %A
+Bestimme weiterhin die **lineare Abbildung** $"g"$:
+- $"B"=$ %B
+Bestimme nun die **zusammengesetzte Abbildung** $ "f" \circ "g" $.
+- $"AB"=$ %AB
+
+
+QUESTION Lineare Unabhängigkeit
+"""
+import numpy, random
+[a,b,c,d,e,f,g,h,i] = random.choices(range(0,1+1),k=9)
+v1 = numpy.matrix([[a],[b]])
+v2 = numpy.matrix([[c],[d]])
+A = numpy.matrix([[a,c],[b,d]])
+q1 = (round(numpy.linalg.det(A)) % 2) != 0
+a = (a + 1) % 2
+v3 = numpy.matrix([[a],[b]])
+v4 = numpy.matrix([[c],[d]])
+A = numpy.matrix([[a,c],[b,d]])
+q2 = (round(numpy.linalg.det(A)) % 2) != 0
+v5 = numpy.matrix([[a],[b],[c]])
+v6 = numpy.matrix([[c],[d],[f]])
+v7 = numpy.matrix([[g],[h],[i]])
+A = numpy.matrix([[a,d,g],[b,e,h],[c,f,i]])
+q3 = (round(numpy.linalg.det(A)) % 2) != 0
+"""
+Welche der unten stehenden Vektoren über dem $GF(2)$ sind **linear unabhängig**?
+[!q1] $ v1, v2 $
+[!q2] $ v3, v4 $
+[!q3] $ v5, v6, v7 $
+
+
+QUESTION Basen
+"""
+from sympy import *
+A = randMatrix(3,3, min=0, max=4)
+while abs(A.det()) < 1e-9:  # A must be invertible
+    A = randMatrix(3,3, min=0, max=4)
+q1 = True
+B = randMatrix(3,3, min=0, max=2)
+B[2,2] = 0
+q2 = B.det() != 0
+A0 = A.col(0)
+A1 = A.col(1)
+A2 = A.col(2)
+B0 = B.col(0)
+B1 = B.col(1)
+B2 = B.col(2)
+"""
+Bilden die folgenden Vektoren eine **Basis** des $\R^3$?
+[!q1] $ A0, A1, A2 $
+[!q2] $ B0, B1, B2 $
+*Hinweis: Bestimme zunächst die Determinante.*
+
+
+QUESTION Orthonormalbasis
+"""
+from sympy import *
+import random
+a = random.randint(-2,2)
+b = a + 1
+x = a**2 - b**2
+y = 2 * a * b
+c1 = -y
+c2 = Rational(1, sqrt(x**2 + y**2))
+"""
+Bestimme $c_1 \in \R$, sodass die folgenden beiden Vektoren eine **Orthogonalbasis** des $\R^2$ bilden:
+- $ "b_1"=\begin{pmatrix}x\\y\end{pmatrix}$ $ "b_2"=\begin{pmatrix}c1\\x\end{pmatrix}$
+- $c_1=$ %c1
+Bestimme nun $c_2 \in \R$, sodass die Basis $\{ c_2 \cdot "b_1", c_2 \cdot "b_2" \}$ eine **Orthonormalbasis** ist.
+- $c_2=$ %c2
+
+
+QUESTION Orthogonale Matrizen
+"""
+import numpy
+E2 = numpy.eye(2)
+A = numpy.random.randint(0, 1+1, size=(2,2))
+B = numpy.random.randint(0, 1+1, size=(2,2))
+C = numpy.random.randint(0, 1+1, size=(2,2))
+D = numpy.random.randint(0, 1+1, size=(2,2))
+qa = numpy.allclose(A * A.transpose(), E2)
+qb = numpy.allclose(B * B.transpose(), E2)
+qc = numpy.allclose(C * C.transpose(), E2)
+qd = numpy.allclose(D * D.transpose(), E2)
+"""
+Welche der folgenden Matrizen über $\R$ sind **orthogonal**?
+[!qa] $A$
+[!qb] $B$
+[!qc] $C$
+[!qd] $D$
+
+
+QUESTION Orthogonale Matrizen
+"""
+import random
+c = random.randint(-4,-2)
+d = random.randint(2,4)
+a = c**2 + d**2
+b = -c
+"""
+Bestimme $a, b \in \R$, sodass die folgende Matrix über $\R$ **orthogonal** ist:
+- $ \displaystyle \frac{1}{\sqrt{"a"}} \begin{pmatrix}c & d\\d & "b"\end{pmatrix} $
+$"a"=$ %a $"b"=$ %b
+
+
+QUESTION Eigenwerte
+"""
+import random
+a = random.randint(1,5)
+b = random.randint(-8,-2)
+lam = { a, b }
+"""
+Sei $A=\begin{pmatrix}a & 0\\0 & b\end{pmatrix}$. \\
+Gebe die **Eigenwerte** von $A$ an:
+- $\lambda=$ %lam
+
+
+QUESTION Eigenwerte
+"""
+from sympy import *
+A = randMatrix(2,2, min=1, max=2)
+while abs(A.det()) < 1e-9 or not A.is_symmetric():  # A must be invertible and symmetric
+    A = randMatrix(2,2, min=1, max=2)
+lam = set(A.eigenvals().keys())
+"""
+Sei $"A"=A$. \\
+Gebe die **Eigenwerte** von $"A"$ an:
+- $\lambda=$ %lam
+*Hinweis: Gebe bei Bedarf `sqrt(x)` für $\sqrt{x}$ an.*
+
+
+QUESTION Eigenwerte
+"""
+import numpy
+A = numpy.random.randint(-10, 10+1, size=(4,4))
+A = numpy.triu(A)
+lam = {A[0,0], A[1,1], A[2,2], A[3,3]}
+"""
+Sei $"A"=A$. \\
+Gebe die **Eigenwerte** von $"A"$ an:
+- $\lambda=$ %lam

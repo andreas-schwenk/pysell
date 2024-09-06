@@ -1,0 +1,254 @@
+LANG    de
+TITLE   Grundlagen
+AUTHOR  Andreas Schwenk
+
+
+QUESTION Mengen
+"""
+import random
+[a,b,c] = random.sample(range(1,5+1),k=3)
+A = {a,b,c}
+B = {a,c}
+"""
+Gegeben sei die Menge $"A"=A$.
+Ist die folgende Aussage wahr?
+[x] $B \subset "A"$
+
+
+QUESTION Mengen
+"""
+import random
+[a,b,c,d] = random.sample(range(1,10+1),k=4)
+A = {a, a+b, a+b+c, a+b+c+d}
+p = 2**len(A)
+"""
+Sei $"A"=A$.
+Wie viele Elemente hat die **Potenzmenge** $P("A")$? \\
+%p
+
+
+QUESTION Mengenoperationen
+Seien $A$ und $B$ Mengen. $A \cup B$ beschreibt:
+(x) die **Vereinigung** von $A$ und $B$.
+( ) den **Durchschnitt** von $A$ und $B$.
+
+
+QUESTION Menge
+"""
+import random
+[a,b,c] = random.sample(range(1,5+1),k=3)
+n = 2
+"""
+Wie viele Elemente hat die Menge $\{\{a,b\},\{c\}\}$? \\
+%n
+
+
+QUESTION Mengen
+"""
+import random
+[a,b,c] = random.sample(range(1,10+1),k=3)
+A = {a,b,c}
+x = max(A) + 4
+"""
+Gegeben Sei die Menge $"A"=A$. Welche der folgenden Aussagen sind wahr?
+[x] $ a \in "A" $
+[x] $ x \notin "A" $
+
+
+QUESTION Mengen
+"""
+import random
+a = random.randint(1,5)
+B = {a,a*2,a*3}
+"""
+Gegeben Sei die Menge $ "B" = \{ k \in \NN | k=a \cdot n ~\text{und}~ n \leq 3 \} $. Gebe die Menge **explizit** an: \\
+$"B"=$ %B
+
+
+QUESTION Summe
+"""
+import random
+a = random.randint(2,4)
+n = random.randint(3,5)
+s = a * n
+"""
+Berechne $\displaystyle \sum_{i=1}^n a$: \\
+%s
+
+
+QUESTION Summe
+"""
+import random
+a = random.randint(2,4)
+n = 3
+s = a * 6
+"""
+Berechne $\displaystyle \sum_{i=1}^n a \cdot i$: \\
+%s
+
+
+QUESTION Produkt
+"""
+import random
+a = random.randint(2,4)
+n = random.randint(3,5)
+p = a ** n
+"""
+Berechne $\displaystyle \prod_{i=1}^n a$: \\
+%p
+
+
+QUESTION Fakultät
+"""
+import random, math
+a = random.randint(3,6)
+f = math.factorial(a)
+"""
+Gebe $a!$ wertmäßig an: \\
+%f
+
+
+QUESTION Binomialkoeffizient
+"""
+import random, math
+n = random.randint(3,5)
+k = random.randint(0,n)
+b = math.comb(n,k)
+"""
+Bestimme den Binomialkoeffizienten $\begin{pmatrix}n\\k\end{pmatrix}$ mit Hilfe des **Pascalschen Dreiecks**. \\
+%b
+
+
+QUESTION Intervalle reeller Zahlen
+Seien $ a, b \in \RR $.
+Wähle die richtigen Antworten aus:
+[x] $ [a, b] $ ist ein geschlossenes Intervall
+[x] $ [a, b[ $ ist ein halboffenes Intervall
+[ ] $ ]a, b[ $ ist ein geschlossenes Intervall
+[x] $ ]a, b] $ ist ein halboffenes Intervall
+
+
+QUESTION Supremum, Infimum
+Sei $X \subset \RR$. Fülle den Lückentext aus.
+- $M \in \RR$ heißt **Supremum** von $X$, falls $M$ eine %"obere" Schranke ist und keine kleinere %"obere" Schranke existiert.
+- $M \in \RR$ heißt **Infimum** von $X$, falls $m$ eine %"untere" Schranke ist und keine größere %"untere" Schranke existiert.
+
+
+QUESTION Beschränkte Mengen
+"""
+import random
+a = random.randint(-5,-2)
+b = a + 3
+[x,y] = random.sample(range(1,3+1),k=2)
+c = b + x
+d = c + y
+m = a
+M = d
+"""
+Sei $ X = [a, c[ ~\cup~ [b, d[ $.
+Bestimme:
+- Infimum m = inf $(X)=$ %m
+- Supremum M = sup $(X)=$ %M
+Wähle die richtigen Antworten aus:
+[x] Das Minimum von X existiert
+[ ] Das Maximum von X existiert
+
+
+QUESTION Betrag
+"""
+import random
+a = random.randint(-10,-1)
+b = abs(a)
+"""
+$|a|=$ %b \\
+Wähle die richtigen Antworten aus:
+[x] $ |xy| = |x| |y| $
+[x] $ |x+y| \leq |x| + |y| $
+[ ] $ |x+y| \geq |x| + |y| $
+
+
+QUESTION Aussagenlogik
+Seien $A$ und $B$ Aussagen. Die **Konjunktion** von $A$ und $B$ wird dargestellt durch:
+(x) $A \land B$
+( ) $A \lor B$
+
+
+QUESTION Aussagenlogik
+"""
+import random
+[a,b,c,d] = random.choices(range(3,5+1),k=4)
+"""
+Welche der folgenden Ausdrücke sind **wahre Aussagen**?
+[ ] Die Menge $M=\{k \in \NN ~|~ k=2 m ~\text{und}~ m>3 \}$ hat 3 Elemente.
+[ ] $a + b \cdot c$.
+[x] $\exists x \in \ZZ ~~ x < 0$
+[x] Die Gleichung $a x + c = d$ besitzt genau eine Lösung.
+
+
+QUESTION Aussagenlogik
+Welche der folgenden Aussagen sind wahr?
+[ ] $ \exists x \in \RR ~~ x < x  $
+[x] $ \forall y \in \ZZ ~~ y^2 \geq 0 $
+[ ] $ \forall z \in \RR ~~ (z \leq 0  \land  z > 0) $
+[x] $ \forall z \in \RR ~~ (z \leq 0  \lor  z > 0) $
+
+
+QUESTION Injektivität, Surjektivität, Bijektivität
+"""
+import random
+a = random.randint(2,10)
+"""
+Betrachte die folgende Abbildung und wähle die richtigen Antworten aus:
+$ f : \RR \to [a,\infty[, ~~  f(x) = x^2 + a $
+[ ] $f$ ist injektiv.
+[x] $f$ ist surjektiv.
+[ ] $f$ ist bijektiv.
+
+
+QUESTION Verkettung von Funktionen
+"""
+import random
+[a,b,c] = random.choices(range(2,5+1),k=3)
+"""
+Sei  $ f : \RR \to \RR $, $ f(x) = a \cdot x + b $ und $ g : \RR \to \RR, g(x) = x^c $.
+Wähle die richtige Antwort aus:
+(x) $ (g \circ f)(x) = (a \cdot x + b)^c $
+( ) $ (g \circ f)(x) = a \cdot x^c + b $
+
+
+QUESTION Gerade und ungerade Funktionen
+Welche der nachfolgenden Funktionen sind **gerade**?
+[x] $ f(x) = x^2 $
+[ ] $ f(x) = x^3 $
+[x] $ f(x) = x^4 + 3 x^2 + 7 $
+[ ] $ f(x) = 2 x^5 - 2 x^2 + 4 $
+
+
+QUESTION Beschränktheit
+"""
+import random
+a = random.randint(2,5)
+"""
+Sei $ f : \RR \to \RR, x \mapsto (x+a)^2 $.
+Wähle die richtigen Antworten aus:
+[x] $f$ ist nach **unten beschränkt**.
+[ ] $f$ ist nach **oben beschränkt**.
+
+
+QUESTION Monotonie
+"""
+import random
+[a,b,c,d] = random.choices(range(2,5+1),k=4)
+"""
+Wähle die richtigen Antworten aus:
+[x] $ f : \RR \to \RR, f(x)=a $ ist **monoton wachsend**.
+[x] $ f : \RR \to \RR, f(x)=b x + c $ ist **streng monoton wachsend**.
+[ ] $ f : \RR \to \RR, f(x)=|x| $ ist **streng monoton wachsend**.
+[x] $ f : \RR \to \RR, f(x)=-x^3-x-d $ ist **streng monoton fallend**.
+
+
+QUESTION Umkehrabbildung
+Eine Funktion $f$ besitzt genau dann eine Umkehrfunktion, wenn folgendes gilt:
+[ ] $f$ ist surjektiv oder injektiv.
+[x] $f$ is surjektiv und injektiv.
+[x] $f$ ist bijektiv.
