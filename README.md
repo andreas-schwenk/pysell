@@ -1,6 +1,6 @@
 # pySELL
 
-<img src="img/logo.jpg" style="max-width: 128px"/>
+<img src="img/logo.jpg" width="128" height="128"/>
 
 `pySELL` is a Python-based Simple E-Learning Language designed for the rapid creation of interactive STEM quizzes, with a focus on randomized math questions.
 
