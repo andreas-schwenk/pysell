@@ -11,9 +11,16 @@
  * evaluated, and compared web-based. Trivial example: The sample solution
  * term is given by string "x^2", and the student entered string "xx".
  * Both terms must be treated equivalent.
+ *
+ * Implementation of new unary functions (e.g. "sin"):
+ * 1. add evaluation in Term.eval(..)
+ * 2. add to grammar in comment of Term.parse(..)
+ * 3. add to Term.fun1(..)
+ * 4. add to TermNode.toTexStr(..)
  */
 
-// TODO: boolean
+// TODO: boolean operands and operators
+// TODO: fun2: atan2
 
 /**
  * Given n, the list [0,1,...,n-1] (or a permutation in case "shuffled" is true)
@@ -323,15 +330,31 @@ export class Term {
       }
       case ".-":
       case "abs":
-      case "sin":
-      case "sinc":
+      case "acos":
+      case "acosh":
+      case "asin":
+      case "asinh":
+      case "atan":
+      case "atanh":
+      case "ceil":
       case "cos":
-      case "tan":
+      case "cosh":
       case "cot":
       case "exp":
+      case "floor":
       case "ln":
       case "log":
-      case "sqrt": {
+      case "log10":
+      case "log2":
+      case "round":
+      case "sin":
+      case "sinc":
+      case "sinh":
+      case "sqrt":
+      case "tan":
+      case "tanh": {
+        // TODO: throw error, if e.g. div/0, catch when comparing terms numerically
+
         // unary operation (".-" is the UNARY minus, e.g. "-5")
         let u = this.eval(dict, node.c[0]);
         switch (node.op) {
@@ -343,26 +366,124 @@ export class Term {
             res.re = Math.sqrt(u.re * u.re + u.im * u.im);
             res.im = 0;
             break;
-          case "sin":
-            res.re = Math.sin(u.re) * Math.cosh(u.im);
-            res.im = Math.cos(u.re) * Math.sinh(u.im);
-            break;
-          case "sinc":
-            // "unroll" term first, and then evaluate recursively
-            tn = new TermNode("/", [new TermNode("sin", [u]), u]);
+          case "acos": // TODO: test!!!!!
+            // acos(u) = -i * ln( u + i * sqrt(1 - u^2) )
+            tn = new TermNode("*", [
+              TermNode.const(0, -1),
+              new TermNode("ln", [
+                new TermNode("+", [
+                  TermNode.const(0, 1),
+                  new TermNode("sqrt", [
+                    new TermNode("-", [
+                      TermNode.const(1, 0),
+                      new TermNode("*", [u, u]),
+                    ]),
+                  ]),
+                ]),
+              ]),
+            ]);
             res = this.eval(dict, tn);
+            break;
+          case "acosh":
+            // TODO: test!!!!!
+            // acosh(u) = ln( u + sqrt( u^2 - 1 ) )
+            tn = new TermNode("*", [
+              u,
+              new TermNode("sqrt", [
+                new TermNode("-", [
+                  new TermNode("*", [u, u]),
+                  TermNode.const(1, 0),
+                ]),
+              ]),
+            ]);
+            res = this.eval(dict, tn);
+            break;
+          case "asin":
+            // TODO: test!!!!!
+            // asin(u) = -i * ln( i * u + sqrt(1 - u^2) )
+            tn = new TermNode("*", [
+              TermNode.const(0, -1),
+              new TermNode("ln", [
+                new TermNode("+", [
+                  new TermNode("*", [TermNode.const(0, 1), u]),
+                  new TermNode("sqrt", [
+                    new TermNode("-", [
+                      TermNode.const(1, 0),
+                      new TermNode("*", [u, u]),
+                    ]),
+                  ]),
+                ]),
+              ]),
+            ]);
+            res = this.eval(dict, tn);
+            break;
+          case "asinh":
+            // TODO: test!!!!!
+            // asinh(u) = ln( u + sqrt( u^2 + 1 ) )
+            tn = new TermNode("*", [
+              u,
+              new TermNode("sqrt", [
+                new TermNode("+", [
+                  new TermNode("*", [u, u]),
+                  TermNode.const(1, 0),
+                ]),
+              ]),
+            ]);
+            res = this.eval(dict, tn);
+            break;
+          case "atan":
+            // TODO: test!!!!!
+            // atan(u) = 0.5*i * ln( (1 - i*u) / (1 + i*u) )
+            tn = new TermNode("*", [
+              TermNode.const(0, 0.5),
+              new TermNode("ln", [
+                new TermNode("/", [
+                  new TermNode("-", [
+                    TermNode.const(0, 1),
+                    new TermNode("*", [TermNode.const(0, 1), u]),
+                  ]),
+                  new TermNode("+", [
+                    TermNode.const(0, 1),
+                    new TermNode("*", [TermNode.const(0, 1), u]),
+                  ]),
+                ]),
+              ]),
+            ]);
+            res = this.eval(dict, tn);
+            break;
+          case "atanh":
+            // TODO: test!!!!!
+            // atanh(u) = 0.5 * ln( (1+z) / (1-z) )
+            tn = new TermNode("*", [
+              TermNode.const(0.5, 0),
+              new TermNode("ln", [
+                new TermNode("/", [
+                  new TermNode("+", [TermNode.const(1, 0), u]),
+                  new TermNode("-", [TermNode.const(1, 0), u]),
+                ]),
+              ]),
+            ]);
+            res = this.eval(dict, tn);
+            break;
+          case "ceil": // TODO: test!!!!!
+            res.re = Math.ceil(u.re);
+            res.im = Math.ceil(u.im);
             break;
           case "cos":
             res.re = Math.cos(u.re) * Math.cosh(u.im);
             res.im = -Math.sin(u.re) * Math.sinh(u.im);
             break;
-          case "tan":
-            // TODO: throw error, if abs(t1)<EPS + catch when comparing terms numerically
-            t1 =
-              Math.cos(u.re) * Math.cos(u.re) +
-              Math.sinh(u.im) * Math.sinh(u.im);
-            res.re = (Math.sin(u.re) * Math.cos(u.re)) / t1;
-            res.im = (Math.sinh(u.im) * Math.cosh(u.im)) / t1;
+          case "cosh":
+            // TODO: test!!!!!
+            // cosh(u) = 0.5 * (exp(u) + exp(-u))
+            tn = new TermNode("*", [
+              TermNode.const(0.5, 0),
+              new TermNode("+", [
+                new TermNode("exp", [u]),
+                new TermNode("exp", [new TermNode(".-", [u])]),
+              ]),
+            ]);
+            res = this.eval(dict, tn);
             break;
           case "cot":
             // TODO: throw error, if abs(t1)<EPS + catch when comparing terms numerically
@@ -376,15 +497,84 @@ export class Term {
             res.re = Math.exp(u.re) * Math.cos(u.im);
             res.im = Math.exp(u.re) * Math.sin(u.im);
             break;
+          case "floor": // TODO: test!!!!!
+            res.re = Math.floor(u.re);
+            res.im = Math.floor(u.im);
+            break;
           case "ln":
           case "log":
+            // ln(u) = ln|u| + i * arg(u)
             res.re = Math.log(Math.sqrt(u.re * u.re + u.im * u.im));
             t1 = Math.abs(u.im) < EPS ? 0 : u.im; // prevent "-0" and similar
             res.im = Math.atan2(t1, u.re);
             break;
+          case "log10": // TODO: test!!!!!
+            // log10(u) = ln(u) / ln(10)
+            tn = new TermNode("/", [
+              new TermNode("ln", [u]),
+              new TermNode("ln", [TermNode.const(10)]),
+            ]);
+            res = this.eval(dict, tn);
+            break;
+          case "log2": // TODO: test!!!!!
+            // log2(u) = ln(u) / ln(2)
+            tn = new TermNode("/", [
+              new TermNode("ln", [u]),
+              new TermNode("ln", [TermNode.const(2)]),
+            ]);
+            res = this.eval(dict, tn);
+            break;
+          case "round": // TODO: test!!!!!
+            res.re = Math.round(u.re);
+            res.im = Math.round(u.im);
+            break;
+          case "sin":
+            res.re = Math.sin(u.re) * Math.cosh(u.im);
+            res.im = Math.cos(u.re) * Math.sinh(u.im);
+            break;
+          case "sinc":
+            // "unroll" term first, and then evaluate recursively
+            tn = new TermNode("/", [new TermNode("sin", [u]), u]);
+            res = this.eval(dict, tn);
+            break;
+          case "sinh":
+            // TODO: test!!!!!
+            // sinh(u) = 0.5 * (exp(u) - exp(-u))
+            tn = new TermNode("*", [
+              TermNode.const(0.5, 0),
+              new TermNode("-", [
+                new TermNode("exp", [u]),
+                new TermNode("exp", [new TermNode(".-", [u])]),
+              ]),
+            ]);
+            res = this.eval(dict, tn);
+            break;
           case "sqrt": // u^(0.5)
             // "unroll" term first, and then evaluate recursively
             tn = new TermNode("^", [u, TermNode.const(0.5)]);
+            res = this.eval(dict, tn);
+            break;
+          case "tan":
+            // TODO: throw error, if abs(t1)<EPS + catch when comparing terms numerically
+            t1 =
+              Math.cos(u.re) * Math.cos(u.re) +
+              Math.sinh(u.im) * Math.sinh(u.im);
+            res.re = (Math.sin(u.re) * Math.cos(u.re)) / t1;
+            res.im = (Math.sinh(u.im) * Math.cosh(u.im)) / t1;
+            break;
+          case "tanh":
+            // TODO: test!!!!!
+            // tanh(u) = (exp(u) - exp(-u)) / (exp(u) + exp(-u))
+            tn = new TermNode("/", [
+              new TermNode("-", [
+                new TermNode("exp", [u]),
+                new TermNode("exp", [new TermNode(".-", [u])]),
+              ]),
+              new TermNode("+", [
+                new TermNode("exp", [u]),
+                new TermNode("exp", [new TermNode(".-", [u])]),
+              ]),
+            ]);
             res = this.eval(dict, tn);
             break;
         }
@@ -396,6 +586,8 @@ export class Term {
           if (id === "pi") return TermNode.const(Math.PI);
           else if (id === "e") return TermNode.const(Math.E);
           else if (id === "i") return TermNode.const(0, 1);
+          else if (id === "true") return TermNode.const(1);
+          else if (id === "false") return TermNode.const(0);
           else if (id in dict) return dict[id];
           throw new Error("eval-error: unknown variable '" + id + "'");
         } else {
@@ -417,8 +609,10 @@ export class Term {
    *   unary = "-" mul | infix;
    *   infix = NUM | fct1 mul | fct1 "(" expr ")" | "(" expr ")" |
    *           "|" expr "|" STR;
-   *   fct1 = "abs" | "sin" | "sinc" | "cos" | "tan" | "cot" | "exp" | "ln" |
-   *          "sqrt";
+   *   fct1 = "abs" | "acos" | "acosh" | "asin" | "asinh" | "atan" | "atanh" |
+   *          "ceil" | "cos" | "cosh" | "cot" | "exp" | "floor" | "ln" | "log" |
+   *          "log10" | "log2" | "round" | "sin" | "sinc" | "sinh" | "sqrt" |
+   *          "tan" | "tanh";
    * @param {string} src -- the input term to be parsed, e.g. "sin xy ^2"
    */
   static parse(src) {
@@ -584,6 +778,8 @@ export class Term {
     } else if (this.isAlpha(this.token[0])) {
       let id = "";
       if (this.token.startsWith("pi")) id = "pi";
+      else if (this.token.startsWith("true")) id = "true";
+      else if (this.token.startsWith("false")) id = "false";
       else if (this.token.startsWith("C1")) id = "C1";
       else if (this.token.startsWith("C2")) id = "C2";
       else id = this.token[0];
@@ -635,14 +831,29 @@ export class Term {
   fun1() {
     const fun1 = [
       "abs",
-      "sinc",
-      "sin",
+      "acos",
+      "acosh",
+      "asin",
+      "asinh",
+      "atan",
+      "atanh",
+      "ceil",
       "cos",
-      "tan",
+      "cosh",
       "cot",
       "exp",
+      "floor",
       "ln",
+      "log",
+      "log10",
+      "log2",
+      "round",
+      "sin",
+      "sinc",
+      "sinh",
       "sqrt",
+      "tan",
+      "tanh",
     ];
     for (let f of fun1) {
       if (this.token.toLowerCase().startsWith(f)) return f;
@@ -881,12 +1092,40 @@ export class TermNode {
         s = "\\frac{" + u + "}{" + v + "}";
         break;
       }
-      case "sin":
-      case "sinc":
+      case "floor": {
+        let u = this.c[0].toTexString(true); // operand w/o parentheses!
+        s += "\\" + this.op + "\\left\\lfloor" + u + "\\right\\rfloor";
+        break;
+      }
+      case "ceil": {
+        let u = this.c[0].toTexString(true); // operand w/o parentheses!
+        s += "\\" + this.op + "\\left\\lceil" + u + "\\right\\rceil";
+        break;
+      }
+      case "round": {
+        let u = this.c[0].toTexString(true); // operand w/o parentheses!
+        s += "\\" + this.op + "\\left[" + u + "\\right]";
+        break;
+      }
+      case "acos":
+      case "acosh":
+      case "asin":
+      case "asinh":
+      case "atan":
+      case "atanh":
       case "cos":
-      case "tan":
+      case "cosh":
       case "cot":
       case "exp":
+      case "ln":
+      case "log":
+      case "log10":
+      case "log2":
+      case "sin":
+      case "sinc":
+      case "sinh":
+      case "tan":
+      case "tanh":
       case "ln": {
         let u = this.c[0].toTexString(true); // operand w/o parentheses!
         s += "\\" + this.op + "\\left(" + u + "\\right)";
