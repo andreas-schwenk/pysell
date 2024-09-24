@@ -1814,6 +1814,10 @@ def main():
     if len(sys.argv) < 2:
         print("USAGE: pysell [-J] INPUT_PATH.txt")
         print("   option -J enables to output a JSON file for debugging purposes")
+        print("EXAMPLE: pysell my-quiz.txt")
+        print(
+            "   compiles quiz definition in file 'my-quiz.txt' to file 'my-quiz.html'"
+        )
         sys.exit(-1)
     write_explicit_json_file = "-J" in sys.argv
     input_path = sys.argv[-1]
