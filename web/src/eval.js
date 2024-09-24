@@ -209,19 +209,23 @@ export function evalQuestion(question) {
   let text = choices[Math.floor(Math.random() * choices.length)];
   question.feedbackPopupDiv.innerHTML = text;
   question.feedbackPopupDiv.style.color =
-    question.state === QuestionState.passed ? "green" : "maroon";
-  question.feedbackPopupDiv.style.display = "block";
+    question.state === QuestionState.passed ? "var(--green)" : "var(--red)";
+  question.feedbackPopupDiv.style.display = "flex";
   setTimeout(() => {
     question.feedbackPopupDiv.style.display = "none";
-  }, 500);
+  }, 1000);
   // change the question button
+  question.editingEnabled = true;
   if (question.state === QuestionState.passed) {
-    if (question.src.instances.length > 0) {
+    question.editingEnabled = false;
+    if (question.src.instances.length > 1) {
       // if the student passed and there are other question instances,
       // provide the ability to repeat the question
       question.checkAndRepeatBtn.innerHTML = iconRepeat;
-    } else question.checkAndRepeatBtn.style.display = "none";
-  } else {
+    } else {
+      question.checkAndRepeatBtn.style.visibility = "hidden";
+    }
+  } else if (question.checkAndRepeatBtn != null) {
     // in case of non-passing, the check button must be provided (kept)
     question.checkAndRepeatBtn.innerHTML = iconCheck;
   }

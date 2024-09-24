@@ -1125,8 +1125,7 @@ export class TermNode {
       case "sinc":
       case "sinh":
       case "tan":
-      case "tanh":
-      case "ln": {
+      case "tanh": {
         let u = this.c[0].toTexString(true); // operand w/o parentheses!
         s += "\\" + this.op + "\\left(" + u + "\\right)";
         break;

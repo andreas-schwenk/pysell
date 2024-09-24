@@ -12,7 +12,6 @@
 import {
   genButton,
   genDiv,
-  genInputField,
   genLi,
   genMathSpan,
   genSpan,
@@ -98,6 +97,8 @@ export class Question {
     this.numChecked = 0;
     /** @type {boolean} -- true, iff the question as a check button */
     this.hasCheckButton = true;
+    /** @type {boolean} */
+    this.editingEnabled = true;
   }
 
   /**
@@ -141,40 +142,35 @@ export class Question {
     let color2 = "transparent";
     switch (this.state) {
       case QuestionState.init:
-      case QuestionState.incomplete:
-        color1 = "rgb(0,0,0)";
-        color2 = "transparent";
+        color1 = "black";
         break;
       case QuestionState.passed:
-        color1 = "rgb(0,150,0)";
-        color2 = "rgba(0,150,0, 0.025)";
+        color1 = "var(--green)";
+        color2 = "rgba(0,150,0, 0.035)";
         break;
+      case QuestionState.incomplete:
       case QuestionState.errors:
-        color1 = "rgb(150,0,0)";
-        color2 = "rgba(150,0,0, 0.025)";
+        color1 = "var(--red)";
+        color2 = "rgba(150,0,0, 0.035)";
         if (this.includesSingleChoice == false && this.numChecked >= 5) {
           // TODO: support this feedback, if there are answer fields beyond
           // single-choice. Currently, each single-choice option increments
           // this.numChecked; so scoring feedback is turned off.
           this.feedbackSpan.innerHTML =
-            "" + this.numCorrect + " / " + this.numChecked;
+            "&nbsp;&nbsp;" + this.numCorrect + " / " + this.numChecked;
         }
         break;
     }
-    this.questionDiv.style.color =
-      this.feedbackSpan.style.color =
-      this.titleDiv.style.color =
-      this.checkAndRepeatBtn.style.backgroundColor =
-      this.questionDiv.style.borderColor =
-        color1;
     this.questionDiv.style.backgroundColor = color2;
+    this.questionDiv.style.borderColor = color1;
   }
 
   /**
    * Generate the DOM of the question.
+   * @param {boolean} [hideCheckBtn=false]
    * @returns {void}
    */
-  populateDom() {
+  populateDom(hideCheckBtn = false) {
     this.parentDiv.innerHTML = "";
     // generate question div
     this.questionDiv = genDiv();
@@ -220,10 +216,13 @@ export class Question {
     // generate question text
     for (let c of this.src.text.c)
       this.questionDiv.appendChild(this.generateText(c));
+
     // generate button row
     let buttonDiv = genDiv();
+    buttonDiv.innerHTML = "";
+    buttonDiv.classList.add("button-group");
     this.questionDiv.appendChild(buttonDiv);
-    buttonDiv.classList.add("buttonRow");
+
     // (a) check button
     this.hasCheckButton = Object.keys(this.expected).length > 0;
     if (this.hasCheckButton) {
@@ -231,13 +230,16 @@ export class Question {
       buttonDiv.appendChild(this.checkAndRepeatBtn);
       this.checkAndRepeatBtn.innerHTML = iconCheck;
       this.checkAndRepeatBtn.style.backgroundColor = "black";
+      if (hideCheckBtn) {
+        this.checkAndRepeatBtn.style.height = "0";
+        this.checkAndRepeatBtn.style.visibility = "hidden";
+      }
     }
-    // (c) spacing
-    let space = genSpan("&nbsp;&nbsp;&nbsp;");
-    buttonDiv.appendChild(space);
-    // (d) feedback text
+    // (c) feedback text
     this.feedbackSpan = genSpan("");
+    this.feedbackSpan.style.userSelect = "none";
     buttonDiv.appendChild(this.feedbackSpan);
+
     // debug text (variables, python src, text src)
     if (this.debug) {
       if (this.src.variables.length > 0) {
@@ -269,6 +271,7 @@ export class Question {
         }
         varDiv.innerHTML = html;
       }
+
       // syntax highlighted source code
       let sources = ["python_src_html", "text_src_html"];
       let titles = ["Python Source Code", "Text Source Code"];
@@ -288,11 +291,13 @@ export class Question {
         }
       }
     }
+
     // evaluation
     if (this.hasCheckButton) {
       this.checkAndRepeatBtn.addEventListener("click", () => {
         if (this.state == QuestionState.passed) {
           this.state = QuestionState.init;
+          this.editingEnabled = true;
           this.reset();
           this.populateDom();
         } else {
@@ -390,6 +395,7 @@ export class Question {
           node.t == "span" || spanInsteadParagraph ? "span" : "p"
         );
         for (let c of node.c) e.appendChild(this.generateText(c));
+        e.style.userSelect = "none";
         return e;
       }
       case "text": {
@@ -565,6 +571,7 @@ export class Question {
           if (mc) {
             // multi-choice
             tr.addEventListener("click", () => {
+              if (this.editingEnabled == false) return;
               this.editedQuestion();
               this.student[answerId] =
                 this.student[answerId] === "true" ? "false" : "true";
@@ -575,6 +582,7 @@ export class Question {
           } else {
             // single-choice
             tr.addEventListener("click", () => {
+              if (this.editingEnabled == false) return;
               this.editedQuestion();
               for (let id of answerIDs) this.student[id] = "false";
               this.student[answerId] = "true";

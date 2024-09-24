@@ -58,6 +58,7 @@ export class GapInput {
     let input = genInputField(width);
     question.gapInputs[this.inputId] = input;
     input.addEventListener("keyup", () => {
+      if (question.editingEnabled == false) return;
       this.question.editedQuestion();
       input.value = input.value.toUpperCase();
       this.question.student[this.inputId] = input.value.trim();
@@ -120,21 +121,32 @@ export class TermInput {
     this.outerSpan.appendChild(this.equationPreviewDiv);
     // events
     this.inputElement.addEventListener("click", () => {
+      if (question.editingEnabled == false) return;
       // mark the question as altered
       this.question.editedQuestion();
       this.edited();
     });
     this.inputElement.addEventListener("keyup", () => {
+      if (question.editingEnabled == false) return;
       // mark the question as altered
       this.question.editedQuestion();
       this.edited();
     });
+
+    this.inputElement.addEventListener("focus", () => {
+      if (question.editingEnabled == false) return;
+    });
+
     this.inputElement.addEventListener("focusout", () => {
       // hide the TeX preview in case that the focus to the input was lost
       this.equationPreviewDiv.innerHTML = "";
       this.equationPreviewDiv.style.display = "none";
     });
     this.inputElement.addEventListener("keydown", (e) => {
+      if (question.editingEnabled == false) {
+        e.preventDefault();
+        return;
+      }
       // forbid special characters
       let allowed = "abcdefghijklmnopqrstuvwxyz";
       allowed += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
