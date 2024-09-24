@@ -1,5 +1,7 @@
 # pySELL
 
+**Welcome! Check out the demo site [here](https://andreas-schwenk.github.io/pysell/ex1.html).**
+
 <img src="https://raw.githubusercontent.com/andreas-schwenk/pysell/refs/heads/main/img/logo.jpg" width="128" height="128"/>
 
 `pySELL` is a Python-based Simple E-Learning Language designed for the rapid creation of interactive STEM quizzes, with a focus on randomized math questions.
