@@ -1,3 +1,9 @@
+# TODO: TIMER, PTS in README.md
+
+# TODO: CSS: all-camel case or hyphens
+# TODO: show points in exercises
+
+# TODO: variables with negative values -> auto-parentheses
 
 # TODO: audio feedback
 # TODO: LaTeX between questions (-> complete course)
@@ -38,8 +44,6 @@
 
 # TODO: gif-videos as tutorials for editing, compiling, debugging, using
 # TODO: guide how to import questions to Moodle/Ilias
-
-# TODO: publish pysell as python package
 
 # TODO: use Babel in esbuild to support older browsers
 

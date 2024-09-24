@@ -154,9 +154,41 @@ What is shown in the image?
 ( ) the PostScript logo
 ```
 
+### Quiz with time limit
+
+Create timed quiz pages easily by adding the `TIMER` keyword to the preamble. Once the timer expires, all questions will be automatically evaluated at once.
+
+```
+LANG    en
+TITLE   pySELL demo with time limit
+AUTHOR  Andreas Schwenk
+
+TIMER   30            # all questions will be evaluated when the timer runs out.
+
+QUESTION Addition                 # student earns 1 points per default
+"""
+import random
+x = random.randint(-10, 10)
+y = random.randint(1, 10)
+z = x + y
+"""
+Calculate $x + y =$ %z
+
+QUESTION Multiplication (2 pts)    # student earns 2 points
+"""
+import random
+x = random.randint(-10, 10)
+y = random.randint(1, 10)
+z = x * y
+"""
+Calculate $x \cdot y =$ %z
+```
+
 ## Syntax
 
 This section describes the syntax of `pySELL`. Many aspects are self-explanatory and can be understood from the [example file](https://github.com/andreas-schwenk/pysell/blob/main/examples/ex1.txt).
+
+![](https://raw.githubusercontent.com/andreas-schwenk/pysell/refs/heads/main/img/example2.jpg)
 
 ### Global
 
@@ -167,6 +199,8 @@ This section describes the syntax of `pySELL`. Many aspects are self-explanatory
 - `AUTHOR` defines the author or institution of the quizzes. You may include HTML code, but everything must be written on the same line where the author keyword starts.
 
 - `QUESTION` marks the beginning of a new question. The title of the question should be written on the same line.
+
+- `TIMER` restricts the time students have to complete the quiz page. The time, specified in seconds, is written after a space.
 
 - `#` introduces a comment, i.e., text that is not considered by the compiler.
 
@@ -360,7 +394,7 @@ To debug (or extend) the web code, first convert an input file into a json file 
 
 Then start a local web server (e.g. using `python3 -m http.server 8000`) and open `web/index.html` (e.g. `localhost:8000/web/`, if your port number is 8000). The uncompressed JavaScript code in directory `web/src/` is interpreted as module.
 
-To update `sell.py` after any change in the JavaScript code, and run `python3 build.py` in order to update variable `html` in file `sell.py`.
+To update `sell.py` after any change in the JavaScript code, and run `./build.sh` in order to update variable `html` in file `sell.py` as well as to rebuild the Python package.
 
 Structure of the repository:
 
@@ -371,3 +405,13 @@ Structure of the repository:
 - `web/` contains the front end, i.e. HTML/CSS/JavaScript code.
 - `web/index.html` is (a) used for testing; in this case, JavaScript code in path `web/src/` is loaded as module (b) used as template code for the final HTML insertion into `sell.py`
 - `web/build.js` is called by `build.py`. It uses `esbuild` to build and minify JavaScript code in path `web/src/`. Alternative build tools should also work without issues.
+
+### Core Dev Notes
+
+Update as follows:
+
+1. change the version number in `pyproject.toml`
+2. update `CHANGELOG`
+3. run `./build.sh`
+4. run `twine upload dist/*`
+5. commit the code and create a new release version for `https://github.com/andreas-schwenk/pysell/releases`

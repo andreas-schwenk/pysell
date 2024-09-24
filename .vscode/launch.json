@@ -6,7 +6,7 @@
       "type": "debugpy",
       "request": "launch",
       "program": "sell.py",
-      "args": ["-J", "examples/ex1.txt"],
+      "args": ["-J", "examples/ex2.txt"],
       "console": "integratedTerminal",
       "env": {
         "PYTHONPATH": "${workspaceFolder}"

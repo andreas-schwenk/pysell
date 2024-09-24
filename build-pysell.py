@@ -20,9 +20,9 @@ if __name__ == "__main__":
     # build web
     try:
         # install web dependencies
-        res = subprocess.run(["npm", "install"], cwd="web")
+        res = subprocess.run(["npm", "install"], cwd="web", check=False)
         # build web
-        res = subprocess.run(["node", "build.js"], cwd="web")
+        res = subprocess.run(["node", "build.js"], cwd="web", check=False)
     except Exception as e:
         print(e)
         print("pySELL dependencies: npm+nodejs")
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     # build html template and update sell.py
     with open("web/index.html", mode="r", encoding="utf-8") as f:
         index_html_lines = f.readlines()
-    with open("web/dist/sell.min.js", mode="r", encoding="utf-8") as f:
+    with open("web/dist/pysell.min.js", mode="r", encoding="utf-8") as f:
         js = f.read().strip()
     with open("sell.py", mode="r", encoding="utf-8") as f:
         sell_py_lines = f.readlines()
@@ -58,7 +58,7 @@ if __name__ == "__main__":
         "</body>",
         "<script>let debug = false; let quizSrc = {};"
         + js
-        + "sell.init(quizSrc,debug);</script></body>",
+        + "pysell.init(quizSrc,debug);</script></body>",
     )
 
     # update file "sell.py" between "# @begin(html" and "# @end(html)"
@@ -88,7 +88,9 @@ if __name__ == "__main__":
         f.write(py.strip() + "\n")
 
 # compile example
-res = subprocess.run(["python3", "sell.py", "-J", "examples/ex1.txt"], cwd=".")
+res = subprocess.run(
+    ["python3", "sell.py", "-J", "examples/ex1.txt"], cwd=".", check=False
+)
 
 # update example in docs/
-res = subprocess.run(["cp", "examples/ex1.html", "docs/"], cwd=".")
+res = subprocess.run(["cp", "examples/ex1.html", "docs/"], cwd=".", check=False)

@@ -1,4 +1,9 @@
 .DS_Store
+
+*.pyc
+build/lib/pysell/
+pysell.egg-info/
+
 web/node_modules/
 web/package-lock.json
 web/dist/

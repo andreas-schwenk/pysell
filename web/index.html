@@ -22,75 +22,120 @@
       crossorigin="anonymous"
     ></script>
     <style>
-      html {
-        font-family: Arial, Helvetica, sans-serif;
+      :root {
+        --grey: #5a5a5a;
+        --green: rgb(24, 82, 1);
+        --red: rgb(123, 0, 0);
       }
+      html,
       body {
-        max-width: 1024px;
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: white;
+      }
+      .contents {
+        max-width: 800px;
         margin-left: auto;
         margin-right: auto;
-        padding-left: 5px;
-        padding-right: 5px;
+        padding: 0;
       }
       h1 {
         text-align: center;
         font-size: 28pt;
         word-wrap: break-word;
+        margin-bottom: 10px;
+        user-select: none;
       }
       img {
         width: 100%;
         display: block;
         margin-left: auto;
         margin-right: auto;
+        user-select: none;
       }
       .author {
         text-align: center;
-        font-size: 18pt;
+        font-size: 16pt;
+        margin-bottom: 24px;
+        user-select: none;
       }
       .courseInfo {
-        font-size: 14pt;
-        font-style: italic;
-        /*margin-bottom: 24px;*/
         text-align: center;
+        user-select: none;
+      }
+      .footer {
+        position: relative;
+        bottom: 0;
+        font-size: small;
+        text-align: center;
+        line-height: 1.8;
+        color: var(--grey);
+        /*background-color: #2c2c2c;*/
+        margin: 0;
+        padding: 10px 10px;
+        user-select: none;
       }
       .question {
         position: relative; /* required for feedback overlays */
         color: black;
         background-color: white;
         border-style: solid;
-        border-radius: 5px;
         border-width: 3px;
         border-color: black;
-        padding: 8px;
-        margin-top: 20px;
-        margin-bottom: 20px;
-        -webkit-box-shadow: 4px 6px 8px -1px rgba(0, 0, 0, 0.93);
-        box-shadow: 4px 6px 8px -1px rgba(0, 0, 0, 0.1);
+        padding: 4px;
+        margin-top: 32px;
+        margin-bottom: 32px;
+        -webkit-box-shadow: 0px 0px 6px 3px #e8e8e8;
+        box-shadow: 0px 0px 6px 3px #e8e8e8;
         overflow-x: auto;
+        overflow-y: hidden;
       }
+      .button-group {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      @media (min-width: 800px) {
+        .question {
+          border-radius: 6px;
+          padding: 16px;
+          margin: 16px;
+        }
+      }
+
       .questionFeedback {
+        opacity: 1.8;
         z-index: 10;
         display: none;
         position: absolute;
         pointer-events: none;
-        left: 10%;
-        top: 33%;
-        width: 80%;
-        /*height: 100%;*/
+        left: 0%;
+        top: 0%;
+        width: 100%;
+        height: 100%;
         text-align: center;
-        font-size: 24pt;
-        text-shadow: 0px 0px 18px rgba(0, 0, 0, 0.33);
-        background-color: rgba(255, 255, 255, 1);
-        padding-top: 20px;
-        padding-bottom: 20px;
+        font-size: 4vw;
+        text-shadow: 0px 0px 18px rgba(0, 0, 0, 0.15);
+        background-color: rgba(255, 255, 255, 0.95);
+        padding: 10px;
+        justify-content: center;
+        align-items: center;
+        /*padding-top: 20px;
+        padding-bottom: 20px;*/
         /*border-style: solid;
         border-width: 4px;
-        border-color: rgb(200, 200, 200);*/
+        border-color: rgb(200, 200, 200);
         border-radius: 16px;
         -webkit-box-shadow: 0px 0px 18px 5px rgba(0, 0, 0, 0.66);
-        box-shadow: 0px 0px 18px 5px rgba(0, 0, 0, 0.66);
+        box-shadow: 0px 0px 18px 5px rgba(0, 0, 0, 0.66);*/
       }
       .questionTitle {
+        user-select: none;
         font-size: 24pt;
       }
       .code {
@@ -118,6 +163,7 @@
         color: rgb(64, 64, 64);
       }
       ul {
+        user-select: none;
         margin-top: 0;
         margin-left: 0px;
         padding-left: 20px;
@@ -153,7 +199,7 @@
         font-size: 12pt;
         color: white;
         text-align: start;
-        z-index: 20;
+        z-index: 100;
         opacity: 0.95;
       }
       .button {
@@ -168,11 +214,6 @@
         border-radius: 4px;
         height: 36px;
         cursor: pointer;
-      }
-      .buttonRow {
-        display: flex;
-        align-items: baseline;
-        margin-top: 12px;
       }
       .matrixResizeButton {
         width: 20px;
@@ -190,32 +231,122 @@
         color: black;
         text-decoration: underline;
       }
+      .timer {
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        padding: 5px 15px;
+        background-color: rgb(32, 32, 32);
+        color: white;
+        opacity: 0.4;
+        font-size: 32pt;
+        z-index: 1000;
+        /*margin: 2px;
+        border-radius: 10px;*/
+        border-bottom-right-radius: 10px;
+        text-align: center;
+        font-family: "Courier New", Courier, monospace;
+      }
+      .evalBtn {
+        text-align: center;
+      }
+      .eval {
+        text-align: center;
+        background-color: black;
+        color: white;
+        padding: 10px;
+      }
+      @media (min-width: 800px) {
+        .eval {
+          border-radius: 10px;
+        }
+      }
+      .timerInfo {
+        font-size: x-large;
+        text-align: center;
+        background-color: black;
+        color: white;
+        padding: 20px 10px;
+        user-select: none;
+      }
+      @media (min-width: 800px) {
+        .timerInfo {
+          border-radius: 6px;
+        }
+      }
     </style>
   </head>
   <body>
+    <div id="timer" class="timer">02:34</div>
     <h1 id="title"></h1>
+    <div style="margin-top: 15px"></div>
     <div class="author" id="author"></div>
     <p id="courseInfo1" class="courseInfo"></p>
     <p id="courseInfo2" class="courseInfo"></p>
     <h1 id="debug" class="debugCode" style="display: none">DEBUG VERSION</h1>
-    <div id="questions"></div>
-    <p style="font-size: 8pt; font-style: italic; text-align: center">
-      This quiz was created using
-      <a href="https://github.com/andreas-schwenk/pysell">pySELL</a>, the
-      <i>Python-based Simple E-Learning Language</i>, written by Andreas
-      Schwenk, GPLv3<br />
-      last update on
-      <span id="date"></span>
-    </p>
+
+    <br />
+
+    <div class="contents">
+      <div id="timer-info" class="timerInfo" style="display: none">
+        <span id="timer-info-text"></span>
+        <br /><br />
+        <button
+          id="start-btn"
+          class="button"
+          style="background-color: var(--green); font-size: x-large"
+        >
+          Start
+        </button>
+      </div>
+
+      <div id="questions"></div>
+
+      <div id="stop-now" class="evalBtn" style="display: none">
+        <button
+          id="stop-now-btn"
+          class="button"
+          style="background-color: var(--green)"
+        >
+          jetzt auswerten (TODO: translate)
+        </button>
+      </div>
+      <br />
+      <div id="questions-eval" class="eval" style="display: none">
+        <h1 id="questions-eval-percentage">0 %</h1>
+      </div>
+    </div>
+
+    <br /><br /><br /><br />
+
+    <div class="footer">
+      <div class="contents">
+        <span id="date"></span> &mdash; This quiz was developed using pySELL, a
+        Python-based Simple E-Learning Language &mdash;
+        <a href="https://pysell.org" style="color: var(--grey)"
+          >https://pysell.org</a
+        >
+        <br />
+        <span style="width: 64px">
+          <img
+            style="max-width: 48px; padding: 16px 0px"
+            src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPCEtLSBDcmVhdGVkIHdpdGggSW5rc2NhcGUgKGh0dHA6Ly93d3cuaW5rc2NhcGUub3JnLykgLS0+Cjxzdmcgd2lkdGg9IjEwMG1tIiBoZWlnaHQ9IjEwMG1tIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4KIDxkZWZzPgogIDxsaW5lYXJHcmFkaWVudCBpZD0ibGluZWFyR3JhZGllbnQzNjU4IiB4MT0iMjguNTI3IiB4Mj0iMTI4LjUzIiB5MT0iNzkuNjQ4IiB5Mj0iNzkuNjQ4IiBncmFkaWVudFRyYW5zZm9ybT0ibWF0cml4KDEuMDE2MSAwIDAgMS4wMTYxIC0yOS43OSAtMzAuOTI4KSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgogICA8c3RvcCBzdG9wLWNvbG9yPSIjNTkwMDVlIiBvZmZzZXQ9IjAiLz4KICAgPHN0b3Agc3RvcC1jb2xvcj0iI2FkMDA3ZiIgb2Zmc2V0PSIxIi8+CiAgPC9saW5lYXJHcmFkaWVudD4KIDwvZGVmcz4KIDxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiByeT0iMCIgZmlsbD0idXJsKCNsaW5lYXJHcmFkaWVudDM2NTgpIi8+CiA8ZyBmaWxsPSIjZmZmIj4KICA8ZyB0cmFuc2Zvcm09Im1hdHJpeCguNDA3NDMgMCAwIC40MDc0MyAtNDIuODQyIC0zNi4xMzYpIiBzdHJva2Utd2lkdGg9IjMuNzc5NSIgc3R5bGU9InNoYXBlLWluc2lkZTp1cmwoI3JlY3Q5NTItNyk7c2hhcGUtcGFkZGluZzo2LjUzMTQ0O3doaXRlLXNwYWNlOnByZSIgYXJpYS1sYWJlbD0iU0VMTCI+CiAgIDxwYXRoIGQ9Im0xNzEuMDEgMjM4LjM5cS0yLjExMi0yLjY4OC01LjU2OC00LjIyNC0zLjM2LTEuNjMyLTYuNTI4LTEuNjMyLTEuNjMyIDAtMy4zNiAwLjI4OC0xLjYzMiAwLjI4OC0yLjk3NiAxLjE1Mi0xLjM0NCAwLjc2OC0yLjMwNCAyLjExMi0wLjg2NCAxLjI0OC0wLjg2NCAzLjI2NCAwIDEuNzI4IDAuNjcyIDIuODggMC43NjggMS4xNTIgMi4xMTIgMi4wMTYgMS40NCAwLjg2NCAzLjM2IDEuNjMyIDEuOTIgMC42NzIgNC4zMiAxLjQ0IDMuNDU2IDEuMTUyIDcuMiAyLjU5MiAzLjc0NCAxLjM0NCA2LjgxNiAzLjY0OHQ1LjA4OCA1Ljc2cTIuMDE2IDMuMzYgMi4wMTYgOC40NDggMCA1Ljg1Ni0yLjIwOCAxMC4xNzYtMi4xMTIgNC4yMjQtNS43NiA3LjAwOHQtOC4zNTIgNC4xMjgtOS42OTYgMS4zNDRxLTcuMjk2IDAtMTQuMTEyLTIuNDk2LTYuODE2LTIuNTkyLTExLjMyOC03LjI5NmwxMC43NTItMTAuOTQ0cTIuNDk2IDMuMDcyIDYuNTI4IDUuMTg0IDQuMTI4IDIuMDE2IDguMTYgMi4wMTYgMS44MjQgMCAzLjU1Mi0wLjM4NHQyLjk3Ni0xLjI0OHExLjM0NC0wLjg2NCAyLjExMi0yLjMwNHQwLjc2OC0zLjQ1NnEwLTEuOTItMC45Ni0zLjI2NHQtMi43ODQtMi40cS0xLjcyOC0xLjE1Mi00LjQxNi0yLjAxNi0yLjU5Mi0wLjk2LTUuOTUyLTIuMDE2LTMuMjY0LTEuMDU2LTYuNDMyLTIuNDk2LTMuMDcyLTEuNDQtNS41NjgtMy42NDgtMi40LTIuMzA0LTMuOTM2LTUuNDcyLTEuNDQtMy4yNjQtMS40NC03Ljg3MiAwLTUuNjY0IDIuMzA0LTkuNjk2dDYuMDQ4LTYuNjI0IDguNDQ4LTMuNzQ0cTQuNzA0LTEuMjQ4IDkuNTA0LTEuMjQ4IDUuNzYgMCAxMS43MTIgMi4xMTIgNi4wNDggMi4xMTIgMTAuNTYgNi4yNHoiLz4KICAgPHBhdGggZD0ibTE5MS44NCAyODguN3YtNjcuOTY4aDUyLjE5bC0xLjI5ODggMTMuOTJoLTM1LjA1MXYxMi43NjhoMzMuNDE5bC0xLjI5ODggMTMuMTUyaC0zMi4xMnYxNC4xMTJoMzEuNTg0bC0xLjI5ODggMTQuMDE2eiIvPgogIDwvZz4KICA8ZyB0cmFuc2Zvcm09Im1hdHJpeCguNDA3NDMgMCAwIC40MDc0MyAtNDAuMTY4IC03OC4wODIpIiBzdHJva2Utd2lkdGg9IjMuNzc5NSIgc3R5bGU9InNoYXBlLWluc2lkZTp1cmwoI3JlY3Q5NTItOS05KTtzaGFwZS1wYWRkaW5nOjYuNTMxNDQ7d2hpdGUtc3BhY2U6cHJlIiBhcmlhLWxhYmVsPSJweSI+CiAgIDxwYXRoIGQ9Im0xODcuNDMgMjY0LjZxMCA0Ljk5Mi0xLjUzNiA5LjZ0LTQuNTEyIDguMTZxLTIuODggMy40NTYtNy4xMDQgNS41Njh0LTkuNiAyLjExMnEtNC40MTYgMC04LjM1Mi0xLjcyOC0zLjkzNi0xLjgyNC02LjE0NC00Ljg5NmgtMC4xOTJ2MjguMzJoLTE1Ljc0NHYtNzAuODQ4aDE0Ljk3NnY1Ljg1NmgwLjI4OHEyLjIwOC0yLjg4IDYuMDQ4LTQuOTkyIDMuOTM2LTIuMjA4IDkuMjE2LTIuMjA4IDUuMTg0IDAgOS40MDggMi4wMTZ0Ny4xMDQgNS40NzJxMi45NzYgMy40NTYgNC41MTIgOC4wNjQgMS42MzIgNC41MTIgMS42MzIgOS41MDR6bS0xNS4yNjQgMHEwLTIuMzA0LTAuNzY4LTQuNTEyLTAuNjcyLTIuMjA4LTIuMTEyLTMuODQtMS4zNDQtMS43MjgtMy40NTYtMi43ODR0LTQuODk2LTEuMDU2cS0yLjY4OCAwLTQuOCAxLjA1NnQtMy42NDggMi43ODRxLTEuNDQgMS43MjgtMi4zMDQgMy45MzYtMC43NjggMi4yMDgtMC43NjggNC41MTJ0MC43NjggNC41MTJxMC44NjQgMi4yMDggMi4zMDQgMy45MzYgMS41MzYgMS43MjggMy42NDggMi43ODR0NC44IDEuMDU2cTIuNzg0IDAgNC44OTYtMS4wNTZ0My40NTYtMi43ODRxMS40NC0xLjcyOCAyLjExMi0zLjkzNiAwLjc2OC0yLjMwNCAwLjc2OC00LjYwOHoiLz4KICAgPHBhdGggZD0ibTIyNC4yOSAyOTUuOXEtMS40NCAzLjc0NC0zLjI2NCA2LjYyNC0xLjcyOCAyLjk3Ni00LjIyNCA0Ljk5Mi0yLjQgMi4xMTItNS43NiAzLjE2OC0zLjI2NCAxLjA1Ni03Ljc3NiAxLjA1Ni0yLjIwOCAwLTQuNjA4LTAuMjg4LTIuMzA0LTAuMjg4LTQuMDMyLTAuNzY4bDEuNzI4LTEzLjI0OHExLjE1MiAwLjM4NCAyLjQ5NiAwLjU3NiAxLjQ0IDAuMjg4IDIuNTkyIDAuMjg4IDMuNjQ4IDAgNS4yOC0xLjcyOCAxLjYzMi0xLjYzMiAyLjc4NC00LjcwNGwxLjUzNi0zLjkzNi0xOS45NjgtNDcuMDRoMTcuNDcybDEwLjY1NiAzMC43MmgwLjI4OGw5LjUwNC0zMC43MmgxNi43MDR6Ii8+CiAgPC9nPgogIDxwYXRoIGQ9Im02OC4wOTYgMTUuNzc1aDcuODAyOWwtOC45ODU0IDY5Ljc5MWgtNy44MDN6IiBzdHJva2Utd2lkdGg9IjEuMTE3NiIvPgogIDxwYXRoIGQ9Im04My44NTMgMTUuNzQ4aDcuODAzbC04Ljk4NTQgNjkuNzkxaC03LjgwM3oiIHN0cm9rZS13aWR0aD0iMS4xMTc2Ii8+CiA8L2c+Cjwvc3ZnPgo="
+          />
+        </span>
+        <span id="data-policy"></span>
+      </div>
+    </div>
+
     <!-- @begin(test) -->
     <script type="module">
       import { init } from "./src/index.js";
       // create json file via
       //   python3 sell.py -J examples/ex1.txt
-      fetch("../examples/ex1.json?v=" + Date.now())
+      fetch("../examples/ex2.json?v=" + Date.now())
         .then((data) => data.json())
         .then((quizSrc) => {
-          let debug = true;
+          let debug = false; // !!!TODO: was true
           init(quizSrc, debug);
         });
     </script>

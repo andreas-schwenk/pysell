@@ -1,0 +1,26 @@
+LANG    en
+TITLE   pySELL demo with time limit
+AUTHOR  Andreas Schwenk
+
+
+TIMER   30     # all questions will be evaluated when the timer runs out.
+
+
+QUESTION Addition      # student earns 1 points per default
+"""
+import random
+x = random.randint(-10, 10)
+y = random.randint(1, 10)
+z = x + y
+"""
+Calculate $x + y =$ %z
+
+
+QUESTION Multiplication (2 pts)      # student earns 2 points
+"""
+import random
+x = random.randint(-10, 10)
+y = random.randint(1, 10)
+z = x * y
+"""
+Calculate $x \cdot y =$ %z
