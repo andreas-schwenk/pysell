@@ -1,6 +1,6 @@
 # pySELL
 
-<img src="img/logo.jpg" width="128" height="128"/>
+<img src="https://raw.githubusercontent.com/andreas-schwenk/pysell/refs/heads/main/img/logo.jpg" width="128" height="128"/>
 
 `pySELL` is a Python-based Simple E-Learning Language designed for the rapid creation of interactive STEM quizzes, with a focus on randomized math questions.
 
@@ -16,13 +16,27 @@ If you are using `pySELL` in one of your (university) classes, I would love to h
 
 As a member of the Free Software Foundation (FSF), I have decided to publish `pySELL` as free and open-source software under the `GPLv3` license.
 
-![](docs/example.jpg)
+![](https://raw.githubusercontent.com/andreas-schwenk/pysell/refs/heads/main/img/example.jpg)
 
 ## User Guide
 
-Download the file [`sell.py`](https://raw.githubusercontent.com/andreas-schwenk/pysell/main/sell.py) from this repository. This is the only file required; all other files are used for the development of `pySELL`.
+To install the `pySELL` package from [https://pypi.org/project/pysell/](https://pypi.org/project/pysell/), simply run the following command:
 
-Run `python3 sell.py FILENAME.txt` to generate a self-contained quiz website `FILENAME.html` from the sources in `FILENAME.txt`. An example is provided below, with more examples available in the `examples/` directory.
+```bash
+pip install pysell
+```
+
+If you've already installed `pySELL`, you can update it to the latest version with the following command:
+
+```bash
+pip install --upgrade pysell
+```
+
+Run the following command to generate a self-contained quiz website `FILENAME.html` from the sources in `FILENAME.txt`. An example is provided below, with more examples available in the `examples/` directory.
+
+```bash
+pysell FILENAME.txt
+```
 
 Additionally, a file `FILENAME_debug.html` is created for debugging purposes. The debug output differs from the release files in the following aspects:
 
@@ -32,9 +46,22 @@ Additionally, a file `FILENAME_debug.html` is created for debugging purposes. Th
 - Python and text sources are displayed with syntax highlighting
 - Line numbers from the source file are shown for each exercise
 
-If you would like to use `SageMath` in your code, run `sage -python sell.py FILENAME.txt`.
+If you would like to use `SageMath` in your code, run the following commands for installation and usage:
 
-_A short developer guide can be found at the end of this document._
+```bash
+sage -pip install pysell
+sage -python -m pysell FILENAME.txt
+```
+
+### Using the Portable Version of pySELL Without Installation
+
+Alternatively, if you'd prefer not to use a package manager, you can directly download the stand-alone file [`sell.py`](https://raw.githubusercontent.com/andreas-schwenk/pysell/main/sell.py) from the repository. This is the only file required; all other files are used for the development of `pySELL`.
+
+Usage example:
+
+```bash
+python3 sell.py FILENAME.txt
+```
 
 ## Dependencies
 
@@ -49,7 +76,7 @@ The following example code generates some questions, as can be seen in the figur
 **Command:**
 
 ```bash
-python3 sell.py examples/ex1.txt
+pysell examples/ex1.txt
 ```
 
 Files `ex1.html` and `ex1_DEBUG.html` will be generated. The latter file shows the sample solution.
@@ -307,7 +334,7 @@ A[0,0] = sin(x) * cos(y)
 
 Elements can also be terms.
 
-#### Excluding the zero
+#### Exclude the zero
 
 In some cases, it may be beneficial to exclude the zero from random number generation. For example, a numerical question would be too easy to solve, if zero is drawn for a variable.
 
