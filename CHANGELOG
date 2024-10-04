@@ -1,3 +1,11 @@
+# v1.3.4
+
+- configure custom course info via `INFO`
+
+# v1.3.3
+
+- fixed a bug, where no title for a question is given
+
 # v1.3.2
 
 - removed left and right borders in question box on mobile devices

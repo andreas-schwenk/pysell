@@ -1,6 +1,6 @@
-# TODO: TIMER, PTS in README.md
 
 # TODO: CSS: all-camel case or hyphens
+
 # TODO: show points in exercises
 
 # TODO: variables with negative values -> auto-parentheses

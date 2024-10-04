@@ -281,7 +281,7 @@
     </style>
   </head>
   <body>
-    <div id="timer" class="timer">02:34</div>
+    <div id="timer" class="timer">99:99</div>
     <h1 id="title"></h1>
     <div style="margin-top: 15px"></div>
     <div class="author" id="author"></div>
@@ -312,7 +312,7 @@
           class="button"
           style="background-color: var(--green)"
         >
-          jetzt auswerten (TODO: translate)
+          jetzt auswerten
         </button>
       </div>
       <br />
@@ -349,7 +349,7 @@
       fetch("../examples/ex2.json?v=" + Date.now())
         .then((data) => data.json())
         .then((quizSrc) => {
-          let debug = false; // !!!TODO: was true
+          let debug = true; // !!!TODO: was true
           init(quizSrc, debug);
         });
     </script>

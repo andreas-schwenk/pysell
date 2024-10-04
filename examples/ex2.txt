@@ -1,6 +1,7 @@
 LANG    en
 TITLE   pySELL demo with time limit
 AUTHOR  Andreas Schwenk
+INFO    My custom information, displayed at the top of the page.
 
 
 TIMER   30     # all questions will be evaluated when the timer runs out.

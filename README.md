@@ -186,11 +186,11 @@ z = x * y
 Calculate $x \cdot y =$ %z
 ```
 
+![](https://raw.githubusercontent.com/andreas-schwenk/pysell/refs/heads/main/img/example2.jpg)
+
 ## Syntax
 
 This section describes the syntax of `pySELL`. Many aspects are self-explanatory and can be understood from the [example file](https://github.com/andreas-schwenk/pysell/blob/main/examples/ex1.txt).
-
-![](https://raw.githubusercontent.com/andreas-schwenk/pysell/refs/heads/main/img/example2.jpg)
 
 ### Global
 
@@ -200,7 +200,7 @@ This section describes the syntax of `pySELL`. Many aspects are self-explanatory
 
 - `AUTHOR` defines the author or institution of the quizzes. You may include HTML code, but everything must be written on the same line where the author keyword starts.
 
-- `QUESTION` marks the beginning of a new question. The title of the question should be written on the same line.
+- `QUESTION` indicates the start of a new question, with its title specified on the same line. By default, each correctly answered question earns the student one point. To specify a different point value, include the desired points in parentheses, such as `(X pts)`, where `X` is the number of points. For example: `QUESTION Turing Machine (3 pts)`
 
 - `TIMER` restricts the time students have to complete the quiz page. The time, specified in seconds, is written after a space.
 

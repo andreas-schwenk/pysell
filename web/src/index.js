@@ -83,15 +83,22 @@ export class Quiz {
     document.getElementById("date").innerHTML = this.quizSrc.date;
     document.getElementById("title").innerHTML = this.quizSrc.title;
     document.getElementById("author").innerHTML = this.quizSrc.author;
-    document.getElementById("courseInfo1").innerHTML =
-      courseInfo1[this.quizSrc.lang];
-    let reload =
-      '<span onclick="location.reload()" style="text-decoration: none; font-weight: bold; cursor: pointer">' +
-      courseInfo3[this.quizSrc.lang] +
-      "</span>";
-    document.getElementById("courseInfo2").innerHTML = courseInfo2[
-      this.quizSrc.lang
-    ].replace("*", reload);
+
+    if (this.quizSrc.info.length > 0) {
+      // custom info
+      document.getElementById("courseInfo1").innerHTML = this.quizSrc.info;
+    } else {
+      // default info
+      document.getElementById("courseInfo1").innerHTML =
+        courseInfo1[this.quizSrc.lang];
+      let reload =
+        '<span onclick="location.reload()" style="text-decoration: none; font-weight: bold; cursor: pointer">' +
+        courseInfo3[this.quizSrc.lang] +
+        "</span>";
+      document.getElementById("courseInfo2").innerHTML = courseInfo2[
+        this.quizSrc.lang
+      ].replace("*", reload);
+    }
 
     document.getElementById("data-policy").innerHTML =
       dataPolicy[this.quizSrc.lang];
