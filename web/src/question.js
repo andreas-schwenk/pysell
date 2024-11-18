@@ -231,7 +231,7 @@ export class Question {
       this.checkAndRepeatBtn.innerHTML = iconCheck;
       this.checkAndRepeatBtn.style.backgroundColor = "black";
       if (hideCheckBtn) {
-        this.checkAndRepeatBtn.style.height = "0";
+        this.checkAndRepeatBtn.style.height = "32px";
         this.checkAndRepeatBtn.style.visibility = "hidden";
       }
     }

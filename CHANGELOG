@@ -1,3 +1,7 @@
+# v1.3.5
+
+- The equation preview in input fields is now consistently visible, even when the evaluate button is not present
+
 # v1.3.4
 
 - configure custom course info via `INFO`
