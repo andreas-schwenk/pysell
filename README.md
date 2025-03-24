@@ -2,7 +2,7 @@
 
 <img src="https://raw.githubusercontent.com/andreas-schwenk/pysell/refs/heads/main/img/logo.jpg" width="128" height="128"/>
 
-**WELCOME! CHECK OUT THE DEMO SITE [HERE](https://andreas-schwenk.github.io/pysell/ex1.html).**
+**WELCOME! VISIT THE WEBSITE [https://pysell.org](https://pysell.org) FOR EXAMPLES AND GUIDES.**
 
 `pySELL` is a Python-based Simple E-Learning Language designed for the rapid creation of interactive STEM quizzes, with a focus on randomized math questions.
 
@@ -14,7 +14,7 @@ Student answers are not stored on servers, ensuring that `pySELL` quizzes provid
 
 Teachers benefit from a simple-to-learn syntax. With some practice, even sophisticated questions can be generated with minimal time investment.
 
-If you are using `pySELL` in one of your (university) classes, I would love to hear about it! Please send feedback, bug reports, or feature requests to `contact@compiler-construction.com`.
+If you are using `pySELL` in one of your (university) classes, I would love to hear about it! Please send feedback, bug reports, or feature requests to [contact@compiler-construction.com](mailto:contact@compiler-construction.com).
 
 As a member of the Free Software Foundation (FSF), I have decided to publish `pySELL` as free and open-source software under the `GPLv3` license.
 
@@ -408,7 +408,7 @@ Structure of the repository:
 - `web/index.html` is (a) used for testing; in this case, JavaScript code in path `web/src/` is loaded as module (b) used as template code for the final HTML insertion into `sell.py`
 - `web/build.js` is called by `build.py`. It uses `esbuild` to build and minify JavaScript code in path `web/src/`. Alternative build tools should also work without issues.
 
-### Core Dev Notes
+### Dev Notes for pySELL-Maintainers
 
 Update as follows:
 
