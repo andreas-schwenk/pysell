@@ -204,7 +204,8 @@ This section describes the syntax of `pySELL`. Many aspects are self-explanatory
 
 - `TIMER` restricts the time students have to complete the quiz page. The time, specified in seconds, is written after a space.
 
-- `#` introduces a comment, i.e., text that is not considered by the compiler.
+- `##` introduces a comment, i.e., text that is not considered by the compiler (Inside of Python code, a single hashtag is
+  used for comments).
 
 ### Questions
 

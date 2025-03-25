@@ -289,38 +289,6 @@ class TextNode:
             for child in self.children:
                 child.parse()
 
-        elif False and self.type == "root":
-            # TODO: remove this old src
-            self.children = [TextNode(" ", "")]
-            lines = self.data.split("\n")
-            self.data = ""
-            for line in lines:
-                line = line.strip()
-                if len(line) == 0:
-                    continue
-                type_ = line[0]  # refer to "types" below
-                if type_ not in "[(-!":
-                    type_ = " "
-                if type_ != self.children[-1].type:
-                    self.children.append(TextNode(type_, ""))
-                self.children[-1].type = type_
-                self.children[-1].data += line + "\n"
-                if line.endswith("\\\\"):
-                    # line break
-                    # TODO: this is NOT allowed, if we are within math mode!!
-                    self.children[-1].data = self.children[-1].data[:-3] + "\n"
-                    self.children.append(TextNode(" ", ""))
-            types = {
-                " ": "paragraph",
-                "(": "single-choice",
-                "[": "multi-choice",
-                "-": "itemize",
-                "!": "command",
-            }
-            for child in self.children:
-                child.type = types[child.type]
-                child.parse()
-
         elif self.type in ("multi-choice", "single-choice"):
             options = self.data.strip().split("\n")
             self.data = ""
@@ -909,6 +877,7 @@ class Question:
         return html
 
 
+# pylint: disable-next=too-many-branches,too-many-locals
 def compile_input_file(input_dirname: str, src: str) -> dict:
     """compiles a SELL input file to JSON"""
     lang = "en"  # language
@@ -922,7 +891,7 @@ def compile_input_file(input_dirname: str, src: str) -> dict:
     parsing_python = False
     lines = src.split("\n")
     for line_no, line in enumerate(lines):
-        line = line.split("#")[0]  # remove comments
+        line = line.split("##")[0]  # remove comments
         line_not_stripped = line
         line = line.strip()
         if len(line) == 0:
